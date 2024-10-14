@@ -28,6 +28,6 @@ flutter:
   fonts:
     - family: Comfortaa
       fonts:
-       - asset: lib/fonts/Comfortaa-Regular.ttf
+       - asset: lib/assets/fonts/Comfortaa-Regular.ttf
 
 
