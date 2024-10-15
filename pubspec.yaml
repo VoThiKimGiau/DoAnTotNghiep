@@ -25,6 +25,7 @@ flutter:
     - lib/assets/icons/order.svg
     - lib/assets/icons/ic_user.svg
     - lib/assets/icons/bell.png
+    - lib/assets/icons/order.png
   fonts:
     - family: Comfortaa
       fonts:
