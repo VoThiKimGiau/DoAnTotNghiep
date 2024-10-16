@@ -7,7 +7,7 @@ import 'ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietDonHangController.dart';
 
 class OrderListScreen extends StatefulWidget {
-  final String maKH; // Thêm tham số để truyền mã khách hàng
+  final String maKH;
 
   const OrderListScreen({required this.maKH, Key? key}) : super(key: key);
 
@@ -21,7 +21,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   void initState() {
     super.initState();
-    // Khởi tạo futureDonHangs với hàm fetchDonHang
     futureDonHangs = DonHangController().fetchDonHang(widget.maKH);
   }
 
@@ -33,14 +32,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Đơn hàng'),
+        title: Text(
+          'Đơn hàng',
+          style: TextStyle(
+            fontSize: 25,
+            color: Colors.black,
+            fontFamily: 'Comfortaa',
+          ),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-        ),
       ),
       body: FutureBuilder<List<DonHang>>(
         future: futureDonHangs,
@@ -48,92 +50,86 @@ class _OrderListScreenState extends State<OrderListScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Có lỗi xảy ra: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Có lỗi xảy ra: ${snapshot.error}',
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('Không có đơn hàng nào.'));
+            return Center(
+              child: Text(
+                'Không có đơn hàng nào.',
+                style: TextStyle(fontSize: 18, fontFamily: 'Comfortaa'),
+              ),
+            );
           }
 
           List<DonHang> donHangs = snapshot.data!;
 
-          return ListView.builder(
+          return ListView.separated(
             itemCount: donHangs.length,
+            separatorBuilder: (context, index) => Divider(height: 1),
             itemBuilder: (context, index) {
               final donHang = donHangs[index];
 
               return FutureBuilder<int>(
-                future: _fetchProductCount(donHang.maDH), // Gọi hàm để lấy số lượng sản phẩm
+                future: _fetchProductCount(donHang.maDH),
                 builder: (context, productCountSnapshot) {
                   if (productCountSnapshot.connectionState == ConnectionState.waiting) {
-                    return ListTile(
-                      title: Text('Đơn hàng: ${donHang.maDH}'),
-                      subtitle: Text('Đang lấy số lượng sản phẩm...'),
-                    );
+                    return _buildOrderTile(donHang, 'Đang lấy số lượng sản phẩm...', null);
                   } else if (productCountSnapshot.hasError) {
-                    return ListTile(
-                      title: Text('Đơn hàng: ${donHang.maDH}'),
-                      subtitle: Text('Có lỗi xảy ra: ${productCountSnapshot.error}'),
-                    );
+                    return _buildOrderTile(donHang, 'Có lỗi xảy ra', null);
                   }
 
-                  int productCount = productCountSnapshot.data ?? 0; // Lấy số lượng sản phẩm
-
-                  // Tạo UI cho từng đơn hàng
-                  return ListTile(
-                    contentPadding: EdgeInsets.all(16.0), // Padding inside the card
-                    title: Row(
-                      children: [
-                        SvgPicture.asset(
-                          'lib/assets/icons/order.svg',
-                          width: 24,
-                          height: 24,
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Đơn hàng: ${donHang.maDH}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontFamily: 'Comfortaa',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Số lượng sản phẩm: $productCount',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Comfortaa',
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 24,
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailScreen(maDH: donHang.maDH),
-                        ),
-                      );
-                    },
-                  );
+                  int productCount = productCountSnapshot.data ?? 0;
+                  return _buildOrderTile(donHang, 'Số lượng sản phẩm: $productCount', productCount);
                 },
               );
             },
           );
         },
       ),
+    );
+  }
+
+  Widget _buildOrderTile(DonHang donHang, String subtitle, int? productCount) {
+    return ListTile(
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      leading: SvgPicture.asset(
+        'lib/assets/icons/order.svg',
+        width: 32,
+        height: 32,
+        color: Colors.blue,
+      ),
+      title: Text(
+        'Đơn hàng: ${donHang.maDH}',
+        style: TextStyle(
+          fontSize: 22, // Updated text size for ListTile title
+          fontFamily: 'Comfortaa',
+          color: Colors.black87,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          fontSize: 20, // Updated text size for ListTile subtitle
+          fontFamily: 'Comfortaa',
+          color: Colors.grey[700],
+        ),
+      ),
+      trailing: Icon(Icons.arrow_forward_ios, size: 20, color: Colors.blue),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderDetailScreen(
+              donHang: donHang,
+              productCount: productCount ?? 0,
+            ),
+          ),
+        );
+      },
     );
   }
 }

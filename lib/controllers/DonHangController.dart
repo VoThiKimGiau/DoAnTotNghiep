@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/IpConfig.dart';
 import '../models/DonHang.dart';
 
 class DonHangController {
   Future<List<DonHang>> fetchDonHang(String maKH) async {
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8080/api/donhang/byCustomer?maKH=$maKH'),
+      Uri.parse('http://${IpConfig.ipConfig}/api/donhang/byCustomer?maKH=$maKH'),
     );
 
     if (response.statusCode == 200) {

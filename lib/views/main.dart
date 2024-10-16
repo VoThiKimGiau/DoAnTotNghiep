@@ -1,8 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart'; // Make sure to import the bottom nav bar
+import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 
+import 'CaiDat/ProfileScreen.dart';
 import 'ThongBao/ThongBao.dart';
 import 'DonHang/DonHang.dart';
 void main() {
@@ -27,27 +27,18 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class ProfileScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Profile Screen'),
-    );
-  }
-}
-
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     NotificationScreen(),
     OrderListScreen(maKH:"KH1"),
-    ProfileScreen()
+    ProfileScreen(makh: "KH1",)
   ];
 
   void _onItemTapped(int index) {
