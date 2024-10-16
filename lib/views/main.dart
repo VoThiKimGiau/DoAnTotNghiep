@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart'; // Make sure to import the bottom nav bar
+
 import 'ThongBao/ThongBao.dart';
 import 'DonHang/DonHang.dart';
 void main() {
+
   runApp(MyApp());
 }
 
@@ -38,12 +42,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 1; // Set default to Notifications
-
+  int _selectedIndex = 1;
   static final List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
     NotificationScreen(),
-    OrderListScreen(),
+    OrderListScreen(maKH:"KH1"),
     ProfileScreen()
   ];
 
