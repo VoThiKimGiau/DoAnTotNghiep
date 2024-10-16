@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:datn_cntt304_bandogiadung/assets/colors/color.dart';
+import '/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/DanhSachSanPham.dart';

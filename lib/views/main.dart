@@ -5,6 +5,8 @@ import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 import 'CaiDat/ProfileScreen.dart';
 import 'ThongBao/ThongBao.dart';
 import 'DonHang/DonHang.dart';
+import 'DangNhap/WelcomeScreen.dart';
+
 void main() {
 
   runApp(MyApp());
@@ -14,7 +16,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: MainScreen(),
+      theme: ThemeData(
+        fontFamily: 'Comfortaa',
+      ),
+      home: SafeArea(
+          child: Scaffold(
+            body: WelcomeScreen(),
+          )
+      ),
     );
   }
 }
