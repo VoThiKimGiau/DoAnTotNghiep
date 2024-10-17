@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 
 import 'CaiDat/ProfileScreen.dart';
+import 'ThongBao/DanhSachTB.dart';
 import 'ThongBao/ThongBao.dart';
 import 'DonHang/DonHang.dart';
 import 'DangNhap/WelcomeScreen.dart';
@@ -45,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
     HomeScreen(),
-    NotificationScreen(),
+    NotificationScreen(maKhachHang: "KH1"),
     OrderListScreen(maKH:"KH1"),
     ProfileScreen(makh: "KH1",)
   ];
