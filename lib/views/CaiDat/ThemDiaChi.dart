@@ -1,5 +1,7 @@
-import 'package:datn_cntt304_bandogiadung/assets/colors/color.dart';
+
 import 'package:flutter/material.dart';
+
+import '../../colors/color.dart';
 
 void main() {
   runApp(MyApp());
