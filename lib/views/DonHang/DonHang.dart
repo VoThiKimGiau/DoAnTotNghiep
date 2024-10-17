@@ -97,7 +97,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       leading: SvgPicture.asset(
-        'lib/assets/icons/order.svg',
+        'assets/icons/order.svg',
         width: 32,
         height: 32,
         color: Colors.blue,
