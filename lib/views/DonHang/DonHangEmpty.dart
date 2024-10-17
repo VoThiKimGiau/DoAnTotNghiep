@@ -30,7 +30,7 @@ class OrderEmptyScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('lib/assets/icons/order.png'),
+            Image.asset('assets/icons/order.png'),
             SizedBox(height: 16),
             Text(
               'Tạm thời không có đơn hàng',

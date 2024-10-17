@@ -3,7 +3,10 @@ import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/RegeneratePassword.dart';
 import 'package:flutter/material.dart';
 
+import '../../controllers/TaiKhoanController.dart';
+
 class FogotPassword extends StatelessWidget{
+  final TaiKhoanController controller = TaiKhoanController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -24,7 +27,7 @@ class FogotPassword extends StatelessWidget{
                   onPressed: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen())
+                        MaterialPageRoute(builder: (context) => LoginScreen(controller: controller)),
                     );
                   },
                   icon: const Icon(Icons.arrow_back_ios_new),

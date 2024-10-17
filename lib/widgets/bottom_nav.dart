@@ -27,20 +27,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
       onTap: widget.onItemTapped,
       items: [
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('lib/assets/icons/home.svg', color: widget.selectedIndex == 0 ? selectedIconColor : unselectedIconColor,),
+          icon: SvgPicture.asset('assets/icons/home.svg', color: widget.selectedIndex == 0 ? selectedIconColor : unselectedIconColor,),
           label: '',
 
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('lib/assets/icons/notification.svg' ,color: widget.selectedIndex == 1 ? selectedIconColor : unselectedIconColor,),
+          icon: SvgPicture.asset('assets/icons/notification.svg' ,color: widget.selectedIndex == 1 ? selectedIconColor : unselectedIconColor,),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('lib/assets/icons/order.svg', color: widget.selectedIndex == 2 ? selectedIconColor : unselectedIconColor,),
+          icon: SvgPicture.asset('assets/icons/order.svg', color: widget.selectedIndex == 2 ? selectedIconColor : unselectedIconColor,),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset('lib/assets/icons/ic_user.svg', color: widget.selectedIndex == 3 ? selectedIconColor : unselectedIconColor,),
+          icon: SvgPicture.asset('assets/icons/ic_user.svg', color: widget.selectedIndex == 3 ? selectedIconColor : unselectedIconColor,),
           label: '',
         ),
       ],

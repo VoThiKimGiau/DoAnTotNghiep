@@ -2,7 +2,11 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../../controllers/TaiKhoanController.dart';
+
 class RegisterScreen extends StatelessWidget {
+  final TaiKhoanController controller = TaiKhoanController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -23,14 +27,20 @@ class RegisterScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginScreen())
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            LoginScreen(controller: controller)),
                   );
                 },
                 icon: const Icon(Icons.arrow_back_ios_new),
                 label: const SizedBox.shrink(),
               ),
             ),
-            const Center(child: Text('Tạo tài khoản', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),)),
+            const Center(
+                child: Text(
+              'Tạo tài khoản',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            )),
             Container(
               height: 350,
               margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
@@ -77,28 +87,28 @@ class RegisterScreen extends StatelessWidget {
             ),
             Expanded(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 40.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 342.0,
-                        child: ElevatedButton(
-                            onPressed: (){
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginScreen()));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Tạo tài khoản')
+              margin: const EdgeInsets.only(top: 40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 342.0,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginScreen(controller: controller)));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                          foregroundColor: Colors.white,
                         ),
-                      )
-                    ],
-                  ),
-                ))
+                        child: const Text('Tạo tài khoản')),
+                  )
+                ],
+              ),
+            ))
           ],
         ),
       ),

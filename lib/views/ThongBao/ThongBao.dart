@@ -19,7 +19,7 @@ class NotificationScreenEmpty extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('lib/assets/icons/bell.png'),
+            Image.asset('assets/icons/bell.png'),
             SizedBox(height: 16),
             Text(
               'Tạm thời không có thông báo',

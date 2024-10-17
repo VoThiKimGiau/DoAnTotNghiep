@@ -1,15 +1,18 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:flutter/material.dart';
 
+import '../../controllers/TaiKhoanController.dart';
 import 'LoginScreen.dart';
 
 class WelcomeScreen extends StatelessWidget {
+
+  final TaiKhoanController controller = TaiKhoanController();
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen(controller: controller)),
       );
     });
 

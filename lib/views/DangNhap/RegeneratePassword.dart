@@ -2,7 +2,10 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 
+import '../../controllers/TaiKhoanController.dart';
+
 class RegeneratePassword extends StatelessWidget {
+  final TaiKhoanController controller = TaiKhoanController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,7 +34,7 @@ class RegeneratePassword extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginScreen())
+                                builder: (context) => LoginScreen(controller: controller)),
                         );
                       },
                       style: ElevatedButton.styleFrom(
