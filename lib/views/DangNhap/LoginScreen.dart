@@ -1,4 +1,6 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/CompleteInformation.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/FogotPassword.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/RegisterScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/WelcomeScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/main.dart';
@@ -13,7 +15,7 @@ class LoginScreen extends StatelessWidget {
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(top: 100),
+            margin: const EdgeInsets.only(top: 100),
             child: SizedBox(
               width: 300,
               height: 300,
@@ -40,7 +42,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 16.0),
+                  margin: const EdgeInsets.symmetric(vertical: 16.0),
                   child: const TextField(
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
@@ -61,14 +63,14 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(builder: (context) => CompleteInformation()),
                       );
                     },
-                    child: const Text('Đăng nhập'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
                     ),
+                    child: const Text('Đăng nhập'),
                   ),
                 ),
                 Container(
@@ -96,7 +98,9 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () {
-                        print('a');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => FogotPassword()));
                       },
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.only(left: 24.0),

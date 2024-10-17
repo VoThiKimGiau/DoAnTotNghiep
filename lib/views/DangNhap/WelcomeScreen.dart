@@ -6,7 +6,7 @@ import 'LoginScreen.dart';
 class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
             child: Image.asset('assets/images/logo.png'),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 25.0),
+            margin: const EdgeInsets.symmetric(vertical: 25.0),
             child: const Text(
               'CỬA HÀNG GIA DỤNG HUIT',
               style: TextStyle(

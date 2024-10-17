@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -11,25 +12,28 @@ class RegisterScreen extends StatelessWidget {
           children: [
             Container(
               alignment: AlignmentDirectional.topStart,
-              margin: EdgeInsets.only(left: 10.0, top: 20.0),
+              margin: const EdgeInsets.only(left: 10.0, top: 20.0),
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
-                  padding: EdgeInsets.all(10),
-                  backgroundColor: Color(0xFFF4F4F4),
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(10),
+                  backgroundColor: const Color(0xFFF4F4F4),
                   foregroundColor: Colors.black,
                 ),
                 onPressed: () {
-                  print('a');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen())
+                  );
                 },
-                icon: Icon(Icons.arrow_back_ios_new),
+                icon: const Icon(Icons.arrow_back_ios_new),
                 label: const SizedBox.shrink(),
               ),
             ),
-            Center(child: Text('Tạo tài khoản', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),)),
+            const Center(child: Text('Tạo tài khoản', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),)),
             Container(
               height: 350,
-              margin: EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
+              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
               child: Column(
                 children: [
                   const TextField(
@@ -39,8 +43,8 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 16.0),
-                    child: TextField(
+                    margin: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: const TextField(
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Họ',
@@ -54,7 +58,7 @@ class RegisterScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 16.0),
+                    margin: const EdgeInsets.symmetric(vertical: 16.0),
                     child: const TextField(
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
@@ -73,7 +77,7 @@ class RegisterScreen extends StatelessWidget {
             ),
             Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(top: 40.0),
+                  margin: const EdgeInsets.only(top: 40.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -81,13 +85,15 @@ class RegisterScreen extends StatelessWidget {
                         width: 342.0,
                         child: ElevatedButton(
                             onPressed: (){
-                              print('a');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => LoginScreen()));
                             },
-                            child: Text('Tạo tài khoản'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryColor,
                               foregroundColor: Colors.white,
-                            )
+                            ),
+                            child: const Text('Tạo tài khoản')
                         ),
                       )
                     ],
