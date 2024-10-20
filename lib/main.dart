@@ -1,15 +1,40 @@
-
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 
-import 'CaiDat/ProfileScreen.dart';
-import 'ThongBao/DanhSachTB.dart';
-import 'ThongBao/ThongBao.dart';
-import 'DonHang/DonHang.dart';
-import 'DangNhap/WelcomeScreen.dart';
+import 'views/CaiDat/ProfileScreen.dart';
+import 'views/ThongBao/DanhSachTB.dart';
+import 'views/ThongBao/ThongBao.dart';
+import 'views/DonHang/DonHang.dart';
+import 'views/DangNhap/WelcomeScreen.dart';
 
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Comfortaa',
+      ),
+      home: SafeArea(
+          child: Scaffold(
+            body: WelcomeScreen(),
+          )
+      ),
+    );
+  }
+}
 
 class HomeScreen extends StatelessWidget {
   @override

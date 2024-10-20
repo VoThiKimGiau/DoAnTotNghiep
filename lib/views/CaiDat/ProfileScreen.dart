@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 KhachHangController controller = new KhachHangController();
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen(controller: controller)),
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
                       (Route<dynamic> route) => false, // Remove all routes from the stack
                 );
               },

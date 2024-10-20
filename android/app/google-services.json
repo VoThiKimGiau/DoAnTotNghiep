@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "730702910807",
+    "project_id": "cntt304-bansanphamgiadun-10457",
+    "storage_bucket": "cntt304-bansanphamgiadun-10457.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730702910807:android:f886c930091bf65215da12",
+        "android_client_info": {
+          "package_name": "com.example.datn_cntt304_bandogiadung"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChj7p1LDzRuSWJkWsHWOALGKB1jzwbvWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

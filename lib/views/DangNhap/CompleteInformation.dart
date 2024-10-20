@@ -1,5 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
-import 'package:datn_cntt304_bandogiadung/views/main.dart';
+import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:flutter/material.dart';
 
 class CompleteInformation extends StatefulWidget {
