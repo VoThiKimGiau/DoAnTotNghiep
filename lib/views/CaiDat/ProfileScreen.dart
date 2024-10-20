@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/TaiKhoanController.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/KhachHang.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String makh;
+  final String? makh;
 
 
   const ProfileScreen({
@@ -29,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     fetchKhachHang();
   }
   Future<void> fetchKhachHang() async {
-    KhachHang? fetchedKhachHang = await KhachHangController().getKhachHang('KH1');
+    KhachHang? fetchedKhachHang = await KhachHangController().getKhachHang(widget.makh);
     setState(() {
       khachHang = fetchedKhachHang;
     });
@@ -37,7 +39,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String name=utf8.decode(khachHang!.tenKH.runes.toList());
+    if (khachHang == null) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    String name = utf8.decode((khachHang!.tenKH?.runes.toList()) ?? []);
+    String email = khachHang!.email ?? "Email chưa đăng ký"; // Default message if email is null
+    String phone = khachHang!.sdt ?? "Số điện thoại chưa đăng ký"; // Default message if phone is null
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -46,12 +58,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(''),
+                backgroundImage: NetworkImage(''), // Add a proper image URL if needed
               ),
               SizedBox(height: 16),
               Text(
                 name,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                email,
+                style: TextStyle(fontSize: 16, color: Colors.black54), // Style for email
+              ),
+              SizedBox(height: 4),
+              Text(
+                phone,
+                style: TextStyle(fontSize: 16, color: Colors.black54), // Style for phone number
               ),
               SizedBox(height: 8),
               Row(
@@ -60,6 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
+                      // Handle edit profile action
                     },
                     child: Text(
                       'Chỉnh sửa',
@@ -75,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Spacer(),
               ElevatedButton(
                 onPressed: () {
-                  // Handle logout
+                  _showLogoutConfirmationDialog();
                 },
                 child: Text('Đăng xuất',
                     style: TextStyle(fontSize: 18, color: Colors.red)),
@@ -104,5 +127,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Xác nhận"),
+          content: Text("Bạn có chắc chắn muốn đăng xuất không?"),
+          actions: [
+            TextButton(
+              child: Text("Hủy"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Đồng ý"),
+              onPressed: () {
+                Navigator.of(context).pop();
+
+                // Proceed with logout
+                KhachHangController controller = new KhachHangController();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen(controller: controller)),
+                      (Route<dynamic> route) => false, // Remove all routes from the stack
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
 }

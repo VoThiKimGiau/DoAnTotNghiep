@@ -31,11 +31,11 @@ class RegeneratePassword extends StatelessWidget {
                 SizedBox(
                   child: ElevatedButton(
                       onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginScreen(controller: controller)),
-                        );
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => LoginScreen(controller: controller)),
+                        // );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,

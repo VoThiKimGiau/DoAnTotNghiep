@@ -9,26 +9,8 @@ import 'ThongBao/ThongBao.dart';
 import 'DonHang/DonHang.dart';
 import 'DangNhap/WelcomeScreen.dart';
 
-void main() {
 
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Comfortaa',
-      ),
-      home: SafeArea(
-          child: Scaffold(
-            body: WelcomeScreen(),
-          )
-      ),
-    );
-  }
-}
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -39,18 +21,31 @@ class HomeScreen extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  final String? maKH;
+  const MainScreen({required this.maKH, Key? key}) : super(key: key);
+
   @override
   _MainScreenState createState() => _MainScreenState();
+
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize _widgetOptions in initState where widget.maKH is accessible
+    _widgetOptions = <Widget>[
+      HomeScreen(),
+      NotificationScreenEmpty(),
+      OrderListScreen(maKH: widget.maKH ),
+      ProfileScreen(makh: widget.maKH ),
+    ];
+  }
   int _selectedIndex = 0;
-  static final List<Widget> _widgetOptions = <Widget>[
-    HomeScreen(),
-    NotificationScreen(maKhachHang: "KH1"),
-    OrderListScreen(maKH:"KH1"),
-    ProfileScreen(makh: "KH1",)
-  ];
+
 
   void _onItemTapped(int index) {
     setState(() {

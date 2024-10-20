@@ -4,7 +4,7 @@ import '../config/IpConfig.dart';
 import '../models/DonHang.dart';
 
 class DonHangController {
-  Future<List<DonHang>> fetchDonHang(String maKH) async {
+  Future<List<DonHang>> fetchDonHang(String? maKH) async {
     final response = await http.get(
       Uri.parse('http://${IpConfig.ipConfig}/api/donhang/byCustomer?maKH=$maKH'),
     );

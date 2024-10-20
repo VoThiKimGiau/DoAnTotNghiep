@@ -7,7 +7,7 @@ import 'ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietDonHangController.dart';
 
 class OrderListScreen extends StatefulWidget {
-  final String maKH;
+  final String? maKH;
 
   const OrderListScreen({required this.maKH, Key? key}) : super(key: key);
 
