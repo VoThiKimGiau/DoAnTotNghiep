@@ -3,12 +3,15 @@ import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/HinhAnhController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/GiaoHang.dart';
+import 'package:datn_cntt304_bandogiadung/ultils/HinhAnhUlt.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import '../../models/ChiTietDonHang.dart';
@@ -26,13 +29,13 @@ class OrderSummary extends StatefulWidget {
 
 class _OrderSummaryState extends State<OrderSummary> {
   late Future<List<ChiTietDonHang>> _orderDetails;
-  late Future<GiaoHang?> _giaoHang;
   late Future<List<KMDH>> _khuyenmai;
   final SanPhamController _sanPhamController = SanPhamController();
   late MauSPController mauSPController=MauSPController();
   late KichCoController kichCoController=KichCoController();
   late ChiTietSPController chiTietSPController=ChiTietSPController();
   late DonHangController donHangController=DonHangController();
+  late HinhAnhController hinhAnhController=HinhAnhController();
   @override
   void initState() {
     super.initState();
@@ -90,6 +93,14 @@ class _OrderSummaryState extends State<OrderSummary> {
       throw Exception("Lay tên sản phẩm thất bại !");
   }
 
+  Future<String> layDuongDan(String maAnh) async
+  {
+    String url=await hinhAnhController.fetchDuongDan(maAnh);
+    if(url!="")
+      return url;
+    else
+      return '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,12 +182,12 @@ class _OrderSummaryState extends State<OrderSummary> {
           return Text('Error: ${snapshot.error}');
         } else {
           ChiTietSP? chiTietSP = snapshot.data;
-
-          // Create a list of futures
-          List<Future<String>> futures = [
+            List<Future<String>> futures = [
             layTenSP(chiTietSP?.maSP ?? '').then((value) => value ?? 'Unknown Product'),
             layTenMau(chiTietSP?.maMau ?? '').then((value) => value ?? 'Unknown Color'),
             layTenKichCo(chiTietSP?.maKichCo ?? '').then((value) => value ?? 'Unknown Size'),
+            layDuongDan(chiTietSP?.maHinhAnh ?? '').then((url) => HinhAnhUlt.getImageUrl(url)),
+
           ];
 
           return FutureBuilder<List<String>>(
@@ -187,17 +198,32 @@ class _OrderSummaryState extends State<OrderSummary> {
               } else if (productDetailsSnapshot.hasError) {
                 return Text('Error: ${productDetailsSnapshot.error}');
               } else {
-                final productDetails = productDetailsSnapshot.data ?? ['', '', ''];
-                String decodeName = utf8.decode(productDetails[0].runes.toList());
-                String tenKichCo = productDetails[2];
-                String tenMau = productDetails[1];
+                final productDetails = productDetailsSnapshot.data ?? ['', '', '', ''];
+                String productName = utf8.decode(productDetails[0].runes.toList());
+                String productColor = productDetails[1];
+                String productSize = productDetails[2];
+                String productImageUrl = productDetails[3]; // Image URL from Firebase
 
                 return Row(
                   children: [
-                    Container(
+                    productImageUrl.isNotEmpty
+                        ? Image.network(
+                      productImageUrl,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[200],
+                        child: Icon(Icons.broken_image),
+                      ),
+                    )
+                        : Container(
                       width: 80,
                       height: 80,
                       color: Colors.grey[200],
+                      child: Icon(Icons.image_not_supported),
                     ),
                     SizedBox(width: 16),
                     Expanded(
@@ -205,7 +231,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$decodeName\n$tenKichCo - $tenMau',
+                            '$productName\n$productSize - $productColor',
                             style: TextStyle(fontSize: 20),
                           ),
                           SizedBox(height: 4),
@@ -213,7 +239,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                         ],
                       ),
                     ),
-                    Text(price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(price, style: TextStyle(fontSize: 20)),
                   ],
                 );
               }
