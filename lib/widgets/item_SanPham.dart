@@ -7,6 +7,7 @@ import '../services/storage/storage_service.dart';
 
 class SanPhamItem extends StatelessWidget {
   final SanPham item;
+
   SanPhamItem({required this.item});
 
   StorageService service = StorageService();
@@ -25,42 +26,59 @@ class SanPhamItem extends StatelessWidget {
             children: [
               ClipRRect(
                 child: Image.network(
-              service.getImageUrl(item.hinhAnhMacDinh),
+                  service.getImageUrl(item.hinhAnhMacDinh),
                   fit: BoxFit.cover,
                   width: 160,
                   height: 200,
                 ),
               ),
-              SizedBox(
-                height: 45,
-                child: Text(
-                  item.tenSP,
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ),
-              SizedBox(
+              Container(
+                  margin: const EdgeInsets.only(left: 10),
+                  height: 45,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      item.tenSP,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  )),
+              Container(
+                margin: const EdgeInsets.only(left: 10),
                 height: 15,
-                child: Text(
-                  sharedFunction.formatCurrency(item.giaMacDinh),
-                  textAlign: TextAlign.left,
-                  style:
-                      const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'Gabarito'),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    sharedFunction.formatCurrency(item.giaMacDinh),
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Gabarito'),
+                  ),
                 ),
               ),
             ],
           )),
-          Container(
-            child: ElevatedButton(
-                onPressed: () {
-                  print('a');
-                },
-                child: SvgPicture.asset(
-                  'assets/icons/heart.svg',
-                  width: 16,
-                  height: 16,
-                )),
-          )
+          Positioned(
+              top: 1,
+              right: 1,
+              child: ElevatedButton(
+            onPressed: () {
+              print('a');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              shadowColor: Colors.transparent,
+              minimumSize: const Size(18, 18),
+              padding: const EdgeInsets.all(0),
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/heart.svg',
+              width: 16,
+              height: 16,
+            ),
+          ))
         ],
       ),
     );
