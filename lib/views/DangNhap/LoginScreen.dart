@@ -1,14 +1,13 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
-import 'package:datn_cntt304_bandogiadung/controllers/TaiKhoanController.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/CompleteInformation.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/FogotPassword.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/RegisterScreen.dart';
-import 'package:datn_cntt304_bandogiadung/models/TaiKhoan.dart';
 import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/KhachHang.dart';
+
 
 class LoginScreen extends StatefulWidget {
 

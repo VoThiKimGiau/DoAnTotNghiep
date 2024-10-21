@@ -1,6 +1,10 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/main.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
+
+import '../../controllers/KhachHangController.dart';
+import '../../models/KhachHang.dart';
 
 class CompleteInformation extends StatefulWidget {
   @override
@@ -120,7 +124,7 @@ class _CompleteInformationState extends State<CompleteInformation> {
                             onPressed: (){
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => HomeScreen()));
+                                  MaterialPageRoute(builder: (context) => LoginScreen()));
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryColor,

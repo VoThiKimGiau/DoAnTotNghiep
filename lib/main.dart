@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/views/TrangChu/TrangChu.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
@@ -5,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 
 import 'views/CaiDat/ProfileScreen.dart';
-import 'views/ThongBao/DanhSachTB.dart';
+import 'controllers/DanhSachTB.dart';
 import 'views/ThongBao/ThongBao.dart';
 import 'views/DonHang/DonHang.dart';
 import 'views/DangNhap/WelcomeScreen.dart';
@@ -63,8 +64,8 @@ class _MainScreenState extends State<MainScreen> {
 
     // Initialize _widgetOptions in initState where widget.maKH is accessible
     _widgetOptions = <Widget>[
-      HomeScreen(),
-      NotificationScreen(maKhachHang: widget.maKH),
+      TrangChuScreen(),
+      NotificationScreen(maKhachHang: widget.maKH ),
       OrderListScreen(maKH: widget.maKH ),
       ProfileScreen(makh: widget.maKH ),
     ];
