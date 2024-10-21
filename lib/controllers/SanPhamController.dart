@@ -19,7 +19,7 @@ class SanPhamController {
     }
   }
 
-  final String baseUrl_AllSP = 'http://${IpConfig.ipConfig}/api/sanpham';
+  final String baseUrl_AllSP = 'http://${IpConfig.ipConfig}/api/sanpham?page=1&size=10';
 
   Future<List<SanPham>> fetchSanPham() async {
     final response = await http.get(
@@ -27,9 +27,15 @@ class SanPhamController {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
-      return jsonResponse.map((item) => SanPham.fromJson(item)).toList();
-    } else {
+      // Decode the response
+      final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      // Access the 'items' list within the 'data' map
+      final List<dynamic> items = jsonResponse['data']['items'];
+
+      // Map the items to SanPham objects
+      return items.map((item) => SanPham.fromJson(item)).toList();
+    }
+    else {
       throw Exception('Failed to load SanPham data');
     }
   }

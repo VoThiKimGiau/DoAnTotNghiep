@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../models/SanPham.dart';
+import '../services/storage/storage_service.dart';
 
 class SanPhamItem extends StatelessWidget {
   final SanPham item;
-
   SanPhamItem({required this.item});
+
+  StorageService service = StorageService();
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class SanPhamItem extends StatelessWidget {
             children: [
               ClipRRect(
                 child: Image.network(
-                  item.hinhAnhMacDinh,
+              service.getImageUrl(item.hinhAnhMacDinh),
                   fit: BoxFit.cover,
                   width: 160,
                   height: 200,

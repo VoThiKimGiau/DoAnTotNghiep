@@ -18,12 +18,12 @@ class SanPham {
   // Factory method to create a Product from JSON
   factory SanPham.fromJson(Map<String, dynamic> json) {
     return SanPham(
-      maSP: json['maSP'],
-      tenSP: json['tenSP'],
-      moTa: json['moTa'],
-      danhMuc: json['danhMuc'],
-      hinhAnhMacDinh: json['hinhAnhMacDinh'],
-      giaMacDinh: json['giaMacDinh'],
+      maSP: json['maSP'] as String,
+      tenSP: json['tenSP'] as String,
+      moTa: json['moTa'] as String,
+      danhMuc: json['danhMuc'] as String,
+      hinhAnhMacDinh: json['maHinhAnhMacDinh'] as String,
+      giaMacDinh: (json['giaMacDinh'] as num).toDouble(),
     );
   }
 
@@ -34,7 +34,7 @@ class SanPham {
       'tenSP': tenSP,
       'moTa': moTa,
       'danhMuc': danhMuc,
-      'hinhAnhMacDinh': hinhAnhMacDinh,
+      'maHinhAnhMacDinh': hinhAnhMacDinh,
       'giaMacDinh': giaMacDinh,
     };
   }

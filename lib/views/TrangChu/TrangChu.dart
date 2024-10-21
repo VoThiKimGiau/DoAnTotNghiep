@@ -163,19 +163,22 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             itemCount: items!.length >= 5 ? 5 : items!.length,
             itemBuilder: (context, index) {
               return Container(
-                width: 100,
+                width: 140,
                 margin: const EdgeInsets.all(8),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
+                    Container(
+                      width: 60,
+                      height: 60,
                       child: CircleAvatar(
                         radius: 30,
                         child: ClipOval(
                           child: Image.network(
                             items![index].anhDanhMuc,
                             fit: BoxFit.cover,
-                            width: 100,
-                            height: 100,
+                            width: 60,
+                            height: 60,
                           ),
                         ),
                       ),
@@ -217,7 +220,6 @@ class _TrangChuScreen extends State<TrangChuScreen> {
         ),
         Container(
             height: 280,
-            width: 160,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
@@ -249,7 +251,6 @@ class _TrangChuScreen extends State<TrangChuScreen> {
         ),
         Container(
             height: 280,
-            width: 160,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
