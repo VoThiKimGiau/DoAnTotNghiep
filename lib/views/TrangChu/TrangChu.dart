@@ -19,6 +19,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
 
   SanPhamController SPController = SanPhamController();
   List<SanPham>? items_SP;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -48,11 +49,13 @@ class _TrangChuScreen extends State<TrangChuScreen> {
       List<SanPham> fetchedItems = await SPController.fetchSanPham();
       setState(() {
         items_SP = fetchedItems; // Cập nhật danh sách
+        isLoading = false;
       });
     } catch (e) {
       print('Error: $e'); // Xử lý lỗi
       setState(() {
         items_SP = []; // Đặt danh sách thành rỗng nếu có lỗi
+        isLoading = false;
       });
     }
   }
@@ -86,6 +89,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator()); // Show loading indicator
+    }
+
+    if (items == null || items!.isEmpty) {
+      return const Center(child: Text('No products available.')); // Handle empty state
+    }
+
     return SafeArea(
         child: SingleChildScrollView(
             child: Column(
@@ -222,7 +233,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             height: 280,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
+              itemCount: items_SP!.length >= 10 ? 10 : items_SP!.length,
               itemBuilder: (context, index) {
                 return SanPhamItem(item: items_SP![index]); // Gọi widget item
               },
@@ -253,7 +264,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             height: 280,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
+              itemCount: items_SP!.length >= 10 ? 10 : items_SP!.length,
               itemBuilder: (context, index) {
                 return SanPhamItem(item: items_SP![index]); // Gọi widget item
               },
