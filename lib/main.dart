@@ -64,7 +64,7 @@ class _MainScreenState extends State<MainScreen> {
     // Initialize _widgetOptions in initState where widget.maKH is accessible
     _widgetOptions = <Widget>[
       HomeScreen(),
-      NotificationScreenEmpty(),
+      NotificationScreen(maKhachHang: widget.maKH),
       OrderListScreen(maKH: widget.maKH ),
       ProfileScreen(makh: widget.maKH ),
     ];

@@ -5,7 +5,7 @@ import '../models/TBKH.dart';
 import '../models/ThongBao.dart';
 
 class ThongBaoController{
-  Future<List<TBKH>> fetchTBKH(String makh) async {
+  Future<List<TBKH>> fetchTBKH(String? makh) async {
     final response = await http.get(
         Uri.parse('http://${IpConfig.ipConfig}/api/tbkh/makh/$makh'));
 

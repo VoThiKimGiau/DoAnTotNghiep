@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/views/ThongBao/ThongBao.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ import '../../models/ThongBao.dart';
 
 
 class NotificationScreen extends StatefulWidget {
-  final String maKhachHang;
+  final String? maKhachHang;
 
   NotificationScreen({required this.maKhachHang});
 
@@ -29,10 +30,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           'Thông báo',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
       ),
@@ -44,16 +47,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
           } else if (snapshot.hasError) {
             return Center(child: Text("Failed to load notifications"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No notifications found"));
-          }else{
             Future.microtask(() {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => NotificationScreenEmpty()),
               );
             });
-            return SizedBox.shrink(); // Avoid returning any widget while waiting for navigation
-
+            return SizedBox.shrink();
           }
 
           List<TBKH> tbkhList = snapshot.data!;
@@ -73,11 +73,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ThongBao thongBao = tbSnapshot.data!;
                     return NotificationItem(
                       icon: Icons.notifications_outlined,
-                      iconColor: tbkh.daXem ? Colors.grey : Colors.red,
+                      iconColor: tbkh.daXem ? Colors.grey :AppColors.primaryColor,
                       message: thongBao.noiDung,
                     );
                   } else {
-                    return SizedBox.shrink(); // Không hiển thị gì nếu không có dữ liệu
+                    return SizedBox.shrink();
                   }
                 },
               );
@@ -85,18 +85,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 1,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today_outlined), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
-        ],
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-      ),
+
     );
   }
 }
@@ -115,25 +104,50 @@ class NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.grey[200],
-            shape: BoxShape.circle,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 6,
+            offset: Offset(0, 3),
           ),
-          child: Icon(icon, color: iconColor, size: 24),
-        ),
-        SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            message,
-            style: TextStyle(fontSize: 16),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: 24),
           ),
-        ),
-      ],
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
