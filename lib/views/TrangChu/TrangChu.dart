@@ -1,5 +1,8 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
+import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
+import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -11,19 +14,23 @@ class TrangChuScreen extends StatefulWidget {
 }
 
 class _TrangChuScreen extends State<TrangChuScreen> {
-  DanhMucSPController dmSP = DanhMucSPController();
+  DanhMucSPController DMSPController = DanhMucSPController();
   List<DanhMucSP>? items;
+
+  SanPhamController SPController = SanPhamController();
+  List<SanPham>? items_SP;
 
   @override
   void initState() {
     super.initState();
     fetchDanhMucSP();
+    fetchSP();
   }
 
   Future<void> fetchDanhMucSP() async {
     try {
       // Gọi phương thức từ controller
-      List<DanhMucSP> fetchedItems = await dmSP.fetchDanhMucSP();
+      List<DanhMucSP> fetchedItems = await DMSPController.fetchDanhMucSP();
       setState(() {
         items = fetchedItems; // Cập nhật danh sách
       });
@@ -31,6 +38,21 @@ class _TrangChuScreen extends State<TrangChuScreen> {
       print('Error: $e'); // Xử lý lỗi
       setState(() {
         items = []; // Đặt danh sách thành rỗng nếu có lỗi
+      });
+    }
+  }
+
+  Future<void> fetchSP() async {
+    try {
+      // Gọi phương thức từ controller
+      List<SanPham> fetchedItems = await SPController.fetchSanPham();
+      setState(() {
+        items_SP = fetchedItems; // Cập nhật danh sách
+      });
+    } catch (e) {
+      print('Error: $e'); // Xử lý lỗi
+      setState(() {
+        items_SP = []; // Đặt danh sách thành rỗng nếu có lỗi
       });
     }
   }
@@ -65,8 +87,8 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            body: Column(
+        child: SingleChildScrollView(
+            child: Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -96,39 +118,40 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                 onPressed: () {
                   print('b');
                 },
-                child: SvgPicture.asset('assets/icons/bag2.svg'),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   backgroundColor: AppColors.primaryColor,
                 ),
+                child: SvgPicture.asset('assets/icons/bag2.svg'),
               ),
             )
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 24, left: 24, right: 24),
+          margin: const EdgeInsets.only(top: 24, left: 24, right: 24),
           child: SearchBar(
             controller: _searchController,
             onChanged: _filterData,
           ),
         ),
         Container(
-          margin: EdgeInsets.symmetric(vertical: 14),
+          margin: const EdgeInsets.symmetric(vertical: 14),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text('Danh mục',
+              const Text('Danh mục',
                   style: TextStyle(
-                      fontSize: 18,
+                      fontFamily: 'Gabarito',
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryColor)),
               TextButton(
                   onPressed: () {
                     print('a');
                   },
-                  child: Text(
+                  child: const Text(
                     'Xem tất cả',
-                    style: TextStyle(color: Colors.black, fontSize: 18),
+                    style: TextStyle(color: Colors.black, fontSize: 16),
                   ))
             ],
           ),
@@ -137,11 +160,11 @@ class _TrangChuScreen extends State<TrangChuScreen> {
           height: 100,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: items!.length,
+            itemCount: items!.length >= 5 ? 5 : items!.length,
             itemBuilder: (context, index) {
               return Container(
                 width: 100,
-                margin: EdgeInsets.all(8),
+                margin: const EdgeInsets.all(8),
                 child: Column(
                   children: [
                     Expanded(
@@ -157,18 +180,83 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       items![index].tenDanhMuc, // Tên của mục
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 10),
                     ),
                   ],
                 ),
               );
             },
           ),
-        )
+        ),
+        Container(
+          margin: const EdgeInsets.only(top: 36, bottom: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Text('Bán chạy',
+                  style: TextStyle(
+                    fontFamily: 'Gabarito',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor)),
+              TextButton(
+                  onPressed: () {
+                    print('a');
+                  },
+                  child: const Text(
+                    'Xem tất cả',
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                  ))
+            ],
+          ),
+        ),
+        Container(
+            height: 280,
+            width: 160,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
+              itemBuilder: (context, index) {
+                return SanPhamItem(item: items_SP![index]); // Gọi widget item
+              },
+            )),
+        Container(
+          margin: const EdgeInsets.only(top: 36, bottom: 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const Text('Mới',
+                  style: TextStyle(
+                      fontFamily: 'Gabarito',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor)),
+              TextButton(
+                  onPressed: () {
+                    print('a');
+                  },
+                  child: const Text(
+                    'Xem tất cả',
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                  ))
+            ],
+          ),
+        ),
+        Container(
+            height: 280,
+            width: 160,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: items_SP!.length > 5 ? 5 : items_SP!.length,
+              itemBuilder: (context, index) {
+                return SanPhamItem(item: items_SP![index]); // Gọi widget item
+              },
+            )),
       ],
     )));
   }

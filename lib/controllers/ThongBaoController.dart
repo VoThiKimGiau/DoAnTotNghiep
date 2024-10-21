@@ -22,7 +22,7 @@ class ThongBaoController{
     final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/thongbao/$maThongBao'));
 
     if (response.statusCode == 200) {
-      return ThongBao.fromJson(jsonDecode(response.body));
+      return ThongBao.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       throw Exception('Failed to load ThongBao');
     }
