@@ -10,7 +10,8 @@ import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/GiaoHang.dart';
-import 'package:datn_cntt304_bandogiadung/ultils/HinhAnhUlt.dart';
+import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
@@ -36,6 +37,8 @@ class _OrderSummaryState extends State<OrderSummary> {
   late ChiTietSPController chiTietSPController=ChiTietSPController();
   late DonHangController donHangController=DonHangController();
   late HinhAnhController hinhAnhController=HinhAnhController();
+  late StorageService service=StorageService();
+
   @override
   void initState() {
     super.initState();
@@ -93,14 +96,6 @@ class _OrderSummaryState extends State<OrderSummary> {
       throw Exception("Lay tên sản phẩm thất bại !");
   }
 
-  Future<String> layDuongDan(String maAnh) async
-  {
-    String url=await hinhAnhController.fetchDuongDan(maAnh);
-    if(url!="")
-      return url;
-    else
-      return '';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,12 +177,13 @@ class _OrderSummaryState extends State<OrderSummary> {
           return Text('Error: ${snapshot.error}');
         } else {
           ChiTietSP? chiTietSP = snapshot.data;
-            List<Future<String>> futures = [
+          String maHinh = chiTietSP?.maHinhAnh ?? '';
+          List<Future<String>> futures = [
             layTenSP(chiTietSP?.maSP ?? '').then((value) => value ?? 'Unknown Product'),
             layTenMau(chiTietSP?.maMau ?? '').then((value) => value ?? 'Unknown Color'),
             layTenKichCo(chiTietSP?.maKichCo ?? '').then((value) => value ?? 'Unknown Size'),
-            layDuongDan(chiTietSP?.maHinhAnh ?? '').then((url) => HinhAnhUlt.getImageUrl(url)),
-
+            // Sử dụng HinhAnhUlt để lấy URL download
+            Future.value(service.getImageUrl(maHinh))
           ];
 
           return FutureBuilder<List<String>>(
@@ -270,22 +266,3 @@ class _OrderSummaryState extends State<OrderSummary> {
   }
 }
 
-
-Widget _buildSummaryItem(String label, String value, {bool isBold = false}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey)),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            fontSize: isBold ? 18 : 16,
-          ),
-        ),
-      ],
-    ),
-  );
-}

@@ -20,26 +20,24 @@ class GiaoHang {
   // Convert JSON to model
   factory GiaoHang.fromJson(Map<String, dynamic> json) {
     return GiaoHang(
-      maVanDon: json['maVanDon'],                       // Adjusted key to match JSON
-      donHang: json['donHang'],                         // Adjusted key to match JSON
-      ngayGui: json['ngayGui'] != null ? DateTime.parse(json['ngayGui']) : null, // Parse date
-      ngayGiao: json['ngayGiao'] != null ? DateTime.parse(json['ngayGiao']) : null, // Parse date
-      trangThai: json['trangThai'],                     // Adjusted key to match JSON
-      tienUng: json['tienUng']?.toDouble(),            // Handle potential null
-      hinhThuc: json['hinhThuc'],                       // Adjusted key to match JSON
+      maVanDon: json['maVanDon'],
+      donHang: json['donHang'],
+      ngayGui: json['ngayGui'] != null ? DateTime.parse(json['ngayGui']) : null,
+      ngayGiao: json['ngayGiao'] != null ? DateTime.parse(json['ngayGiao']) : null,
+      trangThai: json['trangThai'],
+      tienUng: json['tienUng']?.toDouble(),
+      hinhThuc: json['hinhThuc'],
     );
   }
-
-  // Convert model to JSON
   Map<String, dynamic> toJson() {
     return {
-      'maVanDon': maVanDon,                             // Adjusted key to match JSON
-      'donHang': donHang,                               // Adjusted key to match JSON
-      'ngayGui': ngayGui?.toIso8601String(),           // Format date to ISO 8601
-      'ngayGiao': ngayGiao?.toIso8601String(),         // Format date to ISO 8601
-      'trangThai': trangThai,                           // Adjusted key to match JSON
-      'tienUng': tienUng,                               // Handle potential null
-      'hinhThuc': hinhThuc,                             // Adjusted key to match JSON
+      'maVanDon': maVanDon,
+      'donHang': donHang,
+      'ngayGui': ngayGui?.toIso8601String(),
+      'ngayGiao': ngayGiao?.toIso8601String(),
+      'trangThai': trangThai,
+      'tienUng': tienUng,
+      'hinhThuc': hinhThuc,
     };
   }
 }
