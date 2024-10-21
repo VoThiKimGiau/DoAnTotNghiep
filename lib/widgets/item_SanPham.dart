@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -9,11 +10,13 @@ class SanPhamItem extends StatelessWidget {
   SanPhamItem({required this.item});
 
   StorageService service = StorageService();
+  SharedFunction sharedFunction = SharedFunction();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220,
+      margin: const EdgeInsets.only(right: 12),
+      height: 250,
       width: 160,
       child: Stack(
         children: [
@@ -28,16 +31,22 @@ class SanPhamItem extends StatelessWidget {
                   height: 200,
                 ),
               ),
-              Text(
-                item.tenSP,
-                textAlign: TextAlign.left,
-                style: TextStyle(color: Colors.black),
+              SizedBox(
+                height: 45,
+                child: Text(
+                  item.tenSP,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(color: Colors.black),
+                ),
               ),
-              Text(
-                item.giaMacDinh.toString(),
-                textAlign: TextAlign.left,
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              SizedBox(
+                height: 15,
+                child: Text(
+                  sharedFunction.formatCurrency(item.giaMacDinh),
+                  textAlign: TextAlign.left,
+                  style:
+                      const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'Gabarito'),
+                ),
               ),
             ],
           )),
