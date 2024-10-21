@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import '../../models/KhachHang.dart';
 
 class LoginScreen extends StatefulWidget {
-  late KhachHangController controller;
 
   @override
   _LoginScreen createState() => _LoginScreen();
@@ -22,10 +21,12 @@ class _LoginScreen extends State<LoginScreen> {
   final TextEditingController matKhauController = TextEditingController();
   late Future<KhachHang?> login;
   late KhachHang? khachHang;
+  late KhachHangController controller;
 
   @override
   void initState() {
     super.initState();
+    controller= KhachHangController();
   }
 
   Future<void> _login() async {
@@ -37,7 +38,7 @@ class _LoginScreen extends State<LoginScreen> {
     }
 
     try {
-      khachHang = await widget.controller
+      khachHang = await controller
           .login(tenTKController.text, matKhauController.text);
       if (khachHang == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -102,7 +103,7 @@ class _LoginScreen extends State<LoginScreen> {
               ),
               Container(
                 margin:
-                    const EdgeInsets.only(left: 24.0, top: 39.0, right: 24.0),
+                const EdgeInsets.only(left: 24.0, top: 39.0, right: 24.0),
                 child: Column(
                   children: [
                     TextField(

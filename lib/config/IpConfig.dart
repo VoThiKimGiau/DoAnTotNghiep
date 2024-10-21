@@ -1,3 +1,3 @@
 class IpConfig {
-  static const String ipConfig = 'localhost:8080';
+  static const String ipConfig = '10.0.2.2:8080';
 }

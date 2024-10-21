@@ -1,7 +1,12 @@
 import 'dart:convert';
 
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/GiaoHang.dart';
 import 'package:flutter/material.dart';
@@ -24,14 +29,67 @@ class _OrderSummaryState extends State<OrderSummary> {
   late Future<GiaoHang?> _giaoHang;
   late Future<List<KMDH>> _khuyenmai;
   final SanPhamController _sanPhamController = SanPhamController();
-
+  late MauSPController mauSPController=MauSPController();
+  late KichCoController kichCoController=KichCoController();
+  late ChiTietSPController chiTietSPController=ChiTietSPController();
+  late DonHangController donHangController=DonHangController();
   @override
   void initState() {
     super.initState();
-    _giaoHang = GiaoHangController().fetchGiaoHang(widget.donHang.maDH);
+
     _orderDetails = ChiTietDonHangController().fetchListProduct(widget.donHang.maDH);
     _khuyenmai = KMDHController().fetchKMDH(widget.donHang.maDH);
   }
+  Future<DonHang> layDonHang(String maDH) async
+  {
+    DonHang donHang=await donHangController.fetchDetailDonHang(maDH);
+    if (donHang!=null)
+    {
+      return donHang;
+    }
+    else
+      throw Exception("Loi lay don hàng theo mã");
+  }
+  Future<String> layTenMau(String maMau) async
+  {
+    String tenMau='';
+    try {
+      tenMau = await mauSPController.layTenMauByMaMau(maMau);
+      return tenMau;
+    } catch (error) {
+      return 'Lỗi hiển thị màu';
+    }
+  }
+  Future<String> layTenKichCo(String maKichCo) async
+  {
+    String tenKC='';
+    try {
+      tenKC = await kichCoController.layTenKichCo(maKichCo);
+      return tenKC;
+    } catch (error) {
+      return 'Lỗi hiển thị kích cỡ';
+    }
+  }
+  Future<ChiTietSP> layCTSP(String maCTSP) async{
+    ChiTietSP chiTietSP= await chiTietSPController.layCTSPTheoMa(maCTSP);
+    if(chiTietSP!=null)
+    {
+      return chiTietSP;
+    }
+    else
+      throw Exception('Không tìm thấy ChiTietSP với mã: $maCTSP');
+  }
+  Future<String?> layTenSP(String masp) async
+  {
+    String? ten=await _sanPhamController.getProductNameByMaSP(masp);
+    if(ten!="")
+    {
+      return ten;
+    }
+    else
+      throw Exception("Lay tên sản phẩm thất bại !");
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +123,6 @@ class _OrderSummaryState extends State<OrderSummary> {
                       children: snapshot.data!.map((item) {
                         Widget productItem = _buildProductItem(
                             item.sanPham,
-                            item.kichCo,
-                            item.mauSP,
                             'SL ${item.soLuong}',
                             '\$${item.donGia}'
                         );
@@ -98,70 +154,70 @@ class _OrderSummaryState extends State<OrderSummary> {
                 }
               },
             ),
-            FutureBuilder<GiaoHang?>(
-              future: _giaoHang,
-              builder: (context, giaoHangSnapshot) {
-                if (giaoHangSnapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (giaoHangSnapshot.hasError) {
-                  return Text('Error: ${giaoHangSnapshot.error}');
-                } else if (!giaoHangSnapshot.hasData || giaoHangSnapshot.data == null) {
-                  return Text('NaN.');
-                } else {
-                  GiaoHang giaoHang = giaoHangSnapshot.data!;
-                  String decodedHinhThuc = utf8.decode(giaoHang.hinhThuc.runes.toList());
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSummaryItem('Hình thức vận chuyển', decodedHinhThuc, fontSize: 20), // Updated to 20
-                      _buildSummaryItem('Phí giao hàng', '\$8.00', fontSize: 20), // Updated to 20
-                      Divider(),
-                      _buildSummaryItem('Tổng cộng', '\$${widget.donHang.thanhTien}', isBold: true, fontSize: 22), // Updated to 22
-                    ],
-                  );
-                }
-              },
-            ),
+
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProductItem(String maSP, String kichCo, String mau, String quantity, String price) {
-    return FutureBuilder<String?>(
-      future: _sanPhamController.getProductNameByMaSP(maSP),
+  Widget _buildProductItem(String maCTSP, String quantity, String price) {
+    return FutureBuilder<ChiTietSP>(
+      future: chiTietSPController.layCTSPTheoMa(maCTSP),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          String productName = snapshot.data ?? 'Unknown Product';
-          String decodeName = utf8.decode(productName.runes.toList());
-          return Row(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                color: Colors.grey[200],
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          ChiTietSP? chiTietSP = snapshot.data;
+
+          // Create a list of futures
+          List<Future<String>> futures = [
+            layTenSP(chiTietSP?.maSP ?? '').then((value) => value ?? 'Unknown Product'),
+            layTenMau(chiTietSP?.maMau ?? '').then((value) => value ?? 'Unknown Color'),
+            layTenKichCo(chiTietSP?.maKichCo ?? '').then((value) => value ?? 'Unknown Size'),
+          ];
+
+          return FutureBuilder<List<String>>(
+            future: Future.wait(futures), // Wait for all futures to complete
+            builder: (context, productDetailsSnapshot) {
+              if (productDetailsSnapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (productDetailsSnapshot.hasError) {
+                return Text('Error: ${productDetailsSnapshot.error}');
+              } else {
+                final productDetails = productDetailsSnapshot.data ?? ['', '', ''];
+                String decodeName = utf8.decode(productDetails[0].runes.toList());
+                String tenKichCo = productDetails[2];
+                String tenMau = productDetails[1];
+
+                return Row(
                   children: [
-                    Text(
-                      decodeName + '\n' + kichCo + '-' + mau,
-                      style: TextStyle(fontSize: 20), // Updated to 20
+                    Container(
+                      width: 80,
+                      height: 80,
+                      color: Colors.grey[200],
                     ),
-                    SizedBox(height: 4),
-                    Text(quantity, style: TextStyle(color: Colors.grey)),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$decodeName\n$tenKichCo - $tenMau',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          SizedBox(height: 4),
+                          Text(quantity, style: TextStyle(color: Colors.grey)),
+                        ],
+                      ),
+                    ),
+                    Text(price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
-                ),
-              ),
-              Text(price, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), // Updated to 20
-            ],
+                );
+              }
+            },
           );
         }
       },
@@ -189,21 +245,21 @@ class _OrderSummaryState extends State<OrderSummary> {
 }
 
 
-  Widget _buildSummaryItem(String label, String value, {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: TextStyle(color: Colors.grey)),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              fontSize: isBold ? 18 : 16,
-            ),
+Widget _buildSummaryItem(String label, String value, {bool isBold = false}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey)),
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            fontSize: isBold ? 18 : 16,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
