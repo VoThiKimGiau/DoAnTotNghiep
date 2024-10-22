@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/ChiTietPhieuNhap.dart';
 import '../../services/shared_function.dart';
+import 'ChiTietPhieuNhap.dart';
 
 
 
@@ -23,6 +24,7 @@ class PurchaseOrderList extends StatelessWidget {
         title: Text('Danh sách phiếu nhập',style: TextStyle(fontFamily: 'Comfortaa')),
         backgroundColor: Color(0xFF034EA2),
         centerTitle: true,
+        automaticallyImplyLeading: false,
 
       ),
       body: FutureBuilder<List<PhieuNhap>>(
@@ -61,18 +63,29 @@ class PurchaseOrderList extends StatelessWidget {
 
                   List<ChiTietPhieuNhap> chiTietPhieuNhaps = detailSnapshot.data!;
                   int totalQuantity = chiTietPhieuNhaps.length;
-                  //int totalQuantity = chiTietPhieuNhaps.fold(0, (sum, item) => sum + item.soLuong);
                   double totalAmount = chiTietPhieuNhaps.fold(0, (sum, item) => sum + (item.donGia * item.soLuong));
 
-                  return OrderItem(
-                    orderNumber: phieuNhap.maPhieuNhap,
-                    itemCount: totalQuantity,
-                    totalAmount: totalAmount,
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to OrderStatusScreen and pass the order number
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderStatusScreen(pn: phieuNhap),
+                        ),
+                      );
+                    },
+                    child: OrderItem(
+                      orderNumber: phieuNhap.maPhieuNhap,
+                      itemCount: totalQuantity,
+                      totalAmount: totalAmount,
+                    ),
                   );
                 },
               );
             },
           );
+
         },
       ),
       floatingActionButton: FloatingActionButton(
