@@ -25,5 +25,34 @@ class ChiTietSPController{
     else
       throw Exception("Lỗi khi lay san pham");
   }
+  Future<List<ChiTietSP>> fetchAllChiTietSPByMaNCC(String maNCC) async {
+    List<ChiTietSP> allChiTietSPs = [];
+    int page = 0;
+    int pageSize = 10;
+    bool hasNextPage = true;
+
+    while (hasNextPage) {
+      final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/chitietsp?page=$page&size=$pageSize&maNCC=$maNCC'));
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = json.decode(response.body)['data'];
+
+        // Parse danh sách sản phẩm từ API
+        List<dynamic> jsonList = jsonResponse['items'];
+        List<ChiTietSP> chiTietSPPage = jsonList.map((json) => ChiTietSP.fromJson(json)).toList();
+
+        // Thêm dữ liệu trang vào danh sách tổng
+        allChiTietSPs.addAll(chiTietSPPage);
+
+        // Kiểm tra có trang tiếp theo không
+        hasNextPage = jsonResponse['hasNextPage'];
+        page++; // Tăng số trang để fetch trang tiếp theo
+      } else {
+        throw Exception('Failed to load ChiTietSP');
+      }
+    }
+
+    return allChiTietSPs;
+  }
 
 }

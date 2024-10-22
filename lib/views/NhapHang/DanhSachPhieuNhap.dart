@@ -2,6 +2,7 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/views/NhapHang/TaoPhieuNhap.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/ChiTietPhieuNhap.dart';
@@ -85,13 +86,19 @@ class PurchaseOrderList extends StatelessWidget {
               );
             },
           );
-
         },
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () {
-          // Handle button press for creating a new purchase order
+        onPressed: () async {
+          String newOrderCode = await phieuNhapController.generateOrderCode();
+          // Now you can pass newOrderCode to the InventoryEntryScreen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InventoryEntryScreen(newOrderCode: newOrderCode),
+            ),
+          );
         },
       ),
     );

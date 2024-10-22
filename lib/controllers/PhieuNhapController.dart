@@ -17,6 +17,14 @@ class PhieuNhapController{
         throw Exception("Không thể tải danh sách phiếu nhập");
       }
   }
+  Future<String> generateOrderCode() async {
+    List<PhieuNhap> phieuNhaps = await layDanhSachPhieuNhap();
+    int currentCount = phieuNhaps.length;
+
+    // Generate new order code based on the current count
+    String newOrderCode = 'PN${currentCount + 1}';
+    return newOrderCode;
+  }
   Future<PhieuNhap> taoPhieuNhap(PhieuNhap phieuNhap) async {
     final response = await http.post(
       Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap'),
