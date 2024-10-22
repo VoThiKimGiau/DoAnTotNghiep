@@ -2,9 +2,9 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/views/ThongBao/ThongBao.dart';
 import 'package:flutter/material.dart';
 
-import 'ThongBaoController.dart';
-import '../models/TBKH.dart';
-import '../models/ThongBao.dart';
+import '../../controllers/ThongBaoController.dart';
+import '../../models/TBKH.dart';
+import '../../models/ThongBao.dart';
 
 
 class NotificationScreen extends StatefulWidget {

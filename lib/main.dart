@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/bottom_nav.dart';
 
 import 'views/CaiDat/ProfileScreen.dart';
-import 'controllers/DanhSachTB.dart';
+import 'views/ThongBao/DanhSachTB.dart';
 import 'views/ThongBao/ThongBao.dart';
 import 'views/DonHang/DonHang.dart';
 import 'views/DangNhap/WelcomeScreen.dart';
