@@ -2,6 +2,7 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
+import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,11 +15,11 @@ class TrangChuScreen extends StatefulWidget {
 }
 
 class _TrangChuScreen extends State<TrangChuScreen> {
-  DanhMucSPController DMSPController = DanhMucSPController();
+  DanhMucSPController danhMucSPController = DanhMucSPController();
   List<DanhMucSP>? items;
 
-  SanPhamController SPController = SanPhamController();
-  List<SanPham>? items_SP;
+  SanPhamController sanPhamController = SanPhamController();
+  List<SanPham>? itemsSP;
   bool isLoading = true;
 
   @override
@@ -31,7 +32,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   Future<void> fetchDanhMucSP() async {
     try {
       // Gọi phương thức từ controller
-      List<DanhMucSP> fetchedItems = await DMSPController.fetchDanhMucSP();
+      List<DanhMucSP> fetchedItems = await danhMucSPController.fetchDanhMucSP();
       setState(() {
         items = fetchedItems; // Cập nhật danh sách
       });
@@ -46,15 +47,15 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   Future<void> fetchSP() async {
     try {
       // Gọi phương thức từ controller
-      List<SanPham> fetchedItems = await SPController.fetchSanPham();
+      List<SanPham> fetchedItems = await sanPhamController.fetchSanPham();
       setState(() {
-        items_SP = fetchedItems; // Cập nhật danh sách
+        itemsSP = fetchedItems; // Cập nhật danh sách
         isLoading = false;
       });
     } catch (e) {
       print('Error: $e'); // Xử lý lỗi
       setState(() {
-        items_SP = []; // Đặt danh sách thành rỗng nếu có lỗi
+        itemsSP = []; // Đặt danh sách thành rỗng nếu có lỗi
         isLoading = false;
       });
     }
@@ -233,9 +234,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             height: 280,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: items_SP!.length >= 10 ? 10 : items_SP!.length,
+              itemCount: itemsSP!.length >= 10 ? 10 : itemsSP!.length,
               itemBuilder: (context, index) {
-                return SanPhamItem(item: items_SP![index]); // Gọi widget item
+                return GestureDetector(
+                  onTap: () async{
+                  await Navigator.push(context, MaterialPageRoute(builder: (context) => ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),);
+                  },
+                  child: SanPhamItem(item: itemsSP![index]),
+                );
               },
             )),
         Container(
@@ -264,9 +270,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             height: 280,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: items_SP!.length >= 10 ? 10 : items_SP!.length,
+              itemCount: itemsSP!.length >= 10 ? 10 : itemsSP!.length,
               itemBuilder: (context, index) {
-                return SanPhamItem(item: items_SP![index]); // Gọi widget item
+                return GestureDetector(
+                  onTap: () async{
+                    await Navigator.push(context, MaterialPageRoute(builder: (context) => ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),);
+                  },
+                  child: SanPhamItem(item: itemsSP![index]),
+                );
               },
             )),
       ],

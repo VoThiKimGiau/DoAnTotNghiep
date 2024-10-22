@@ -39,4 +39,17 @@ class SanPhamController {
       throw Exception('Failed to load SanPham data');
     }
   }
+
+  Future<SanPham> getProductByMaSP(String maSP) async {
+    final response = await http.get(Uri.parse('$baseUrl?maSP=$maSP'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      return SanPham.fromJson(jsonResponse);
+    } else {
+      throw Exception('Failed to load product by MaSP');
+    }
+  }
+
+
 }
