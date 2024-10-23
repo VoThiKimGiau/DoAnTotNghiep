@@ -48,4 +48,27 @@ class PhieuNhapController{
       throw Exception("Không thể tạo phiếu nhập mới");
     }
   }
+  Future<void> updatePhieuNhapDaGiao(String maPN) async {
+    final String url = 'http://${IpConfig.ipConfig}/api/phieunhap/daGiaoHang/$maPN';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Nếu cập nhật thành công
+        final data = json.decode(response.body);
+        print('Cập nhật trạng thái phiếu nhập thành công: $data');
+      } else {
+        // Nếu có lỗi
+        throw Exception('Không thể cập nhật trạng thái: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Đã xảy ra lỗi khi cập nhật phiếu nhập: $error');
+    }
+  }
 } 

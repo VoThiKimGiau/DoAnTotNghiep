@@ -8,28 +8,41 @@ import 'package:flutter/material.dart';
 import '../../models/ChiTietPhieuNhap.dart';
 import '../../services/shared_function.dart';
 import 'ChiTietPhieuNhap.dart';
+import 'OrderItem.dart';
 
 
 
-class PurchaseOrderList extends StatelessWidget {
+class PurchaseOrderList extends StatefulWidget {
   final PhieuNhapController phieuNhapController = PhieuNhapController();
   final ChiTietPhieuNhapController chiTietPhieuNhapController = ChiTietPhieuNhapController();
   final String maNV;
 
   PurchaseOrderList({Key? key, required this.maNV}) : super(key: key);
+  @override
+  _PurchaseOrderListState createState() => _PurchaseOrderListState();
+}
+
+class _PurchaseOrderListState extends State<PurchaseOrderList> {
+  late Future<List<PhieuNhap>> futurePhieuNhaps;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load the data when the widget is initialized
+    futurePhieuNhaps = PhieuNhapController().layDanhSachPhieuNhap();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Danh sách phiếu nhập',style: TextStyle(fontFamily: 'Comfortaa')),
+        title: Text('Danh sách phiếu nhập', style: TextStyle(fontFamily: 'Comfortaa')),
         backgroundColor: Color(0xFF034EA2),
         centerTitle: true,
         automaticallyImplyLeading: false,
-
       ),
       body: FutureBuilder<List<PhieuNhap>>(
-        future: phieuNhapController.layDanhSachPhieuNhap(),
+        future: futurePhieuNhaps,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -46,7 +59,7 @@ class PurchaseOrderList extends StatelessWidget {
             itemBuilder: (context, index) {
               PhieuNhap phieuNhap = phieuNhaps[index];
               return FutureBuilder<List<ChiTietPhieuNhap>>(
-                future: chiTietPhieuNhapController.layDanhSachChiTietPhieuNhap(phieuNhap.maPhieuNhap),
+                future: ChiTietPhieuNhapController().layDanhSachChiTietPhieuNhap(phieuNhap.maPhieuNhap),
                 builder: (context, detailSnapshot) {
                   if (detailSnapshot.connectionState == ConnectionState.waiting) {
                     return ListTile(
@@ -78,6 +91,7 @@ class PurchaseOrderList extends StatelessWidget {
                   List<ChiTietPhieuNhap> chiTietPhieuNhaps = detailSnapshot.data!;
                   int totalQuantity = chiTietPhieuNhaps.length;
                   double totalAmount = chiTietPhieuNhaps.fold(0, (sum, item) => sum + (item.donGia * item.soLuong));
+
                   return GestureDetector(
                     onTap: () {
                       // Navigate to OrderStatusScreen and pass the order number
@@ -86,7 +100,14 @@ class PurchaseOrderList extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => OrderStatusScreen(pn: phieuNhap),
                         ),
-                      );
+                      ).then((result) {
+                        // Check if data has changed
+                        if (result == true) {
+                          setState(() {
+                            futurePhieuNhaps = widget.phieuNhapController.layDanhSachPhieuNhap();
+                          });
+                        }
+                      });
                     },
                     child: OrderItem(
                       orderNumber: phieuNhap.maPhieuNhap,
@@ -103,60 +124,25 @@ class PurchaseOrderList extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
-          String newOrderCode = await phieuNhapController.generateOrderCode();
+          String newOrderCode = await PhieuNhapController().generateOrderCode();
           // Now you can pass newOrderCode to the InventoryEntryScreen
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => InventoryEntryScreen(newOrderCode: newOrderCode,maNV:maNV ),
+              builder: (context) => InventoryEntryScreen(newOrderCode: newOrderCode, maNV: widget.maNV),
             ),
-          );
+          ).then((result) {
+            if (result == true) {
+              // Reload the data when returning from the InventoryEntryScreen
+              setState(() {
+                futurePhieuNhaps = PhieuNhapController().layDanhSachPhieuNhap();
+              });
+            }
+          });
         },
       ),
     );
   }
 }
 
-class OrderItem extends StatelessWidget {
-  final String orderNumber;
-  final int itemCount;
-  final double totalAmount;
 
-  const OrderItem({
-    Key? key,
-    required this.orderNumber,
-    required this.itemCount,
-    required this.totalAmount,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.description, color: Colors.grey,size: 22),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Mã phiếu: $orderNumber',
-                  style: TextStyle(fontSize: 20,fontFamily: 'Comfortaa'),
-                ),
-                Text('Số lượng chi tiết: $itemCount', style: TextStyle(fontSize:18,color: Colors.grey,fontFamily: 'Comfortaa')),
-                Text('Tổng tiền: ${totalAmount.toStringAsFixed(0)} VNĐ', style: TextStyle(fontSize:18,color: Colors.grey,fontFamily: 'Comfortaa')),
-              ],
-            ),
-          ),
-          Icon(Icons.chevron_right, color: Colors.grey),
-        ],
-      ),
-    );
-  }
-}

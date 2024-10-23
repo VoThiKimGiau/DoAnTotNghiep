@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
+import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/ChiTietPhieuNhap.dart';
@@ -38,8 +39,7 @@ class InventoryForm extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Lưu phiếu nhập thành công")),
         );
-        // Optional: Navigate back or to another screen
-        Navigator.pop(context);
+        Navigator.push(context,MaterialPageRoute(builder:(context)=> PurchaseOrderList(maNV:phieuNhap.maNV)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

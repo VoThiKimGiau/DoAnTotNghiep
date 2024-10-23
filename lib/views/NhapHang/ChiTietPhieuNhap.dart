@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachCTSP.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
@@ -7,7 +8,6 @@ import '../../models/PhieuNhap.dart';
 
 class OrderStatusScreen extends StatefulWidget {
   final PhieuNhap pn;
-
   OrderStatusScreen({required this.pn});
 
   @override
@@ -15,8 +15,9 @@ class OrderStatusScreen extends StatefulWidget {
 }
 
 class _OrderStatusScreenState extends State<OrderStatusScreen> {
-  late Future<List<ChiTietPhieuNhap>> _chiTietPhieuNhapFuture;
-
+  late Future<List<ChiTietPhieuNhap>> _chiTietPhieuNhapFuture = ChiTietPhieuNhapController().layDanhSachChiTietPhieuNhap("0");  // Giá trị tạm thời
+  late PhieuNhapController phieuNhapController=PhieuNhapController();
+  bool isButtonDisabled = false;
   @override
   void initState() {
     super.initState();
@@ -26,7 +27,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String formatTrangThai = utf8.decode(widget.pn.trangThai.codeUnits);
+    String formatTrangThai = utf8.decode(widget.pn.trangThai.runes.toList());
 
     bool isReceived = formatTrangThai == 'Đã nhận hàng';
     bool isConfirmed = formatTrangThai == 'Đã xác nhận';
@@ -98,6 +99,19 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                   }
                 },
               ),
+              if (!isReceived)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    onPressed: isButtonDisabled ? null : () async {
+                      setState(() {
+                        isButtonDisabled = true;
+                      });
+                      await phieuNhapController.updatePhieuNhapDaGiao(widget.pn.maPhieuNhap); // Gọi hàm cập nhật
+                    },
+                    child: Text('Đã nhập hàng'),
+                  ),
+                ),
             ],
           ),
         ),
