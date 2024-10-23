@@ -11,6 +11,7 @@ import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:flutter/material.dart';
 import '../../models/ChiTietSP.dart';
+import 'XacNhanPhieuNhap.dart';
 
 class InventoryEntryScreen extends StatefulWidget {
   final String newOrderCode;
@@ -38,6 +39,7 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
   Map<String, bool> selectedItems = {};
   final StorageService storageService = StorageService();
   double temporaryTotal = 0.0;
+  Map<String, Map<String, String?>> productDetailsCache = {};
 
   @override
   void initState() {
@@ -90,9 +92,17 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
   Future<void> _fetchChiTietSPBySupplier(String maNCC) async {
     try {
       List<ChiTietSP> fetchedChiTietSPs = await chiTietSPController.fetchAllChiTietSPByMaNCC(maNCC);
+
+      // Fetch all product details at once and cache them
+      for (var ctsp in fetchedChiTietSPs) {
+        if (!productDetailsCache.containsKey(ctsp.maCTSP)) {
+          productDetailsCache[ctsp.maCTSP] = await fetchProductDetails(ctsp);
+        }
+      }
+
       setState(() {
         chiTietSPs = fetchedChiTietSPs;
-        quantities = List<int>.filled(chiTietSPs.length, 0); // Initialize quantities for products
+        quantities = List<int>.filled(chiTietSPs.length, 0);
       });
     } catch (e) {
       print('Error fetching ChiTietSP: $e');
@@ -169,14 +179,42 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
                 Text('${temporaryTotal.toStringAsFixed(0)}đ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
-            SizedBox(height: 24), SizedBox(
+            SizedBox(height: 24),
+            SizedBox(
               width: double.infinity,
               child: _isOrderCreated
                   ? ElevatedButton(
                 onPressed: () {
-                  // Handle confirmation logic here
+                  PhieuNhap phieuNhap = PhieuNhap(
+                    maPhieuNhap: widget.newOrderCode,
+                    nhaCungCap: selectedSupplier!,
+                    maNV: widget.maNV,
+                    tongTien: getTotalAmount(),
+                    ngayDat: DateTime.now(),
+                    trangThai: 'Đang xử lý',
+                  );
+
+                  List<Map<String, dynamic>> selectedProductsWithQuantities = [];
+                  for (int i = 0; i < chiTietSPs.length; i++) {
+                    if (selectedItems[chiTietSPs[i].maCTSP] == true && quantities[i] > 0) {
+                      selectedProductsWithQuantities.add({
+                        'product': chiTietSPs[i],
+                        'quantity': quantities[i],
+                      });
+                    }
+                  }
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InventoryForm(
+                        phieuNhap: phieuNhap,
+                        selectedProductsWithQuantities: selectedProductsWithQuantities,
+                      ),
+                    ),
+                  );
                 },
-                child: Text('Xác nhận (${quantities.reduce((a, b) => a + b)})'),
+                child: Text('Xác nhận (${quantities.where((q) => q > 0).length})'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   padding: EdgeInsets.symmetric(vertical: 16),
@@ -196,7 +234,6 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
                     maNV: widget.maNV,
                     tongTien: 0,
                     ngayDat: DateTime.now(),
-                    ngayGiao: DateTime.now().add(Duration(days: 3)),
                     trangThai: 'Đang xử lý',
                   );
 
@@ -237,125 +274,109 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
     // Initialize the selection state for this item if it doesn't exist
     selectedItems.putIfAbsent(chiTietSP.maCTSP, () => false);
 
-    return FutureBuilder<Map<String, String?>>(
-      future: fetchProductDetails(chiTietSP),
-      builder: (BuildContext context, AsyncSnapshot<Map<String, String?>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          final productDetails = snapshot.data;
-          return Container(
-            margin: EdgeInsets.only(bottom: 16),
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
+    // Get cached product details
+    final productDetails = productDetailsCache[chiTietSP.maCTSP];
+
+    if (productDetails == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Checkbox
+          Checkbox(
+            value: selectedItems[chiTietSP.maCTSP],
+            onChanged: (bool? value) {
+              setState(() {
+                selectedItems[chiTietSP.maCTSP] = value ?? false;
+                _updateTemporaryTotal();
+              });
+            },
+          ),
+          // Product Image
+          Container(
+            width: 80,
+            height: 80,
+            margin: EdgeInsets.only(right: 12),
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
+              child: chiTietSP.maHinhAnh != null && chiTietSP.maHinhAnh.isNotEmpty
+                  ? Image.network(
+                storageService.getImageUrl(chiTietSP.maHinhAnh),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey[600],
+                    ),
+                  );
+                },
+              )
+                  : Container(
+                color: Colors.grey[300],
+                child: Icon(
+                  Icons.image_not_supported,
+                  color: Colors.grey[600],
+                ),
+              ),
             ),
-            child: Row(
+          ),
+          // Product Details
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Checkbox
-                Checkbox(
-                  value: selectedItems[chiTietSP.maCTSP],
-                  onChanged: (bool? value) {
-                    setState(() {
-                      selectedItems[chiTietSP.maCTSP] = value ?? false;
-                      _updateTemporaryTotal(); // Cập nhật tổng tạm tính
-                    });
-                  },
+                Text(
+                  utf8.decode(productDetails['productName']?.runes.toList() ?? []),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                // Product Image
-                Container(
-                  width: 80,
-                  height: 80,
-                  margin: EdgeInsets.only(right: 12),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: chiTietSP.maHinhAnh != null && chiTietSP.maHinhAnh.isNotEmpty
-                        ? Image.network(
-                      storageService.getImageUrl(chiTietSP.maHinhAnh)                      ,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey[600],
-                          ),
-                        );
+                Text(
+                  '${utf8.decode(productDetails['size']?.runes.toList() ?? [])} - ${utf8.decode(productDetails['color']?.runes.toList() ?? [])}',
+                ),
+                Text(
+                  '${chiTietSP.giaBan}đ',
+                  style: TextStyle(color: Colors.red),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.remove_circle_outline),
+                      onPressed: () {
+                        setState(() {
+                          if (quantities[index] > 0) quantities[index]--;
+                          _updateTemporaryTotal();
+                        });
                       },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    )
-                        : Container(
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey[600],
-                      ),
                     ),
-                  ),
-                ),
-                // Product Details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${productDetails != null ? utf8.decode(productDetails['productName']?.runes.toList() ?? []) : 'Unknown Product'}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        '${productDetails != null ? utf8.decode(productDetails['size']?.runes.toList() ?? []) : 'Unknown Size'} - ${productDetails != null ? utf8.decode(productDetails['color']?.runes.toList() ?? []) : 'Unknown Color'}',
-                      ),
-                      Text(
-                        '${chiTietSP.giaBan}đ',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.remove_circle_outline),
-                            onPressed: () {
-                              setState(() {
-                                if (quantities[index] > 0) quantities[index]--;
-                                _updateTemporaryTotal(); // Cập nhật tổng tạm tính
-                              });
-                            },
-                          ),
-                          Text('${quantities[index]}'),
-                          IconButton(
-                            icon: Icon(Icons.add_circle_outline),
-                            onPressed: () {
-                              setState(() {
-                                quantities[index]++;
-                                _updateTemporaryTotal(); // Cập nhật tổng tạm tính
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    Text('${quantities[index]}'),
+                    IconButton(
+                      icon: Icon(Icons.add_circle_outline),
+                      onPressed: () {
+                        setState(() {
+                          quantities[index]++;
+                          _updateTemporaryTotal();
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
-          );
-        }
-      },
+          ),
+        ],
+      ),
     );
-}
+  }
   void _updateTemporaryTotal() {
     temporaryTotal = 0.0; // Reset tổng tạm tính
     for (int i = 0; i < chiTietSPs.length; i++) {

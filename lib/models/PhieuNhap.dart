@@ -39,6 +39,7 @@ class PhieuNhap {
       'tongTien': tongTien,
       'ngayDat': ngayDat.toIso8601String(),
       'ngayGiao': ngayGiao?.toIso8601String()
+      , 'trangThai': trangThai,
     };
   }
 }

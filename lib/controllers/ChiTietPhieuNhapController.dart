@@ -43,7 +43,6 @@ class ChiTietPhieuNhapController{
   }
   Future<List<ChiTietPhieuNhap>> themNhieuChiTietPhieuNhap(List<ChiTietPhieuNhap> danhSachChiTiet) async {
     List<ChiTietPhieuNhap> ketQua = [];
-
     for (ChiTietPhieuNhap chiTiet in danhSachChiTiet) {
       try {
         ChiTietPhieuNhap chiTietMoi = await themChiTietPhieuNhap(chiTiet);
@@ -52,7 +51,6 @@ class ChiTietPhieuNhapController{
         print("Lỗi khi thêm chi tiết phiếu nhập: $e");
       }
     }
-
     return ketQua;
   }
 
