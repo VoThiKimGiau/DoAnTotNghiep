@@ -29,7 +29,7 @@ class MauSPController{
     }
   }
 
-  Future<MauSP> layDanhSachMauTheoMa(String maMau) async {
+  Future<MauSP> layMauTheoMa(String maMau) async {
     final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/mau-sps/$maMau'));
 
     if (response.statusCode == 200) {

@@ -1,23 +1,22 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
-import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
-import 'package:datn_cntt304_bandogiadung/models/MauSP.dart';
+import 'package:datn_cntt304_bandogiadung/models/KichCo.dart';
 import 'package:flutter/material.dart';
 
-class CircleButtonColor extends StatefulWidget {
+class CircleButtonSize extends StatefulWidget {
   final List<String> items;
 
-  CircleButtonColor({required this.items});
+  CircleButtonSize({required this.items});
 
   @override
-  _CircleButtonColor createState() => _CircleButtonColor();
+  _CircleButtonSize createState() => _CircleButtonSize();
 }
 
-class _CircleButtonColor extends State<CircleButtonColor> {
+class _CircleButtonSize extends State<CircleButtonSize> {
   int selectedIndex = -1; // Không có nút nào được chọn
 
-  MauSPController mauSPController = MauSPController();
-  List<MauSP> dsMauSP = [];
+  KichCoController kichCoController = KichCoController();
+  List<KichCo> dsKichCo = [];
 
   void selectButton(int index) {
     setState(() {
@@ -28,25 +27,25 @@ class _CircleButtonColor extends State<CircleButtonColor> {
   @override
   void initState() {
     super.initState();
-    fetchMauSP();
+    fetchKichCo();
   }
 
-  Future<void> fetchMauSP() async {
+  Future<void> fetchKichCo() async {
     try {
-      List<MauSP> fetchedItems = [];
+      List<KichCo> fetchedItems = [];
 
       for (String item in widget.items) {
-        MauSP itemMauSP = await mauSPController.layMauTheoMa(item);
-        fetchedItems.add(itemMauSP);
+        KichCo itemKichCo = await kichCoController.layKichCo(item);
+        fetchedItems.add(itemKichCo);
       }
 
       setState(() {
-        dsMauSP = fetchedItems;
+        dsKichCo = fetchedItems;
       });
     } catch (e) {
       print('Error: $e');
       setState(() {
-        dsMauSP = [];
+        dsKichCo = [];
       });
     }
   }
@@ -81,33 +80,13 @@ class _CircleButtonColor extends State<CircleButtonColor> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        width: 100,
-                        child: Text(
-                          dsMauSP[index].tenMau,
-                          style: TextStyle(
-                            color: selectedIndex == index
-                                ? Colors.white
-                                : Colors.black,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(int.parse(
-                              dsMauSP[index].maHEX.replaceFirst('#', '0xFF'))),
-                          border: Border.all(
-                            color: selectedIndex == index
-                                ? Colors.white
-                                : Color(int.parse(dsMauSP[index]
-                                    .maHEX
-                                    .replaceFirst('#', '0xFF'))),
-                            width: 3.0,
-                          ),
+                      Text(
+                        dsKichCo[index].tenKichCo,
+                        style: TextStyle(
+                          color: selectedIndex == index
+                              ? Colors.white
+                              : Colors.black,
+                          fontSize: 16,
                         ),
                       ),
                       const Icon(Icons.check, color: Colors.white, size: 20),
