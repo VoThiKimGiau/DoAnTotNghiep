@@ -37,21 +37,26 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     super.initState();
     fetchSP(widget.maSP!);
     fetchChiTietSP(widget.maSP!);
-    fetchSPTuongTu();
   }
 
   Future<void> fetchSP(String maSanPham) async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       SanPham fetchedItem = await sanPhamController.getProductByMaSP(maSanPham);
       setState(() {
         item = fetchedItem;
-        isLoading = false;
+        fetchSPTuongTu(item!.danhMuc);
       });
     } catch (e) {
-      print('Error: $e'); // Xử lý lỗi
+      print('Error: $e'); // Handle error
       setState(() {
-        item = null;
-        isLoading = false;
+        item = null; // Ensure item is null if there's an error
+      });
+    } finally {
+      setState(() {
+        isLoading = false; // Stop loading after fetching
       });
     }
   }
@@ -61,38 +66,39 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
       List<ChiTietSP> fetchedItems =
           await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
       setState(() {
-        dsCTSP = fetchedItems; // Cập nhật danh sách
+        dsCTSP = fetchedItems; // Update list
         getDSHinhAnh();
       });
     } catch (e) {
-      print('Error: $e'); // Xử lý lỗi
+      print('Error: $e'); // Handle error
       setState(() {
-        dsCTSP = []; // Đặt danh sách thành rỗng nếu có lỗi
+        dsCTSP = []; // Set list to empty on error
       });
     }
   }
 
   void getDSHinhAnh() {
-    for (ChiTietSP ct in dsCTSP) {
-      dsHinhSP.add(ct.maHinhAnh);
+    dsHinhSP = dsCTSP.map((ct) => ct.maHinhAnh).toList();
+  }
+
+  Future<void> fetchSPTuongTu(String maDanhMuc) async {
+    try {
+      List<SanPham> fetchedItems =
+          await sanPhamController.getProductByCategory(maDanhMuc);
+      setState(() {
+        itemsSP = fetchedItems;
+        removeSPHienTai();
+      });
+    } catch (e) {
+      print('Error: $e'); // Handle error
+      setState(() {
+        itemsSP = []; // Set list to empty on error
+      });
     }
   }
 
-  Future<void> fetchSPTuongTu() async {
-    try {
-      // Gọi phương thức từ controller
-      List<SanPham> fetchedItems = await sanPhamController.fetchSanPham();
-      setState(() {
-        itemsSP = fetchedItems; // Cập nhật danh sách
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error: $e'); // Xử lý lỗi
-      setState(() {
-        itemsSP = []; // Đặt danh sách thành rỗng nếu có lỗi
-        isLoading = false;
-      });
-    }
+  void removeSPHienTai() {
+    itemsSP?.removeWhere((sp) => sp.maSP == item?.maSP);
   }
 
   @override
@@ -140,9 +146,11 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                 ),
               ),
               isLoading
-                  ? const CircularProgressIndicator() // Hiển thị loader trong khi đang tải
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator()) // Display loader while loading
                   : item == null
-                      ? const Text('Không tìm thấy sản phẩm.')
+                      ? const Center(child: Text('Không tìm thấy sản phẩm.'))
                       : Column(
                           children: [
                             Row(
@@ -222,29 +230,79 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                               ),
                             ),
                             Container(
-                              margin: const EdgeInsets.only(left: 23, top: 24),
-                              child: const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Sản phẩm tương tự ',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Gabarito'),
+                                margin:
+                                    const EdgeInsets.only(left: 23, top: 24),
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Sản phẩm tương tự ',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Gabarito'),
+                                  ),
+                                )),
+                            Container(
+                                height: 280,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: itemsSP != null
+                                      ? (itemsSP!.length >= 5
+                                          ? 5
+                                          : itemsSP!.length)
+                                      : 0,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChiTietSanPhamScreen(
+                                                    maSP: itemsSP![index].maSP),
+                                          ),
+                                        );
+                                      },
+                                      child: SanPhamItem(item: itemsSP![index]),
+                                    );
+                                  },
+                                )),
+                            Container(
+                              margin: const EdgeInsets.all(24),
+                              child: SizedBox(
+                                width: double.infinity, // Đặt chiều rộng là vô hạn
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print('a');
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                  ),
+                                  child: const Text(
+                                    'Đặt hàng',
+                                    style: TextStyle(color: Colors.white, fontSize: 16),
+                                  ),
                                 ),
-                              )
+                              ),
                             ),
-                            // Container(
-                            //     height: 280,
-                            //     child: ListView.builder(
-                            //       scrollDirection: Axis.horizontal,
-                            //       itemCount: itemsSP!.length >= 5 ? 5 : itemsSP!.length,
-                            //       itemBuilder: (context, index) {
-                            //         return GestureDetector(
-                            //           onTap: () async{
-                            //             await Navigator.push(context, MaterialPageRoute(builder: (context) => ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),);
-                            //           },
-                            //           child: SanPhamItem(item: itemsSP![index]),
-                            //         );
-                            //       },
-                            //     )),
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 24),
+                              child: SizedBox(
+                                width: double.infinity, // Đặt chiều rộng là vô hạn
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print('a');
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                  ),
+                                  child: const Text(
+                                    'Thêm vào giỏ hàng',
+                                    style: TextStyle(color: Colors.white, fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
             ],

@@ -18,8 +18,8 @@ class ChiTietSPController{
     final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/chitietsp/detail?maSanPham=$maSP'));
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(response.body);
-      print('Response body: ${response.body}'); // In ra nội dung phản hồi
+      List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      //print('Response body: ${response.body}'); // In ra nội dung phản hồi
       return jsonResponse.map((item) => ChiTietSP.fromJson(item)).toList();
     } else {
       print('Error: ${response.statusCode}'); // In ra mã lỗi
