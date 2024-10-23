@@ -19,4 +19,13 @@ class ChiTietGioHang {
       donGia: json['donGia'] ?? 0.0,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'gioHang': maGioHang,
+      'sanPham': maCTSP,
+      'soLuong': soLuong,
+      'donGia': donGia,
+    };
+  }
 }

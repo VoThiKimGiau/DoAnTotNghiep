@@ -33,4 +33,21 @@ class ChiTietGioHangController {
       throw Exception('Failed to load product list');
     }
   }
+
+  Future<ChiTietGioHang> themChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
+    final response = await http.post(
+      Uri.parse('http://${IpConfig.ipConfig}/api/chitietgiohang'),
+      headers: <String, String>{
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(chiTietGioHang.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return ChiTietGioHang.fromJson(json.decode(response.body));
+    } else {
+      throw Exception("Không thể thêm chi tiết giỏ hàng");
+    }
+  }
 }
