@@ -38,6 +38,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   List<String> dsMauSP = [];
   List<String> dsKichCo = [];
 
+  int _quantity = 1;
+
   @override
   void initState() {
     super.initState();
@@ -54,8 +56,6 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
       setState(() {
         item = fetchedItem;
         fetchSPTuongTu(item!.danhMuc);
-        getDSMau();
-        getDSKichCo();
       });
     } catch (e) {
       print('Error: $e'); // Handle error
@@ -73,14 +73,21 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     try {
       List<ChiTietSP> fetchedItems =
           await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
+      List<String> mauSP = await getDSMau(fetchedItems);
+      List<String> kichCo = await getDSKichCo(fetchedItems);
+
       setState(() {
-        dsCTSP = fetchedItems; // Update list
+        dsCTSP = fetchedItems;
         getDSHinhAnh();
+        dsMauSP = mauSP;
+        dsKichCo = kichCo;
       });
     } catch (e) {
       print('Error: $e'); // Handle error
       setState(() {
-        dsCTSP = []; // Set list to empty on error
+        dsCTSP = [];
+        dsMauSP = [];
+        dsKichCo = [];
       });
     }
   }
@@ -109,16 +116,20 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     itemsSP?.removeWhere((sp) => sp.maSP == item?.maSP);
   }
 
-  void getDSMau() {
-    for (ChiTietSP ct in dsCTSP) {
-      dsMauSP.add(ct.maMau);
+  Future<List<String>> getDSMau(List<ChiTietSP> lstCT) async {
+    List<String> lst = [];
+    for (ChiTietSP ct in lstCT) {
+      lst.add(ct.maMau);
     }
+    return lst;
   }
 
-  void getDSKichCo() {
-    for (ChiTietSP kc in dsCTSP) {
-      dsKichCo.add(kc.maKichCo);
+  Future<List<String>> getDSKichCo(List<ChiTietSP> lstCT) async {
+    List<String> lst = [];
+    for (ChiTietSP ct in lstCT) {
+      lst.add(ct.maKichCo);
     }
+    return lst;
   }
 
   @override
@@ -295,7 +306,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     CustomBottomSheet.show(context, "Đặt hàng",
-                                        dsCTSP, dsMauSP, dsKichCo);
+                                        dsCTSP, dsMauSP, dsKichCo, _quantity);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primaryColor,
@@ -320,7 +331,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                         "Thêm vào giỏ hàng",
                                         dsCTSP,
                                         dsMauSP,
-                                        dsKichCo);
+                                        dsKichCo,
+                                        _quantity);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primaryColor,
@@ -344,42 +356,67 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
 }
 
 class CustomBottomSheet {
-  static void show(BuildContext context, String buttonText,
-      List<ChiTietSP> dsCTSP, List<String> dsMau, List<String> dsKichCo) {
+  static void show(
+      BuildContext context,
+      String buttonText,
+      List<ChiTietSP> dsCTSP,
+      List<String> dsMau,
+      List<String> dsKichCo,
+      int initialQuantity) {
+    int quantity = initialQuantity;
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         final screenHeight = MediaQuery.of(context).size.height;
         final bottomSheetHeight = screenHeight * 0.75;
 
-        return Container(
-          height: bottomSheetHeight,
-          width: double.infinity,
-          color: Colors.white,
-          child: Stack( // Use Stack to allow for positioned elements
-            children: [
-              SingleChildScrollView( // Make the Column scrollable
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              height: bottomSheetHeight,
+              width: double.infinity,
+              color: Colors.white,
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
-                      child: const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Màu sắc',
-                          style: TextStyle(
-                              fontFamily: 'Gabarito',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Màu sắc',
+                            style: TextStyle(
+                                fontFamily: 'Gabarito',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.black,
+                              size: 16,
+                            ),
+                            label: const SizedBox.shrink(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.all(0),
+                              minimumSize: const Size(18, 18),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    // Show loading indicator if dsMau is empty
                     if (dsMau.isEmpty)
                       const Center(child: CircularProgressIndicator())
+                    else if (dsMau.isNotEmpty)
+                      CircleButtonColor(items: dsMau)
                     else
-                      CircleButtonColor(items: dsMau),
-
+                      const Center(child: Text('Không có màu sắc nào.')),
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
                       child: const Align(
@@ -393,27 +430,71 @@ class CustomBottomSheet {
                         ),
                       ),
                     ),
-                    // Show loading indicator if dsKichCo is empty
                     if (dsKichCo.isEmpty)
                       const Center(child: CircularProgressIndicator())
+                    else if (dsKichCo.isNotEmpty)
+                      CircleButtonSize(items: dsKichCo)
                     else
-                      CircleButtonSize(items: dsKichCo),
-
+                      const Center(child: Text('Không có kích cỡ nào.')),
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
-                      child: const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Số lượng',
-                          style: TextStyle(
-                              fontFamily: 'Gabarito',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Số lượng',
+                            style: TextStyle(
+                                fontFamily: 'Gabarito',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    quantity++; // Tăng số lượng
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  minimumSize: const Size(40, 40),
+                                  shape: const CircleBorder(),
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                                child: const Icon(Icons.add,
+                                    color: Colors.white, size: 16),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 22),
+                                child: Text('$quantity',
+                                    style: const TextStyle(fontSize: 20)),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (quantity > 1) {
+                                    setState(() {
+                                      quantity--; // Giảm số lượng
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  minimumSize: const Size(40, 40),
+                                  shape: const CircleBorder(),
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                                child: const Icon(Icons.remove,
+                                    color: Colors.white, size: 16),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    // Add your quantity selection widget here
-
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 24),
                       width: double.infinity,
@@ -434,29 +515,8 @@ class CustomBottomSheet {
                   ],
                 ),
               ),
-              Positioned( // Correctly using Positioned within Stack
-                top: 5,
-                right: 10,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shadowColor: Colors.transparent,
-                    minimumSize: const Size(18, 18),
-                    padding: const EdgeInsets.all(0),
-                  ),
-                  label: const SizedBox.shrink(),
-                  icon: const Icon(
-                    Icons.close,
-                    size: 16,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
