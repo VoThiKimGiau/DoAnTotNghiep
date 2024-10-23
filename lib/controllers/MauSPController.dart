@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
+import 'package:datn_cntt304_bandogiadung/models/MauSP.dart';
 import 'package:http/http.dart' as http;
 class MauSPController{
   
-  Future<String> layTenMauByMaMau(String maMau) async
-  {
+  Future<String> layTenMauByMaMau(String maMau) async {
     final response =await http.get(Uri.parse(('http://${IpConfig.ipConfig}/api/mau-sps/$maMau')));
     if (response.statusCode==200)
       {
@@ -17,6 +17,7 @@ class MauSPController{
         throw Exception('Failed to load color name');
       }
   }
+
   Future<int> fetchProductCount(String madh) async {
     final response = await http.get(
       Uri.parse('http://${IpConfig.ipConfig}/api/chitietdonhang/count?madh=$madh'),
@@ -25,6 +26,20 @@ class MauSPController{
       return int.parse(response.body);
     } else {
       throw Exception('Failed to load product count');
+    }
+  }
+
+  Future<MauSP> layDanhSachMauTheoMa(String maMau) async {
+    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/mau-sps/$maMau'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse =
+      json.decode(utf8.decode(response.bodyBytes));
+
+      return MauSP.fromJson(jsonResponse);
+    } else {
+      print('Error: ${response.statusCode}'); // In ra mã lỗi
+      throw Exception("Lỗi khi lấy màu sản phẩm");
     }
   }
 }
