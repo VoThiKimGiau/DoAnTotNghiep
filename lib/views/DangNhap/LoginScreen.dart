@@ -74,7 +74,7 @@ import '../../models/NhanVien.dart';
             }
           else
             {
-              String? maNV=nhanVien?.maNV;
+              String maNV=nhanVien?.maNV??'';
               Navigator.push(context,
               MaterialPageRoute(builder: (context)=>PurchaseOrderList(maNV:maNV ))
               );

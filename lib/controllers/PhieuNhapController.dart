@@ -38,11 +38,11 @@ class PhieuNhapController{
         'maNV': phieuNhap.maNV,
         'tongTien': phieuNhap.tongTien,
         'ngayDat': phieuNhap.ngayDat.toIso8601String(), // Chuyển đổi ngày thành chuỗi
-        'ngayGiao': phieuNhap.ngayGiao.toIso8601String(), // Chuyển đổi ngày thành chuỗi
+        'ngayGiao': phieuNhap.ngayGiao?.toIso8601String(), // Chuyển đổi ngày thành chuỗi
       }),
     );
 
-    if (response.statusCode == 201) { // 201 Created
+    if (response.statusCode == 201) {
       return PhieuNhap.fromJson(json.decode(response.body));
     } else {
       throw Exception("Không thể tạo phiếu nhập mới");

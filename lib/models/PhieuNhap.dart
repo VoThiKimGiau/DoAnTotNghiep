@@ -4,7 +4,7 @@ class PhieuNhap {
   final String maNV;
   final double tongTien;
   final DateTime ngayDat;  // Đảm bảo là kiểu DateTime
-  final DateTime ngayGiao;
+  final DateTime? ngayGiao;
   final String trangThai;// Sử dụng kiểu String
 
   PhieuNhap({
@@ -13,8 +13,8 @@ class PhieuNhap {
     required this.maNV,
     required this.tongTien,
     required this.ngayDat,
-    required this.ngayGiao,
     required this.trangThai,
+    this.ngayGiao
   });
 
   // Từ JSON sang đối tượng PhieuNhap
@@ -25,8 +25,8 @@ class PhieuNhap {
       maNV: json['maNV'].trim(),
       tongTien: (json['tongTien'] as num).toDouble(), // Đảm bảo là kiểu double
       ngayDat: DateTime.parse(json['ngayDat']), // Chuyển đổi chuỗi thành DateTime
-      ngayGiao: DateTime.parse(json['ngayGiao']),
-      trangThai: json['trangThai']??''
+        ngayGiao: json['ngayGiao'] != null ? DateTime.parse(json['ngayGiao']) : null, // Kiểm tra null
+        trangThai: json['trangThai']??''
     );
   }
 
@@ -37,8 +37,8 @@ class PhieuNhap {
       'nhaCungCap': nhaCungCap,
       'maNV': maNV,
       'tongTien': tongTien,
-      'ngayDat': ngayDat.toIso8601String(),  // Chuyển đổi DateTime thành chuỗi
-      'ngayGiao': ngayGiao.toIso8601String()
+      'ngayDat': ngayDat.toIso8601String(),
+      'ngayGiao': ngayGiao?.toIso8601String()
     };
   }
 }

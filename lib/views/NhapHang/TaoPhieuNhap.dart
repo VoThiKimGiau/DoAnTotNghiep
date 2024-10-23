@@ -1,16 +1,21 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/NhaCungCapController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/NhaCungCap.dart';
+import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:flutter/material.dart';
 import '../../models/ChiTietSP.dart';
 
 class InventoryEntryScreen extends StatefulWidget {
   final String newOrderCode;
-  InventoryEntryScreen({Key? key, required this.newOrderCode}) : super(key: key);
+  final String maNV;
+  InventoryEntryScreen({Key? key, required this.newOrderCode,required this.maNV}) : super(key: key);
 
   @override
   _InventoryEntryScreenState createState() => _InventoryEntryScreenState();
@@ -25,9 +30,14 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
   List<int> quantities = [0, 0, 0]; // Quantities for products
   SanPhamController sanPhamController = SanPhamController();
   bool isLoading = true;
-
+  PhieuNhapController phieuNhapController=PhieuNhapController();
+  bool _isCreating = false;
+  bool _isOrderCreated = false;
   late MauSPController mauSPController = MauSPController();
   late KichCoController kichCoController = KichCoController();
+  Map<String, bool> selectedItems = {};
+  final StorageService storageService = StorageService();
+  double temporaryTotal = 0.0;
 
   @override
   void initState() {
@@ -77,8 +87,6 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
       print('Error fetching suppliers: $e');
     }
   }
-
-  // Fetch danh sách chi tiết sản phẩm theo nhà cung cấp
   Future<void> _fetchChiTietSPBySupplier(String maNCC) async {
     try {
       List<ChiTietSP> fetchedChiTietSPs = await chiTietSPController.fetchAllChiTietSPByMaNCC(maNCC);
@@ -101,8 +109,9 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
     } catch (e) {
       print('Error fetching product details: $e');
     }
-    return productDetails; // Return the details
+    return productDetails;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,18 +127,17 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('PN10', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text('${widget.newOrderCode}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             Text('Nhà cung cấp'),
             suppliers.isEmpty
-                ? CircularProgressIndicator() // Show loading when no data
+                ? CircularProgressIndicator()
                 : DropdownButton<String>(
               value: selectedSupplier,
               isExpanded: true,
-              onChanged: (String? newValue) {
+              onChanged: _isOrderCreated ? null : (String? newValue) {  // Add this condition
                 setState(() {
                   selectedSupplier = newValue;
-                  // Fetch products when changing supplier
                   if (newValue != null) {
                     _fetchChiTietSPBySupplier(newValue);
                   }
@@ -143,7 +151,6 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
               }).toList(),
             ),
             SizedBox(height: 16),
-            // Expanded widget to allow scrolling of product entries
             Expanded(
               child: chiTietSPs.isEmpty
                   ? Center(child: Text('Không có sản phẩm nào'))
@@ -159,19 +166,63 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Tạm tính:', style: TextStyle(fontSize: 18)),
-                Text('999999đ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('${temporaryTotal.toStringAsFixed(0)}đ', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
-            SizedBox(height: 24),
-            SizedBox(
+            SizedBox(height: 24), SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: _isOrderCreated
+                  ? ElevatedButton(
                 onPressed: () {
-                  // Handle confirm order
+                  // Handle confirmation logic here
                 },
                 child: Text('Xác nhận (${quantities.reduce((a, b) => a + b)})'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                ),
+              )
+                  : ElevatedButton(
+                onPressed: _isCreating
+                    ? null
+                    : () async {
+                  setState(() {
+                    _isCreating = true;
+                  });
+
+                  PhieuNhap phieuNhap = PhieuNhap(
+                    maPhieuNhap: widget.newOrderCode,
+                    nhaCungCap: selectedSupplier!,
+                    maNV: widget.maNV,
+                    tongTien: 0,
+                    ngayDat: DateTime.now(),
+                    ngayGiao: DateTime.now().add(Duration(days: 3)),
+                    trangThai: 'Đang xử lý',
+                  );
+
+                  try {
+                    PhieuNhap result = await phieuNhapController.taoPhieuNhap(phieuNhap);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Tạo phiếu nhập thành công! Mã: ${result.maPhieuNhap}')),
+                    );
+
+                    setState(() {
+                      _isOrderCreated = true;
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Lỗi khi tạo phiếu nhập: $e')),
+                    );
+                  } finally {
+                    setState(() {
+                      _isCreating = false;
+                    });
+                  }
+                },
+                child: Text('Tạo phiếu nhập'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
@@ -182,15 +233,17 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
     );
   }
 
-
   Widget _buildProductEntry(int index, ChiTietSP chiTietSP) {
+    // Initialize the selection state for this item if it doesn't exist
+    selectedItems.putIfAbsent(chiTietSP.maCTSP, () => false);
+
     return FutureBuilder<Map<String, String?>>(
-      future: fetchProductDetails(chiTietSP), // Fetch product details asynchronously
+      future: fetchProductDetails(chiTietSP),
       builder: (BuildContext context, AsyncSnapshot<Map<String, String?>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Show loading while fetching
+          return CircularProgressIndicator();
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}'); // Show error if any
+          return Text('Error: ${snapshot.error}');
         } else {
           final productDetails = snapshot.data;
           return Container(
@@ -200,35 +253,101 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${productDetails != null ? utf8.decode(productDetails['productName']?.runes.toList() ?? []) : 'Unknown Product'}',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                // Apply utf8.decode to size and color if needed
-                Text('${productDetails != null ? utf8.decode(productDetails['size']?.runes.toList() ?? []) : 'Unknown Size'} -  ${productDetails != null ? utf8.decode(productDetails['color']?.runes.toList() ?? []) : 'Unknown Color'}'),
-
-                Text('${chiTietSP.giaBan}'),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.remove_circle_outline),
-                      onPressed: () {
-                        setState(() {
-                          if (quantities[index] > 0) quantities[index]--;
-                        });
+                // Checkbox
+                Checkbox(
+                  value: selectedItems[chiTietSP.maCTSP],
+                  onChanged: (bool? value) {
+                    setState(() {
+                      selectedItems[chiTietSP.maCTSP] = value ?? false;
+                      _updateTemporaryTotal(); // Cập nhật tổng tạm tính
+                    });
+                  },
+                ),
+                // Product Image
+                Container(
+                  width: 80,
+                  height: 80,
+                  margin: EdgeInsets.only(right: 12),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: chiTietSP.maHinhAnh != null && chiTietSP.maHinhAnh.isNotEmpty
+                        ? Image.network(
+                      storageService.getImageUrl(chiTietSP.maHinhAnh)                      ,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey[600],
+                          ),
+                        );
                       },
-                    ),
-                    Text('${quantities[index]}'),
-                    IconButton(
-                      icon: Icon(Icons.add_circle_outline),
-                      onPressed: () {
-                        setState(() {
-                          quantities[index]++;
-                        });
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
                       },
+                    )
+                        : Container(
+                      color: Colors.grey[300],
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey[600],
+                      ),
                     ),
-                  ],
+                  ),
+                ),
+                // Product Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${productDetails != null ? utf8.decode(productDetails['productName']?.runes.toList() ?? []) : 'Unknown Product'}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${productDetails != null ? utf8.decode(productDetails['size']?.runes.toList() ?? []) : 'Unknown Size'} - ${productDetails != null ? utf8.decode(productDetails['color']?.runes.toList() ?? []) : 'Unknown Color'}',
+                      ),
+                      Text(
+                        '${chiTietSP.giaBan}đ',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.remove_circle_outline),
+                            onPressed: () {
+                              setState(() {
+                                if (quantities[index] > 0) quantities[index]--;
+                                _updateTemporaryTotal(); // Cập nhật tổng tạm tính
+                              });
+                            },
+                          ),
+                          Text('${quantities[index]}'),
+                          IconButton(
+                            icon: Icon(Icons.add_circle_outline),
+                            onPressed: () {
+                              setState(() {
+                                quantities[index]++;
+                                _updateTemporaryTotal(); // Cập nhật tổng tạm tính
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -236,5 +355,32 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
         }
       },
     );
+}
+  void _updateTemporaryTotal() {
+    temporaryTotal = 0.0; // Reset tổng tạm tính
+    for (int i = 0; i < chiTietSPs.length; i++) {
+      if (selectedItems[chiTietSPs[i].maCTSP] == true) {
+        temporaryTotal += quantities[i] * chiTietSPs[i].giaBan; // Tính tổng cho sản phẩm được chọn
+      }
+    }
+    setState(() {}); // Cập nhật giao diện
   }
+  // Helper method to get selected items count
+  int get selectedItemsCount => selectedItems.values.where((selected) => selected).length;
+
+  // Method to get list of selected ChiTietSP
+  List<ChiTietSP> getSelectedProducts() {
+    return chiTietSPs.where((ctsp) => selectedItems[ctsp.maCTSP] == true).toList();
+  }
+  double getTotalAmount() {
+    double total = 0;
+    for (int i = 0; i < chiTietSPs.length; i++) {
+      if (quantities[i] > 0) {
+        total += quantities[i] * chiTietSPs[i].giaBan; // Assuming giaBan is the price per unit
+      }
+    }
+    return total;
+  }
+
+
 }

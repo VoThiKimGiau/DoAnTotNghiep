@@ -41,4 +41,20 @@ class ChiTietPhieuNhapController{
       throw Exception("Không thể thêm chi tiết phiếu nhập");
     }
   }
+  Future<List<ChiTietPhieuNhap>> themNhieuChiTietPhieuNhap(List<ChiTietPhieuNhap> danhSachChiTiet) async {
+    List<ChiTietPhieuNhap> ketQua = [];
+
+    for (ChiTietPhieuNhap chiTiet in danhSachChiTiet) {
+      try {
+        ChiTietPhieuNhap chiTietMoi = await themChiTietPhieuNhap(chiTiet);
+        ketQua.add(chiTietMoi);
+      } catch (e) {
+        print("Lỗi khi thêm chi tiết phiếu nhập: $e");
+      }
+    }
+
+    return ketQua;
+  }
+
+
 }

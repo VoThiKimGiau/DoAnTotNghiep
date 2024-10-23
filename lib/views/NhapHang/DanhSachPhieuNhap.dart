@@ -14,7 +14,7 @@ import 'ChiTietPhieuNhap.dart';
 class PurchaseOrderList extends StatelessWidget {
   final PhieuNhapController phieuNhapController = PhieuNhapController();
   final ChiTietPhieuNhapController chiTietPhieuNhapController = ChiTietPhieuNhapController();
-  final String? maNV;
+  final String maNV;
 
   PurchaseOrderList({Key? key, required this.maNV}) : super(key: key);
 
@@ -57,15 +57,27 @@ class PurchaseOrderList extends StatelessWidget {
                       title: Text('Có lỗi xảy ra: ${detailSnapshot.error}'),
                     );
                   } else if (!detailSnapshot.hasData || detailSnapshot.data!.isEmpty) {
-                    return ListTile(
-                      title: Text('Chi tiết không có sẵn.'),
+                    return GestureDetector(
+                      onTap: () {
+                        // Navigate to OrderStatusScreen and pass the order number
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderStatusScreen(pn: phieuNhap),
+                          ),
+                        );
+                      },
+                      child: OrderItem(
+                        orderNumber: phieuNhap.maPhieuNhap,
+                        itemCount: 0,
+                        totalAmount: 0,
+                      ),
                     );
                   }
 
                   List<ChiTietPhieuNhap> chiTietPhieuNhaps = detailSnapshot.data!;
                   int totalQuantity = chiTietPhieuNhaps.length;
                   double totalAmount = chiTietPhieuNhaps.fold(0, (sum, item) => sum + (item.donGia * item.soLuong));
-
                   return GestureDetector(
                     onTap: () {
                       // Navigate to OrderStatusScreen and pass the order number
@@ -96,7 +108,7 @@ class PurchaseOrderList extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => InventoryEntryScreen(newOrderCode: newOrderCode),
+              builder: (context) => InventoryEntryScreen(newOrderCode: newOrderCode,maNV:maNV ),
             ),
           );
         },
