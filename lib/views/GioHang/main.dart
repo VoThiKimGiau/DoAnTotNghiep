@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../models/ChiTietGioHang.dart';
 import 'GioHangPage.dart';
-
 List<ChiTietGioHang> cartItems = []; // Danh sách giỏ hàng
-
 void main() {
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -21,25 +18,20 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class ProductSelectionPage extends StatefulWidget {
   @override
   _ProductSelectionPageState createState() => _ProductSelectionPageState();
 }
-
 class _ProductSelectionPageState extends State<ProductSelectionPage> {
   String color = "Orange";
   String size = "Nhỏ";
   int quantity = 1; // Giá trị mặc định của số lượng là 1
-
   final Map<String, double> sizePrices = {
     'Nhỏ': 148.00,
     'Vừa': 168.00,
     'Lớn': 188.00,
   };
-
   double get currentPrice => sizePrices[size]!;
-
   void _showOrderSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -87,7 +79,6 @@ class _ProductSelectionPageState extends State<ProductSelectionPage> {
                     }).toList(),
                   ),
                   SizedBox(height: 20),
-
                   // Chọn kích cỡ
                   Text("Kích cỡ:", style: TextStyle(fontSize: 16)),
                   SizedBox(height: 10),
@@ -112,14 +103,12 @@ class _ProductSelectionPageState extends State<ProductSelectionPage> {
                     }).toList(),
                   ),
                   SizedBox(height: 20),
-
                   // Hiển thị giá sản phẩm
                   Text(
                     "Giá: \$${(currentPrice * quantity).toStringAsFixed(2)}",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
-
                   // Số lượng
                   Text("Số lượng:", style: TextStyle(fontSize: 16)),
                   Row(
@@ -147,13 +136,12 @@ class _ProductSelectionPageState extends State<ProductSelectionPage> {
                     ],
                   ),
                   SizedBox(height: 20),
-
                   // Thêm vào giỏ hàng
                   ElevatedButton(
                     onPressed: () {
                       cartItems.add(ChiTietGioHang(
                         maGioHang: 'GH${cartItems.length + 1}', // Tạo mã giỏ hàng
-                        maSP: 'SP1', // Có thể thay đổi thành mã sản phẩm thực tế
+                        maSP: 'Sản phẩm 1', // Có thể thay đổi thành mã sản phẩm thực tế
                         maKichCo: size,
                         maMau: color,
                         soLuong: quantity,
@@ -178,7 +166,6 @@ class _ProductSelectionPageState extends State<ProductSelectionPage> {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

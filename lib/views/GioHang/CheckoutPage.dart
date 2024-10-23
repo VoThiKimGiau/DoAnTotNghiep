@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 
+import 'PaymentMethodPage.dart';
+
+import 'PromoCodePage.dart';
+import 'SelectAddressPage.dart';
+import 'ShippingMethodPage.dart';
 import 'SuccessPage.dart';
 
 class CheckoutPage extends StatefulWidget {
-  final double totalAmount; // Thêm biến để nhận tổng tiền
+  final double totalAmount;
 
-  CheckoutPage({required this.totalAmount}); // Cập nhật constructor
+  CheckoutPage({required this.totalAmount});
 
   @override
   _CheckoutPageState createState() => _CheckoutPageState();
 }
 
-
 class _CheckoutPageState extends State<CheckoutPage> {
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
   String selectedPromoCode = '';
-  List<String> promoCodes = ['Giảm tối đa \$30 ', 'Giảm 9%', 'Giảm tối đa \$70'];
+  List<String> promoCodes = [
+    'Giảm tối đa \$30',
+    'Giảm 9%',
+    'Giảm tối đa \$70',
+  ];
 
-  // Danh sách địa chỉ
   List<Map<String, String>> shippingAddresses = [
     {
       'name': 'Hoàng Minh',
@@ -34,367 +41,223 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thanh toán'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Thông tin nhận hàng
-              GestureDetector(
-                onTap: () => _showShippingAddresses(context),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Thông tin nhận hàng",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    if (selectedAddress.isNotEmpty)
-                      _buildInfoRow("Tên người nhận", selectedAddress['name']!),
-                    if (selectedAddress.isNotEmpty)
-                      _buildInfoRow("Địa chỉ", selectedAddress['address']!),
-                    if (selectedAddress.isNotEmpty)
-                      _buildInfoRow("Số điện thoại", selectedAddress['phone']!),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () => _addNewShippingInfo(context),
-                      child: Text("Thêm địa chỉ nhận hàng mới"),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-
-              // Phương thức thanh toán
-              Text(
-                "Phương thức thanh toán",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              _buildPaymentMethodOptions(),
-
-              SizedBox(height: 20),
-
-              // Phương thức vận chuyển
-              Text(
-                "Phương thức vận chuyển",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              _buildShippingMethodOptions(),
-
-              SizedBox(height: 20),
-
-              // Áp dụng mã khuyến mãi
-              Text(
-                "Áp dụng mã khuyến mãi",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              _buildPromoCodeOptions(),
-
-              SizedBox(height: 20),
-
-              // Hiển thị tổng giá trị đơn hàng và nút xác nhận
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Tổng cộng", style: TextStyle(fontSize: 18, color: Colors.grey)),
-                  Text("\$${widget.totalAmount.toStringAsFixed(2)}", style: TextStyle(fontSize: 18)), // Hiển thị tổng tiền
-                ],
-              ),
-
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => SuccessPage()),
-                  );
-                },
-                child: Text("Đặt hàng"),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
-                ),
-              ),
-            ],
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Column(
         children: [
-          Text(label, style: TextStyle(fontSize: 16)),
-          Text(value, style: TextStyle(fontSize: 16)),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Column(
+                children: [
+                  _buildSectionCard(
+                    title: 'Thông tin nhận hàng',
+                    content: selectedAddress.isNotEmpty
+                        ? _buildAddressContent()
+                        : Text('Chưa có thông tin nhận hàng'),
+                    onTap: () => _showShippingAddresses(context),
+                  ),
+                  _buildSectionCard(
+                    title: 'Phương thức thanh toán',
+                    content: Text(selectedPaymentMethod),
+                    onTap: _showPaymentMethodOptions,
+                  ),
+                  _buildSectionCard(
+                    title: 'Phương thức vận chuyển',
+                    content: Text(selectedShippingMethod),
+                    onTap: _showShippingMethodOptions,
+                  ),
+                  _buildSectionCard(
+                    title: 'Áp dụng khuyến mãi',
+                    content: Text(selectedPromoCode.isNotEmpty
+                        ? selectedPromoCode
+                        : 'Không có mã giảm giá'),
+                    onTap: _showPromoCodeOptions,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _buildSummarySection(),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentMethodOptions() {
-    return Column(
-      children: [
-        ListTile(
-          title: const Text('Thanh toán khi nhận hàng'),
-          leading: Radio<String>(
-            value: 'Thanh toán khi nhận hàng',
-            groupValue: selectedPaymentMethod,
-            onChanged: (String? value) {
-              setState(() {
-                selectedPaymentMethod = value!;
-              });
-            },
-          ),
+  Widget _buildSectionCard({
+    required String title,
+    required Widget content,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
         ),
-        ListTile(
-          title: const Text('Thanh toán online'),
-          leading: Radio<String>(
-            value: 'Thanh toán online',
-            groupValue: selectedPaymentMethod,
-            onChanged: (String? value) {
-              setState(() {
-                selectedPaymentMethod = value!;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShippingMethodOptions() {
-    return Column(
-      children: [
-        ListTile(
-          title: const Text('Thường'),
-          leading: Radio<String>(
-            value: 'Thường',
-            groupValue: selectedShippingMethod,
-            onChanged: (String? value) {
-              setState(() {
-                selectedShippingMethod = value!;
-              });
-            },
-          ),
-        ),
-        ListTile(
-          title: const Text('Hỏa tốc'),
-          leading: Radio<String>(
-            value: 'Hỏa tốc',
-            groupValue: selectedShippingMethod,
-            onChanged: (String? value) {
-              setState(() {
-                selectedShippingMethod = value!;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPromoCodeOptions() {
-    return Column(
-      children: promoCodes.map((promoCode) {
-        return ListTile(
-          title: Text(promoCode),
-          leading: Radio<String>(
-            value: promoCode,
-            groupValue: selectedPromoCode,
-            onChanged: (String? value) {
-              setState(() {
-                selectedPromoCode = value!;
-              });
-            },
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // Hàm mở hộp thoại danh sách địa chỉ nhận hàng
-  Future<void> _showShippingAddresses(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Danh sách địa chỉ nhận hàng'),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              itemCount: shippingAddresses.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(shippingAddresses[index]['name']!),
-                  subtitle: Text(shippingAddresses[index]['address']!),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _editShippingInfo(context, index);
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          // Cập nhật selectedAddress nếu địa chỉ bị xóa là địa chỉ đã chọn
-                          if (selectedAddress == shippingAddresses[index]) {
-                            setState(() {
-                              selectedAddress = {}; // Xóa thông tin địa chỉ nhận hàng đã chọn
-                            });
-                          }
-                          setState(() {
-                            shippingAddresses.removeAt(index);
-                          });
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  onTap: () {
-                    // Cập nhật thông tin nhận hàng với địa chỉ đã chọn
-                    setState(() {
-                      selectedAddress = shippingAddresses[index];
-                    });
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
+                  const SizedBox(height: 6),
+                  content,
+                ],
+              ),
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Hủy'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
+            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
-  // Hàm mở hộp thoại thêm địa chỉ mới
-  Future<void> _addNewShippingInfo(BuildContext context) async {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController addressController = TextEditingController();
-    final TextEditingController phoneController = TextEditingController();
-
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Thêm địa chỉ nhận hàng mới'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Tên người nhận'),
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: InputDecoration(labelText: 'Địa chỉ'),
-                ),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(labelText: 'Số điện thoại'),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Hủy'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Lưu'),
-              onPressed: () {
-                setState(() {
-                  // Thêm địa chỉ mới vào danh sách
-                  shippingAddresses.add({
-                    'name': nameController.text,
-                    'address': addressController.text,
-                    'phone': phoneController.text,
-                  });
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+  Widget _buildAddressContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('${selectedAddress['name']} | ${selectedAddress['phone']}'),
+        const SizedBox(height: 4),
+        Text(selectedAddress['address']!),
+      ],
     );
   }
 
-  // Hàm mở hộp thoại chỉnh sửa thông tin địa chỉ
-  Future<void> _editShippingInfo(BuildContext context, int index) async {
-    final TextEditingController nameController = TextEditingController(text: shippingAddresses[index]['name']);
-    final TextEditingController addressController = TextEditingController(text: shippingAddresses[index]['address']);
-    final TextEditingController phoneController = TextEditingController(text: shippingAddresses[index]['phone']);
+  void _showPaymentMethodOptions() async {
+    final selected = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaymentMethodPage(
+          selectedMethod: selectedPaymentMethod,
+        ),
+      ),
+    );
 
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Sửa địa chỉ nhận hàng'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Tên người nhận'),
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: InputDecoration(labelText: 'Địa chỉ'),
-                ),
-                TextField(
-                  controller: phoneController,
-                  decoration: InputDecoration(labelText: 'Số điện thoại'),
-                ),
-              ],
+    if (selected != null) {
+      setState(() {
+        selectedPaymentMethod = selected;
+      });
+    }
+  }
+
+  void _showShippingMethodOptions() async {
+    final selected = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ShippingMethodPage(
+          selectedMethod: selectedShippingMethod,
+        ),
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        selectedShippingMethod = selected;
+      });
+    }
+  }
+
+  void _showPromoCodeOptions() async {
+    final selected = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PromoCodePage(
+          selectedPromoCode: selectedPromoCode, // Tham số này cần tồn tại
+          promoCodes: promoCodes,
+        ),
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        selectedPromoCode = selected;
+      });
+    }
+  }
+
+
+  Widget _buildSummarySection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildSummaryRow('Tạm tính', widget.totalAmount),
+          _buildSummaryRow('Phí giao hàng', 8.0),
+          _buildSummaryRow('Tổng cộng', widget.totalAmount + 8.0, isTotal: true),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Logic để xử lý đặt hàng
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => SuccessPage()),
+              );
+            },
+            child: Text('Đặt hàng'),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(double.infinity, 50),
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Hủy'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Lưu'),
-              onPressed: () {
-                setState(() {
-                  // Cập nhật địa chỉ đã chọn
-                  shippingAddresses[index] = {
-                    'name': nameController.text,
-                    'address': addressController.text,
-                    'phone': phoneController.text,
-                  };
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
+  }
+
+  Widget _buildSummaryRow(String label, double amount, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontSize: 16)),
+          Text(
+            '\$${amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showShippingAddresses(BuildContext context) async {
+    final selected = await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectAddressPage(
+          shippingAddresses: shippingAddresses,
+          selectedAddress: selectedAddress,
+        ),
+      ),
+    );
+
+    if (selected != null) {
+      setState(() {
+        selectedAddress = selected;
+      });
+    }
   }
 }
