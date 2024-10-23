@@ -1,41 +1,73 @@
+import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:flutter/material.dart';
+import '../../controllers/ChiTietGioHangController.dart';
 import '../../models/ChiTietGioHang.dart';
 import 'CheckoutPage.dart';
 
-class GioHangPage extends StatefulWidget {
-  final List<ChiTietGioHang> gioHangItems;
 
-  GioHangPage({required this.gioHangItems});
+class GioHangPage extends StatefulWidget {
+  final String maGioHang; // Thêm maGioHang để lấy thông tin giỏ hàng
+
+  GioHangPage({required this.maGioHang});
 
   @override
   _GioHangPageState createState() => _GioHangPageState();
 }
 
 class _GioHangPageState extends State<GioHangPage> {
+  late ChiTietGioHangController _controller;
+  List<ChiTietGioHang> gioHangItems = [];
+  bool _isLoading = true; // Biến để theo dõi trạng thái tải
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ChiTietGioHangController();
+    _fetchGioHangItems(); // Gọi hàm để lấy danh sách sản phẩm
+  }
+
+  // Hàm lấy danh sách sản phẩm trong giỏ hàng
+  Future<void> _fetchGioHangItems() async {
+    try {
+      final items = await _controller.fetchListProduct(widget.maGioHang);
+      setState(() {
+        gioHangItems = items;
+        _isLoading = false; // Cập nhật trạng thái tải
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false; // Cập nhật trạng thái tải
+      });
+      // Hiển thị thông báo lỗi
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: $e')),
+      );
+    }
+  }
+
   // Hàm tính tổng tiền của giỏ hàng
   double _tinhTongTien() {
     double tongTien = 0.0;
-    for (var item in widget.gioHangItems) {
+    for (var item in gioHangItems) {
       tongTien += item.donGia * item.soLuong;
     }
     return tongTien;
   }
 
   // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
-  void _capNhatSoLuong(int index, int soLuongMoi) {
-    setState(() {
-      final itemCu = widget.gioHangItems[index];
-      widget.gioHangItems[index] = ChiTietGioHang(
-        maGioHang: itemCu.maGioHang,
-        maSP: itemCu.maSP,
-        maKichCo: itemCu.maKichCo,
-        maMau: itemCu.maMau,
-        soLuong: soLuongMoi,
-        donGia: itemCu.donGia,
-      );
-    });
-  }
-
+  // void _capNhatSoLuong(int index, int soLuongMoi) {
+  //   setState(() {
+  //     final itemCu = gioHangItems[index];
+  //     gioHangItems[index] = ChiTietGioHang(
+  //       maGioHang: itemCu.maGioHang,
+  //       maSP: itemCu.maSP,
+  //       maKichCo: itemCu.maKichCo,
+  //       maMau: itemCu.maMau,
+  //       soLuong: soLuongMoi,
+  //       donGia: itemCu.donGia,
+  //     );
+  //   });
+  // }
 
   // Hàm điều hướng tới trang thanh toán
   void _datHang() {
@@ -50,7 +82,7 @@ class _GioHangPageState extends State<GioHangPage> {
   // Hàm xóa toàn bộ giỏ hàng
   void _xoaTatCa() {
     setState(() {
-      widget.gioHangItems.clear();
+      gioHangItems.clear();
     });
   }
 
@@ -78,7 +110,9 @@ class _GioHangPageState extends State<GioHangPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: widget.gioHangItems.isEmpty
+        child: _isLoading // Hiển thị giao diện tải
+            ? Center(child: CircularProgressIndicator())
+            : gioHangItems.isEmpty
             ? Center(
           child: Text(
             'Giỏ hàng trống',
@@ -90,9 +124,9 @@ class _GioHangPageState extends State<GioHangPage> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: widget.gioHangItems.length,
+                itemCount: gioHangItems.length,
                 itemBuilder: (context, index) {
-                  final item = widget.gioHangItems[index];
+                  final item = gioHangItems[index];
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     child: Padding(
@@ -104,7 +138,7 @@ class _GioHangPageState extends State<GioHangPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                item.maSP,
+                                item.maCTSP,
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 10),
@@ -117,7 +151,7 @@ class _GioHangPageState extends State<GioHangPage> {
                                 icon: Icon(Icons.remove),
                                 onPressed: () {
                                   if (item.soLuong > 1) {
-                                    _capNhatSoLuong(index, item.soLuong - 1);
+                                    //_capNhatSoLuong(index, item.soLuong - 1);
                                   }
                                 },
                               ),
@@ -126,7 +160,7 @@ class _GioHangPageState extends State<GioHangPage> {
                               IconButton(
                                 icon: Icon(Icons.add),
                                 onPressed: () {
-                                  _capNhatSoLuong(index, item.soLuong + 1);
+                                 //_capNhatSoLuong(index, item.soLuong + 1);
                                 },
                               ),
                             ],

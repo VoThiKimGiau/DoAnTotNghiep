@@ -1,17 +1,22 @@
 class ChiTietGioHang {
   final String maGioHang;
-  final String maSP;
-  final String maKichCo;
-  final String maMau;
+  final String maCTSP;
   final int soLuong;
   final double donGia;
 
   ChiTietGioHang({
     required this.maGioHang,
-    required this.maSP,
-    required this.maKichCo,
-    required this.maMau,
+    required this.maCTSP,
     required this.soLuong,
     required this.donGia,
   });
+
+  factory ChiTietGioHang.fromJson(Map<String, dynamic> json) {
+    return ChiTietGioHang(
+      maGioHang: json['gioHang'] ?? '',
+      maCTSP: json['sanPham'] ?? '',
+      soLuong: json['soLuong'] ?? 0,
+      donGia: json['donGia'] ?? 0.0,
+    );
+  }
 }

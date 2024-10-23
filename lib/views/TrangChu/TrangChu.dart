@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/GioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
@@ -8,8 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../controllers/DanhMucSPController.dart';
+import '../GioHang/GioHangPage.dart';
 
 class TrangChuScreen extends StatefulWidget {
+  final String? maKhachHang;
+
+  TrangChuScreen({required this.maKhachHang});
+
   @override
   State<TrangChuScreen> createState() => _TrangChuScreen();
 }
@@ -22,11 +28,15 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   List<SanPham>? itemsSP;
   bool isLoading = true;
 
+  GioHangController gioHangController = GioHangController();
+  late Future<String> maGioHang;
+
   @override
   void initState() {
     super.initState();
     fetchDanhMucSP();
     fetchSP();
+    fetchMaGioHang();
   }
 
   Future<void> fetchDanhMucSP() async {
@@ -61,6 +71,10 @@ class _TrangChuScreen extends State<TrangChuScreen> {
     }
   }
 
+  Future<void> fetchMaGioHang()async {
+    maGioHang = gioHangController.getMaGHByMaKH(widget.maKhachHang);
+  }
+
   final TextEditingController _searchController = TextEditingController();
   List<String> _filteredData = [];
   List<String> _data = [
@@ -91,11 +105,13 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator()); // Show loading indicator
+      return const Center(
+          child: CircularProgressIndicator()); // Show loading indicator
     }
 
     if (items == null || items!.isEmpty) {
-      return const Center(child: Text('No products available.')); // Handle empty state
+      return const Center(
+          child: Text('No products available.')); // Handle empty state
     }
 
     return SafeArea(
@@ -127,8 +143,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
               width: 40,
               height: 40,
               child: ElevatedButton(
-                onPressed: () {
-                  print('b');
+                onPressed: () async {
+                  String maGioHangValue = await maGioHang;
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GioHangPage(
+                                maGioHang: maGioHangValue,
+                              )));
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(12),
@@ -215,7 +237,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             children: [
               const Text('Bán chạy',
                   style: TextStyle(
-                    fontFamily: 'Gabarito',
+                      fontFamily: 'Gabarito',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primaryColor)),
@@ -237,8 +259,13 @@ class _TrangChuScreen extends State<TrangChuScreen> {
               itemCount: itemsSP!.length >= 10 ? 10 : itemsSP!.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: () async{
-                  await Navigator.push(context, MaterialPageRoute(builder: (context) => ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),);
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),
+                    );
                   },
                   child: SanPhamItem(item: itemsSP![index]),
                 );
@@ -273,8 +300,13 @@ class _TrangChuScreen extends State<TrangChuScreen> {
               itemCount: itemsSP!.length >= 10 ? 10 : itemsSP!.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
-                  onTap: () async{
-                    await Navigator.push(context, MaterialPageRoute(builder: (context) => ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),);
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),
+                    );
                   },
                   child: SanPhamItem(item: itemsSP![index]),
                 );

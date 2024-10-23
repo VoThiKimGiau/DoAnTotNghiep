@@ -11,7 +11,7 @@ class SanPhamController {
     final response = await http.get(Uri.parse('$baseUrl?maSP=$maSP'));
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = json.decode(response.body);
+      final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
       return jsonResponse[
           'tenSP']; // Adjust the key according to your actual response
     } else {
