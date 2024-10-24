@@ -32,7 +32,7 @@ class InventoryForm extends StatelessWidget {
         );
       }).toList();
 
-      // Save all details using themNhieuChiTietPhieuNhap
+
       final savedDetails = await _controller.themNhieuChiTietPhieuNhap(chiTietPhieuNhaps);
 
       if (savedDetails.length == chiTietPhieuNhaps.length) {

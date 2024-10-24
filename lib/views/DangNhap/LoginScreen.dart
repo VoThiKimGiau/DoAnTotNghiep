@@ -24,7 +24,7 @@ import '../../models/NhanVien.dart';
     late Future<KhachHang?> login;
     late KhachHang? khachHang;
     late KhachHangController controller;
-    bool isCustomer=false;
+    bool isCustomer=true;
     bool isEmployee=false;
     late NhanVienController nhanVienController;
     late NhanVien? nhanVien;
@@ -32,6 +32,7 @@ import '../../models/NhanVien.dart';
     @override
     void initState() {
       super.initState();
+
       controller= KhachHangController();
       nhanVienController=NhanVienController();
     }

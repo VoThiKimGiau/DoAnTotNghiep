@@ -78,7 +78,13 @@ class _PurchaseOrderListState extends State<PurchaseOrderList> {
                           MaterialPageRoute(
                             builder: (context) => OrderStatusScreen(pn: phieuNhap),
                           ),
-                        );
+                        ).then((result) {
+                          if (result == true) {
+                            setState(() {
+                              futurePhieuNhaps = widget.phieuNhapController.layDanhSachPhieuNhap();
+                            });
+                          }
+                        });
                       },
                       child: OrderItem(
                         orderNumber: phieuNhap.maPhieuNhap,

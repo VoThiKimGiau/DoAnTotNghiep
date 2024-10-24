@@ -271,10 +271,7 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
   }
 
   Widget _buildProductEntry(int index, ChiTietSP chiTietSP) {
-    // Initialize the selection state for this item if it doesn't exist
     selectedItems.putIfAbsent(chiTietSP.maCTSP, () => false);
-
-    // Get cached product details
     final productDetails = productDetailsCache[chiTietSP.maCTSP];
 
     if (productDetails == null) {
@@ -291,7 +288,6 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Checkbox
           Checkbox(
             value: selectedItems[chiTietSP.maCTSP],
             onChanged: (bool? value) {
@@ -301,7 +297,6 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
               });
             },
           ),
-          // Product Image
           Container(
             width: 80,
             height: 80,
@@ -331,17 +326,17 @@ class _InventoryEntryScreenState extends State<InventoryEntryScreen> {
               ),
             ),
           ),
-          // Product Details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  utf8.decode(productDetails['productName']?.runes.toList() ?? []),
+                  productDetails['productName'] ?? '',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  '${utf8.decode(productDetails['size']?.runes.toList() ?? [])} - ${utf8.decode(productDetails['color']?.runes.toList() ?? [])}',
+                  '${utf8.decode(productDetails['size']?.runes.toList() ?? [])
+                  } - ${productDetails['color'] ?? ''}',
                 ),
                 Text(
                   '${chiTietSP.giaBan}đ',

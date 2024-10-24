@@ -41,7 +41,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context, true),
         ),
         title: Text('#${widget.pn.maPhieuNhap}', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
