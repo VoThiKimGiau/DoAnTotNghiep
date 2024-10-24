@@ -35,6 +35,7 @@ class ChiTietGioHangController {
   }
 
   Future<ChiTietGioHang> themChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
+    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.post(
       Uri.parse('http://${IpConfig.ipConfig}/api/chitietgiohang'),
       headers: <String, String>{
@@ -47,7 +48,8 @@ class ChiTietGioHangController {
     if (response.statusCode == 200) {
       return ChiTietGioHang.fromJson(json.decode(response.body));
     } else {
-      throw Exception("Không thể thêm chi tiết giỏ hàng");
+      print("Phản hồi lỗi: ${response.body}");
+      throw Exception("Không thể thêm chi tiết giỏ hàng: ${response.body}");
     }
   }
 }

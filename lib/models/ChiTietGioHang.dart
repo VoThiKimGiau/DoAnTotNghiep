@@ -22,8 +22,8 @@ class ChiTietGioHang {
 
   Map<String, dynamic> toJson() {
     return {
-      'gioHang': maGioHang,
-      'sanPham': maCTSP,
+      'maGioHang': maGioHang,
+      'maSanPham': maCTSP,
       'soLuong': soLuong,
       'donGia': donGia,
     };

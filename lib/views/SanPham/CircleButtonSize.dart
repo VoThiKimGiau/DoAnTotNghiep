@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 class CircleButtonSize extends StatefulWidget {
   final List<String> items;
+  final Function(String) onSelected;
 
-  CircleButtonSize({required this.items});
+  CircleButtonSize({required this.items, required this.onSelected,});
 
   @override
   _CircleButtonSize createState() => _CircleButtonSize();
@@ -18,10 +19,11 @@ class _CircleButtonSize extends State<CircleButtonSize> {
   KichCoController kichCoController = KichCoController();
   List<KichCo> dsKichCo = [];
 
-  void selectButton(int index) {
+  void onSelected(int index) {
     setState(() {
       selectedIndex = index;
     });
+    widget.onSelected(dsKichCo[index].maKichCo);
   }
 
   @override
@@ -41,6 +43,10 @@ class _CircleButtonSize extends State<CircleButtonSize> {
 
       setState(() {
         dsKichCo = fetchedItems;
+        if (dsKichCo.isNotEmpty) {
+          selectedIndex = 0; // Set default selection to the first item
+          widget.onSelected(dsKichCo[0].maKichCo); // Notify the parent of the default selection
+        }
       });
     } catch (e) {
       print('Error: $e');
@@ -60,7 +66,7 @@ class _CircleButtonSize extends State<CircleButtonSize> {
             itemCount: widget.items.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () => selectButton(index),
+                onTap: () => onSelected(index),
                 child: Container(
                   height: 50,
                   margin:

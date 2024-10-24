@@ -264,7 +264,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),
+                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP, maKH: widget.maKhachHang,)),
                     );
                   },
                   child: SanPhamItem(item: itemsSP![index]),
@@ -305,7 +305,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP)),
+                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP, maKH: widget.maKhachHang,)),
                     );
                   },
                   child: SanPhamItem(item: itemsSP![index]),

@@ -1,4 +1,7 @@
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietGioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/GioHangController.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietGioHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/KichCo.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
@@ -15,9 +18,9 @@ import '../SanPham/CircleButtonColor.dart';
 import '../SanPham/CircleButtonSize.dart';
 
 class ChiTietSanPhamScreen extends StatefulWidget {
-  final String? maSP;
+  final String? maSP, maKH;
 
-  ChiTietSanPhamScreen({required this.maSP});
+  ChiTietSanPhamScreen({required this.maSP, this.maKH});
 
   @override
   _ChiTietSanPhamScreen createState() => _ChiTietSanPhamScreen();
@@ -38,13 +41,18 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   List<String> dsMauSP = [];
   List<String> dsKichCo = [];
 
+  GioHangController gioHangController = GioHangController();
+
   int _quantity = 1;
+  String? maGH;
+  String? maSanPham;
 
   @override
   void initState() {
     super.initState();
     fetchSP(widget.maSP!);
     fetchChiTietSP(widget.maSP!);
+    maSanPham = widget.maSP;
   }
 
   Future<void> fetchSP(String maSanPham) async {
@@ -72,15 +80,17 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   Future<void> fetchChiTietSP(String maSanPham) async {
     try {
       List<ChiTietSP> fetchedItems =
-          await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
+      await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
       List<String> mauSP = await getDSMau(fetchedItems);
       List<String> kichCo = await getDSKichCo(fetchedItems);
+      String maGioH = await fetchMaGH(widget.maKH);
 
       setState(() {
         dsCTSP = fetchedItems;
         getDSHinhAnh();
         dsMauSP = mauSP;
         dsKichCo = kichCo;
+        maGH = maGioH;
       });
     } catch (e) {
       print('Error: $e'); // Handle error
@@ -99,7 +109,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   Future<void> fetchSPTuongTu(String maDanhMuc) async {
     try {
       List<SanPham> fetchedItems =
-          await sanPhamController.getProductByCategory(maDanhMuc);
+      await sanPhamController.getProductByCategory(maDanhMuc);
       setState(() {
         itemsSP = fetchedItems;
         removeSPHienTai();
@@ -130,6 +140,10 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
       lst.add(ct.maKichCo);
     }
     return lst;
+  }
+
+  Future<String> fetchMaGH(String? maKH) async {
+    return gioHangController.getMaGHByMaKH(maKH);
   }
 
   @override
@@ -178,175 +192,199 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
               ),
               isLoading
                   ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Display loader while loading
+                  child:
+                  CircularProgressIndicator()) // Display loader while loading
                   : item == null
-                      ? const Center(child: Text('Không tìm thấy sản phẩm.'))
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SizedBox(
+                  ? const Center(child: Text('Không tìm thấy sản phẩm.'))
+                  : Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 250,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: dsHinhSP.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.only(
+                                    top: 24,
+                                    bottom: 24,
+                                    left: 24,
+                                    right: 10),
+                                child: ClipRRect(
+                                  borderRadius:
+                                  BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    storageService
+                                        .getImageUrl(dsHinhSP[index]),
+                                    fit: BoxFit.cover,
+                                    width: 160,
                                     height: 250,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: dsHinhSP.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 24,
-                                              bottom: 24,
-                                              left: 24,
-                                              right: 10),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.network(
-                                              storageService
-                                                  .getImageUrl(dsHinhSP[index]),
-                                              fit: BoxFit.cover,
-                                              width: 160,
-                                              height: 250,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(left: 24),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      item!.tenSP,
-                                      style: const TextStyle(
-                                          fontSize: 25,
-                                          color: Colors.black,
-                                          fontFamily: 'Gabarito',
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                    Text(
-                                      sharedFunction
-                                          .formatCurrency(item!.giaMacDinh),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.primaryColor,
-                                          fontFamily: 'Gabarito',
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(
-                                  left: 23, top: 24, right: 25),
-                              height: 150,
-                              child: SingleChildScrollView(
-                                child: Text(
-                                  item!.moTa,
-                                  style: const TextStyle(fontSize: 16),
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
-                            ),
-                            Container(
-                                margin:
-                                    const EdgeInsets.only(left: 23, top: 24),
-                                child: const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Sản phẩm tương tự ',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Gabarito'),
-                                  ),
-                                )),
-                            Container(
-                                height: 280,
-                                margin: const EdgeInsets.only(left: 24),
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: itemsSP != null
-                                      ? (itemsSP!.length >= 5
-                                          ? 5
-                                          : itemsSP!.length)
-                                      : 0,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ChiTietSanPhamScreen(
-                                                    maSP: itemsSP![index].maSP),
-                                          ),
-                                        );
-                                      },
-                                      child: SanPhamItem(item: itemsSP![index]),
-                                    );
-                                  },
-                                )),
-                            Container(
-                              margin: const EdgeInsets.all(24),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    CustomBottomSheet.show(context, "Đặt hàng",
-                                        dsCTSP, dsMauSP, dsKichCo, _quantity);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                  ),
-                                  child: const Text(
-                                    'Đặt hàng',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    CustomBottomSheet.show(
-                                        context,
-                                        "Thêm vào giỏ hàng",
-                                        dsCTSP,
-                                        dsMauSP,
-                                        dsKichCo,
-                                        _quantity);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                  ),
-                                  child: const Text(
-                                    'Thêm vào giỏ hàng',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                              );
+                            },
+                          ),
                         ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 24),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            item!.tenSP,
+                            style: const TextStyle(
+                                fontSize: 25,
+                                color: Colors.black,
+                                fontFamily: 'Gabarito',
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            sharedFunction
+                                .formatCurrency(item!.giaMacDinh),
+                            style: const TextStyle(
+                                fontSize: 16,
+                                color: AppColors.primaryColor,
+                                fontFamily: 'Gabarito',
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(
+                        left: 23, top: 24, right: 25),
+                    height: 150,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        item!.moTa,
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  ),
+                  Container(
+                      margin:
+                      const EdgeInsets.only(left: 23, top: 24),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Sản phẩm tương tự ',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Gabarito'),
+                        ),
+                      )),
+                  Container(
+                      height: 280,
+                      margin: const EdgeInsets.only(left: 24),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: itemsSP != null
+                            ? (itemsSP!.length >= 5
+                            ? 5
+                            : itemsSP!.length)
+                            : 0,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChiTietSanPhamScreen(
+                                        maSP: itemsSP![index].maSP,
+                                        maKH: widget.maKH,),
+                                ),
+                              );
+                            },
+                            child: SanPhamItem(item: itemsSP![index]),
+                          );
+                        },
+                      )),
+                  Container(
+                    margin: const EdgeInsets.all(24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          CustomBottomSheet.show(
+                              context,
+                              "Đặt hàng",
+                              dsCTSP,
+                              dsMauSP,
+                              dsKichCo,
+                              _quantity,
+                              maSanPham ?? '',
+                              maGH ?? '',
+                          (newPrice)
+                          {
+                            setState(() {
+                              // Cập nhật giá trong widget cha
+                              var currentPrice = newPrice;
+                            });
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                        ),
+                        child: const Text(
+                          'Đặt hàng',
+                          style: TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin:
+                    const EdgeInsets.symmetric(horizontal: 24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          CustomBottomSheet.show(
+                            context,
+                            "Thêm vào giỏ hàng",
+                            dsCTSP,
+                            dsMauSP,
+                            dsKichCo,
+                            _quantity,
+                            maSanPham ?? '',
+                            maGH ?? '',
+                                  (newPrice)
+                              {
+                                setState(() {
+                                  // Cập nhật giá trong widget cha
+                                  var currentPrice = newPrice;
+                                });
+                              });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryColor,
+                        ),
+                        child: const Text(
+                          'Thêm vào giỏ hàng',
+                          style: TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -356,18 +394,50 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
 }
 
 class CustomBottomSheet {
-  static void show(
-      BuildContext context,
+  static void show(BuildContext context,
       String buttonText,
       List<ChiTietSP> dsCTSP,
       List<String> dsMau,
       List<String> dsKichCo,
-      int initialQuantity) {
+      int initialQuantity,
+      String maSP,
+      String maGH,
+      Function(double) onPriceUpdate) {
     int quantity = initialQuantity;
+    String? selectedMau;
+    String? selectedKichCo;
+    ChiTietSP? chiTietSP;
+
+    Future<ChiTietSP?> getCTSP(String maMau, String maKichCo,
+        String maSP) async {
+      for (ChiTietSP ct in dsCTSP) {
+        if (ct.maMau == maMau && ct.maKichCo == maKichCo && ct.maSP == maSP) {
+          return ct;
+        }
+      }
+      return null;
+    }
+
+    Future<void> loadChiTietSP() async {
+      if (selectedMau != null && selectedKichCo != null && maSP != null) {
+        ChiTietSP? chiTietSP = await getCTSP(
+            selectedMau!, selectedKichCo!, maSP!);
+        if (chiTietSP != null) {
+          print("Chi tiết sản phẩm: $chiTietSP");
+          onPriceUpdate(chiTietSP.giaBan);
+        } else {
+          print("Không có chi tiết sản phẩm này");
+        }
+      }
+    }
+
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        final screenHeight = MediaQuery.of(context).size.height;
+        final screenHeight = MediaQuery
+            .of(context)
+            .size
+            .height;
         final bottomSheetHeight = screenHeight * 0.75;
 
         return StatefulBuilder(
@@ -413,10 +483,16 @@ class CustomBottomSheet {
                     ),
                     if (dsMau.isEmpty)
                       const Center(child: CircularProgressIndicator())
-                    else if (dsMau.isNotEmpty)
-                      CircleButtonColor(items: dsMau)
                     else
-                      const Center(child: Text('Không có màu sắc nào.')),
+                      if (dsMau.isNotEmpty)
+                        CircleButtonColor(
+                          items: dsMau,
+                          onSelected: (value) {
+                            setState(() {
+                              selectedMau = value; // Capture selected color
+                            });
+                          },
+                        ),
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
                       child: const Align(
@@ -431,11 +507,17 @@ class CustomBottomSheet {
                       ),
                     ),
                     if (dsKichCo.isEmpty)
-                      const Center(child: CircularProgressIndicator())
-                    else if (dsKichCo.isNotEmpty)
-                      CircleButtonSize(items: dsKichCo)
-                    else
-                      const Center(child: Text('Không có kích cỡ nào.')),
+                      const Center(child: CircularProgressIndicator()),
+                    if (dsKichCo.isNotEmpty)
+                      CircleButtonSize(
+                        items: dsKichCo,
+                        onSelected: (value) {
+                          setState(() {
+                            selectedKichCo = value; // Capture selected size
+                          });
+                          loadChiTietSP();
+                        },
+                      ),
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
                       child: Row(
@@ -468,7 +550,7 @@ class CustomBottomSheet {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.symmetric(horizontal: 22),
+                                const EdgeInsets.symmetric(horizontal: 22),
                                 child: Text('$quantity',
                                     style: const TextStyle(fontSize: 20)),
                               ),
@@ -499,16 +581,53 @@ class CustomBottomSheet {
                       margin: const EdgeInsets.symmetric(horizontal: 24),
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          print('a');
+                        onPressed: () async {
+                          if (buttonText == "Thêm vào giỏ hàng") {
+                            print(
+                                "Selected mau: $selectedMau, selected kich co: $selectedKichCo, maSP: $maSP");
+                            if (selectedMau != null && selectedKichCo != null &&
+                                maSP != null) {
+                              chiTietSP = await getCTSP(
+                                  selectedMau!, selectedKichCo!, maSP);
+                              if (chiTietSP == null) {
+                                print("Không có chi tiết sản phẩm này");
+                              } else {
+                                ChiTietGioHangController chiTietGioHangController = ChiTietGioHangController();
+                                chiTietGioHangController.themChiTietGioHang(
+                                  ChiTietGioHang(
+                                    maGioHang: maGH,
+                                    maCTSP: chiTietSP!.maCTSP,
+                                    soLuong: quantity,
+                                    donGia: chiTietSP!.giaBan,
+                                  ),
+                                );
+                              }
+                            } else {
+                              print("Màu sắc hoặc kích cỡ chưa được chọn.");
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
                         ),
-                        child: Text(
-                          buttonText,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              selectedMau != null && selectedKichCo != null
+                                  ? '${quantity * (chiTietSP?.giaBan ?? 0)}'
+                                  : '0',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              buttonText,
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                            ),
+                          ],
                         ),
                       ),
                     ),

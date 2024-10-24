@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 
 class CircleButtonColor extends StatefulWidget {
   final List<String> items;
+  final Function(String) onSelected;
 
-  CircleButtonColor({required this.items});
+  CircleButtonColor({
+    required this.items,
+    required this.onSelected,
+  });
 
   @override
   _CircleButtonColor createState() => _CircleButtonColor();
@@ -19,10 +23,11 @@ class _CircleButtonColor extends State<CircleButtonColor> {
   MauSPController mauSPController = MauSPController();
   List<MauSP> dsMauSP = [];
 
-  void selectButton(int index) {
+  void onSelected(int index) {
     setState(() {
       selectedIndex = index;
     });
+    widget.onSelected(dsMauSP[index].maMau); // Call onSelected with the selected color
   }
 
   @override
@@ -42,6 +47,10 @@ class _CircleButtonColor extends State<CircleButtonColor> {
 
       setState(() {
         dsMauSP = fetchedItems;
+        if (dsMauSP.isNotEmpty) {
+          selectedIndex = 0; // Set default selection to the first item
+          widget.onSelected(dsMauSP[0].maMau); // Notify the parent of the default selection
+        }
       });
     } catch (e) {
       print('Error: $e');
@@ -61,7 +70,7 @@ class _CircleButtonColor extends State<CircleButtonColor> {
             itemCount: widget.items.length,
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () => selectButton(index),
+                onTap: () => onSelected(index),
                 child: Container(
                   height: 50,
                   margin:
@@ -84,7 +93,7 @@ class _CircleButtonColor extends State<CircleButtonColor> {
                       SizedBox(
                         width: 100,
                         child: Text(
-                          dsMauSP[index].tenMau,
+                          dsMauSP.isNotEmpty ? dsMauSP[index].tenMau : '',
                           style: TextStyle(
                             color: selectedIndex == index
                                 ? Colors.white
