@@ -176,7 +176,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                     Container(
                       width: 40,
                       height: 40,
-                      margin: EdgeInsets.only(right: 36),
+                      margin: const EdgeInsets.only(right: 36),
                       child: ElevatedButton(
                         onPressed: () {
                           print('b');

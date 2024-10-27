@@ -3,6 +3,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/GioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
+import 'package:datn_cntt304_bandogiadung/views/DanhMuc/CategoryList.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
 import 'package:flutter/material.dart';
@@ -41,15 +42,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
 
   Future<void> fetchDanhMucSP() async {
     try {
-      // Gọi phương thức từ controller
       List<DanhMucSP> fetchedItems = await danhMucSPController.fetchDanhMucSP();
       setState(() {
-        items = fetchedItems; // Cập nhật danh sách
+        items = fetchedItems;
       });
     } catch (e) {
-      print('Error: $e'); // Xử lý lỗi
+      print('Error: $e');
       setState(() {
-        items = []; // Đặt danh sách thành rỗng nếu có lỗi
+        items = [];
       });
     }
   }
@@ -181,7 +181,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                       color: AppColors.primaryColor)),
               TextButton(
                   onPressed: () {
-                    print('a');
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryListScreen()));
                   },
                   child: const Text(
                     'Xem tất cả',

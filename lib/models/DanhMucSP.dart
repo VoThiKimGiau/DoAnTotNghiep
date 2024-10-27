@@ -16,4 +16,12 @@ class DanhMucSP {
       anhDanhMuc: json['anhDanhMuc'].trim(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'maDanhMuc': maDanhMuc,
+      'tenDanhMuc': tenDanhMuc,
+      'anhDanhMuc': anhDanhMuc,
+    };
+  }
 }
