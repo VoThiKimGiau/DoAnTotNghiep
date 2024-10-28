@@ -2,10 +2,12 @@ import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
+import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../controllers/DanhMucSPController.dart';
+import '../../widgets/girdView_SanPham.dart';
 
 class ProductByCategoryScreen extends StatefulWidget {
   final String? maDanhMuc;
@@ -76,7 +78,7 @@ class _ProductByCategoryScreen extends State<ProductByCategoryScreen> {
     return SafeArea(
       child: Scaffold(
         body: isLoading // Check if loading
-            ? Center(
+            ? const Center(
                 child: CircularProgressIndicator()) // Show loading indicator
             : Column(
                 children: [
@@ -142,70 +144,9 @@ class _ProductByCategoryScreen extends State<ProductByCategoryScreen> {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 24),
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // Number of columns
-                          crossAxisSpacing: 10, // Spacing between columns
-                          mainAxisSpacing: 10, // Spacing between rows
-                          childAspectRatio: 0.6, // Aspect ratio of each cell
-                        ),
-                        itemCount: itemsSP!.length,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ChiTietSanPhamScreen(
-                                              maSP: itemsSP![index].maSP,
-                                              maKH: widget.maKH,
-                                            )));
-                              },
-                              child: SizedBox(
-                                height: 280,
-                                child: Card(
-                                  elevation: 4,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Image.network(
-                                        storageService.getImageUrl(
-                                            itemsSP![index].hinhAnhMacDinh),
-                                        height: 200,
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 4, vertical: 8),
-                                          child: Text(
-                                            itemsSP![index].tenSP,
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          ),
-                                        ),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              horizontal: 4),
-                                          child: Text(
-                                            sharedFunction.formatCurrency(
-                                                itemsSP![index].giaMacDinh),
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ));
-                        },
+                      child: GridViewSanPham(
+                        itemsSP: itemsSP ?? [],
+                        maKH: widget.maKH,
                       ),
                     ),
                   ),
