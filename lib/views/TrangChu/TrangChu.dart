@@ -4,6 +4,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:datn_cntt304_bandogiadung/views/DanhMuc/CategoryList.dart';
+import 'package:datn_cntt304_bandogiadung/views/DanhMuc/ProductByCategory.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +72,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
     }
   }
 
-  Future<void> fetchMaGioHang()async {
+  Future<void> fetchMaGioHang() async {
     maGioHang = gioHangController.getMaGHByMaKH(widget.maKhachHang);
   }
 
@@ -181,7 +182,12 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                       color: AppColors.primaryColor)),
               TextButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CategoryListScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CategoryListScreen(
+                                  maKH: widget.maKhachHang,
+                                )));
                   },
                   child: const Text(
                     'Xem tất cả',
@@ -190,43 +196,51 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             ],
           ),
         ),
-        Container(
+        SizedBox(
           height: 100,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: items!.length >= 5 ? 5 : items!.length,
             itemBuilder: (context, index) {
-              return Container(
-                width: 140,
-                margin: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      child: CircleAvatar(
-                        radius: 30,
-                        child: ClipOval(
-                          child: Image.network(
-                            items![index].anhDanhMuc,
-                            fit: BoxFit.cover,
-                            width: 60,
-                            height: 60,
+              return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProductByCategoryScreen(
+                                maDanhMuc: items![index].maDanhMuc, maKH: widget.maKhachHang,)));
+                  },
+                  child: Container(
+                    width: 140,
+                    margin: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: CircleAvatar(
+                            radius: 30,
+                            child: ClipOval(
+                              child: Image.network(
+                                items![index].anhDanhMuc,
+                                fit: BoxFit.cover,
+                                width: 60,
+                                height: 60,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        Text(
+                          items![index].tenDanhMuc, // Tên của mục
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 10),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      items![index].tenDanhMuc, // Tên của mục
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 10),
-                    ),
-                  ],
-                ),
-              );
+                  ));
             },
           ),
         ),
@@ -263,8 +277,10 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP, maKH: widget.maKhachHang,)),
+                          builder: (context) => ChiTietSanPhamScreen(
+                                maSP: itemsSP![index].maSP,
+                                maKH: widget.maKhachHang,
+                              )),
                     );
                   },
                   child: SanPhamItem(item: itemsSP![index]),
@@ -304,8 +320,10 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              ChiTietSanPhamScreen(maSP: itemsSP![index].maSP, maKH: widget.maKhachHang,)),
+                          builder: (context) => ChiTietSanPhamScreen(
+                                maSP: itemsSP![index].maSP,
+                                maKH: widget.maKhachHang,
+                              )),
                     );
                   },
                   child: SanPhamItem(item: itemsSP![index]),

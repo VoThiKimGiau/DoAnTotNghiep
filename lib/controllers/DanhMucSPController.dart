@@ -5,7 +5,7 @@ import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:http/http.dart' as http;
 
-class DanhMucSPController{
+class DanhMucSPController {
   Future<List<DanhMucSP>> fetchDanhMucSP() async {
     String baseUrl = 'http://${IpConfig.ipConfig}/api/danhmucsp';
 
@@ -21,8 +21,9 @@ class DanhMucSPController{
     }
   }
 
-  Future<List<SanPham>> fetchProductByCategory(String maDM) async{
-    String baseUrl = 'http://${IpConfig.ipConfig}/api/sanpham/byCategory?maDanhMuc=$maDM';
+  Future<List<SanPham>> fetchProductByCategory(String? maDM) async {
+    String baseUrl =
+        'http://${IpConfig.ipConfig}/api/sanpham/byCategory?maDanhMuc=$maDM';
 
     final response = await http.get(
       Uri.parse(baseUrl),
@@ -33,6 +34,21 @@ class DanhMucSPController{
       return jsonResponse.map((item) => SanPham.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load Product By Category data');
+    }
+  }
+
+  Future<String?> fetchTenDM(String? maDM) async {
+    String baseUrl = 'http://${IpConfig.ipConfig}/api/danhmucsp/$maDM';
+
+    final response = await http.get(
+      Uri.parse(baseUrl),
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      return jsonResponse['tenDanhMuc'];
+    } else {
+      throw Exception('Failed to load DanhMucSP theo mã danh mục data');
     }
   }
 }

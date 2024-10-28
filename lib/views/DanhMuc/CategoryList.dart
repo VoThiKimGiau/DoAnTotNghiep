@@ -6,6 +6,10 @@ import '../../controllers/DanhMucSPController.dart';
 import '../../models/DanhMucSP.dart';
 
 class CategoryListScreen extends StatefulWidget {
+  final String? maKH;
+
+  CategoryListScreen({required this.maKH});
+
   @override
   _CategoryListScreen createState() => _CategoryListScreen();
 }
@@ -111,8 +115,10 @@ class _CategoryListScreen extends State<CategoryListScreen> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             ProductByCategoryScreen(
-                                                maDanhMuc:
-                                                    items![index].maDanhMuc)));
+                                              maDanhMuc:
+                                                  items![index].maDanhMuc,
+                                              maKH: widget.maKH,
+                                            )));
                               },
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 64),
