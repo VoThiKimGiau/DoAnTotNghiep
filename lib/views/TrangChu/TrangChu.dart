@@ -7,6 +7,7 @@ import 'package:datn_cntt304_bandogiadung/views/DanhMuc/CategoryList.dart';
 import 'package:datn_cntt304_bandogiadung/views/DanhMuc/ProductByCategory.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:datn_cntt304_bandogiadung/widgets/item_SanPham.dart';
+import 'package:datn_cntt304_bandogiadung/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -76,32 +77,6 @@ class _TrangChuScreen extends State<TrangChuScreen> {
     maGioHang = gioHangController.getMaGHByMaKH(widget.maKhachHang);
   }
 
-  final TextEditingController _searchController = TextEditingController();
-  List<String> _filteredData = [];
-  List<String> _data = [
-    'Apple',
-    'Banana',
-    'Cherry',
-    'Date',
-    'Grape',
-    'Kiwi',
-    'Mango',
-    'Orange',
-  ];
-
-  void _filterData(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        _filteredData = [];
-      });
-    } else {
-      setState(() {
-        _filteredData = _data
-            .where((item) => item.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,28 +141,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
           ),
           Container(
             margin: const EdgeInsets.only(top: 24, left: 24, right: 24),
-            child: TextField(
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFFF4F4F4),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(
-                      color: Colors.transparent), // Viền khi không được chọn
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0), // Bo góc
-                  borderSide: const BorderSide(
-                      color: Colors.transparent), // Viền khi được chọn
-                ),
-                prefixIcon: Image.asset('assets/icons/search.png'),
-                hintText: 'Tìm kiếm',
-                hintStyle: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+            child: SearchBar_SP()
           ),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 14),

@@ -57,9 +57,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 50,
-                backgroundImage: NetworkImage(''), // Add a proper image URL if needed
+                //backgroundImage: NetworkImage(''), // Add a proper image URL if needed
               ),
               SizedBox(height: 16),
               Text(

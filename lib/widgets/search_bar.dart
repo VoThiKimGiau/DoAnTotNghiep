@@ -1,32 +1,44 @@
+import 'package:datn_cntt304_bandogiadung/views/TrangChu/SearchResult.dart';
 import 'package:flutter/material.dart';
 
-class SearchBar extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
+class SearchBar_SP extends StatelessWidget {
+  final TextEditingController _controller = TextEditingController();
 
-  const SearchBar({
-    Key? key,
-    required this.controller,
-    required this.onChanged,
-  }) : super(key: key);
+  void _onSearch(BuildContext context) {
+    String query = _controller.text;
+    if (query.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchResultScreen(query: query, maKH: 'KH1',),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: TextField(
-        controller: controller,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: 'Tìm kiếm',
-          hintStyle: const TextStyle(color: Colors.grey),
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(color: Colors.grey),
-          ),
-          filled: true,
-          fillColor: Colors.white,
+    return TextField(
+      controller: _controller,
+      onSubmitted: (value) => _onSearch(context),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFFF4F4F4),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+              color: Colors.transparent), // Viền khi không được chọn
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide:
+              const BorderSide(color: Colors.transparent), // Viền khi được chọn
+        ),
+        prefixIcon: Image.asset('assets/icons/search.png'),
+        hintText: 'Tìm kiếm',
+        hintStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 12,
         ),
       ),
     );
