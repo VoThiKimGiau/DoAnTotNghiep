@@ -149,6 +149,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -169,6 +170,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
+                          backgroundColor: Colors.white,
                         ),
                         child: SvgPicture.asset('assets/icons/arrowleft.svg'),
                       ),
@@ -183,6 +185,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
+                          backgroundColor: Colors.white,
                         ),
                         child: SvgPicture.asset('assets/icons/heart.svg'),
                       ),

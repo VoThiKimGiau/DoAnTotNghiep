@@ -43,6 +43,7 @@ class GridViewSanPham extends StatelessWidget {
               height: 280,
               child: Stack(children: [
                 Card(
+                  color: Colors.white,
                   elevation: 4,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

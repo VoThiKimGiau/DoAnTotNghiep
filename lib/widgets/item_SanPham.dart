@@ -22,6 +22,7 @@ class SanPhamItem extends StatelessWidget {
       child: Stack(
         children: [
           Card(
+              color: Colors.white,
               child: Column(
             children: [
               ClipRRect(

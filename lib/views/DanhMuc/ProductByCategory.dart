@@ -77,6 +77,7 @@ class _ProductByCategoryScreen extends State<ProductByCategoryScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: isLoading // Check if loading
             ? const Center(
                 child: CircularProgressIndicator()) // Show loading indicator
@@ -98,6 +99,7 @@ class _ProductByCategoryScreen extends State<ProductByCategoryScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.all(12),
+                              backgroundColor: Colors.white,
                             ),
                             child:
                                 SvgPicture.asset('assets/icons/arrowleft.svg'),
@@ -143,6 +145,7 @@ class _ProductByCategoryScreen extends State<ProductByCategoryScreen> {
                   ),
                   Expanded(
                     child: Container(
+                      color: Colors.white,
                       margin: const EdgeInsets.symmetric(horizontal: 24),
                       child: GridViewSanPham(
                         itemsSP: itemsSP ?? [],

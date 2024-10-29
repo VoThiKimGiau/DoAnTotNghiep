@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../controllers/DanhMucSPController.dart';
 import '../../models/DanhMucSP.dart';
+import '../../widgets/listView_DanhMuc.dart';
 
 class CategoryListScreen extends StatefulWidget {
   final String? maKH;
@@ -42,6 +43,7 @@ class _CategoryListScreen extends State<CategoryListScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             Container(
@@ -60,6 +62,7 @@ class _CategoryListScreen extends State<CategoryListScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(12),
+                        backgroundColor: Colors.white,
                       ),
                       child: SvgPicture.asset('assets/icons/arrowleft.svg'),
                     ),
@@ -86,77 +89,23 @@ class _CategoryListScreen extends State<CategoryListScreen> {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
               child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Danh mục',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Gabarito',
-                    ),
-                    textAlign: TextAlign.left,
-                  )),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Danh mục',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Gabarito',
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
             ),
             Expanded(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24),
-                child: items == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        itemCount: items!.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ProductByCategoryScreen(
-                                              maDanhMuc:
-                                                  items![index].maDanhMuc,
-                                              maKH: widget.maKH,
-                                            )));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 64),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 12, horizontal: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 40,
-                                    height: 40,
-                                    child: CircleAvatar(
-                                      radius: 30,
-                                      child: ClipOval(
-                                        child: Image.network(
-                                          items![index].anhDanhMuc,
-                                          fit: BoxFit.cover,
-                                          width: 40,
-                                          height: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    items![index].tenDanhMuc,
-                                    style: const TextStyle(
-                                        color: Colors.black, fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+              child: DanhMucListView(
+                items: items,
+                maKH: widget.maKH,
               ),
             ),
           ],

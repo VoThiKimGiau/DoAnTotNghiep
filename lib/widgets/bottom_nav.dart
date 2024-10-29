@@ -24,6 +24,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Container(
       color: Colors.white,
       child: BottomNavigationBar(
+        backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         currentIndex: widget.selectedIndex,
         onTap: widget.onItemTapped,
