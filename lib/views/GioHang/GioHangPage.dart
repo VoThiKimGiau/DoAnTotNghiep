@@ -1,7 +1,7 @@
-import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/ChiTietGioHangController.dart';
 import '../../models/ChiTietGioHang.dart';
+import '../../services/storage/storage_service.dart';
 import 'CheckoutPage.dart';
 
 
@@ -16,6 +16,7 @@ class GioHangPage extends StatefulWidget {
 
 class _GioHangPageState extends State<GioHangPage> {
   late ChiTietGioHangController _controller;
+  late StorageService _storageService;
   List<ChiTietGioHang> gioHangItems = [];
   bool _isLoading = true; // Biến để theo dõi trạng thái tải
 
@@ -23,6 +24,7 @@ class _GioHangPageState extends State<GioHangPage> {
   void initState() {
     super.initState();
     _controller = ChiTietGioHangController();
+    _storageService = StorageService(); // Khởi tạo StorageService
     _fetchGioHangItems(); // Gọi hàm để lấy danh sách sản phẩm
   }
 
@@ -54,27 +56,12 @@ class _GioHangPageState extends State<GioHangPage> {
     return tongTien;
   }
 
-  // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
-  // void _capNhatSoLuong(int index, int soLuongMoi) {
-  //   setState(() {
-  //     final itemCu = gioHangItems[index];
-  //     gioHangItems[index] = ChiTietGioHang(
-  //       maGioHang: itemCu.maGioHang,
-  //       maSP: itemCu.maSP,
-  //       maKichCo: itemCu.maKichCo,
-  //       maMau: itemCu.maMau,
-  //       soLuong: soLuongMoi,
-  //       donGia: itemCu.donGia,
-  //     );
-  //   });
-  // }
-
   // Hàm điều hướng tới trang thanh toán
   void _datHang() {
     double tongTien = _tinhTongTien();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CheckoutPage(totalAmount: tongTien),
+        builder: (context) => CheckoutPage(totalAmount: tongTien, customerId: '',),
       ),
     );
   }
@@ -110,7 +97,7 @@ class _GioHangPageState extends State<GioHangPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: _isLoading // Hiển thị giao diện tải
+        child: _isLoading
             ? Center(child: CircularProgressIndicator())
             : gioHangItems.isEmpty
             ? Center(
@@ -127,23 +114,41 @@ class _GioHangPageState extends State<GioHangPage> {
                 itemCount: gioHangItems.length,
                 itemBuilder: (context, index) {
                   final item = gioHangItems[index];
+                  final imageUrl = _storageService.getImageUrl(item.maCTSP);
+
                   return Card(
                     margin: EdgeInsets.symmetric(vertical: 10),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.maCTSP,
-                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 10),
-                              Text('Giá: \$${item.donGia.toStringAsFixed(2)}'),
-                            ],
+                          // Hiển thị hình ảnh sản phẩm
+                          Image.network(
+                            imageUrl,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.broken_image, size: 80);
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(child: CircularProgressIndicator());
+                            },
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.maCTSP,
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 10),
+                                Text('Giá: \$${item.donGia.toStringAsFixed(2)}'),
+                              ],
+                            ),
                           ),
                           Row(
                             children: [
@@ -155,12 +160,11 @@ class _GioHangPageState extends State<GioHangPage> {
                                   }
                                 },
                               ),
-                              Text(item.soLuong.toString(),
-                                  style: TextStyle(fontSize: 16)),
+                              Text(item.soLuong.toString(), style: TextStyle(fontSize: 16)),
                               IconButton(
                                 icon: Icon(Icons.add),
                                 onPressed: () {
-                                 //_capNhatSoLuong(index, item.soLuong + 1);
+                                  //_capNhatSoLuong(index, item.soLuong + 1);
                                 },
                               ),
                             ],

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-
 import 'PaymentMethodPage.dart';
-
 import 'PromoCodePage.dart';
 import 'SelectAddressPage.dart';
 import 'ShippingMethodPage.dart';
 import 'SuccessPage.dart';
+import '../../controllers/TTNhanHangController.dart';
+import '../../models/TTNhanHang.dart';
 
 class CheckoutPage extends StatefulWidget {
   final double totalAmount;
+  final String customerId; // Thêm tham số cho mã khách hàng
 
-  CheckoutPage({required this.totalAmount});
+  CheckoutPage({required this.totalAmount, required this.customerId}); // Cập nhật constructor
 
   @override
   _CheckoutPageState createState() => _CheckoutPageState();
@@ -26,15 +27,29 @@ class _CheckoutPageState extends State<CheckoutPage> {
     'Giảm tối đa \$70',
   ];
 
-  List<Map<String, String>> shippingAddresses = [
-    {
-      'name': 'Hoàng Minh',
-      'address': '123 Lê Lợi, Quận 1, TPHCM',
-      'phone': '+84 345 678 910',
-    },
-  ];
+  List<TTNhanHang> shippingAddresses = [];
+  TTNhanHang? selectedAddress;
+  final TTNhanHangController controller = TTNhanHangController(); // Khởi tạo controller
 
-  Map<String, String> selectedAddress = {};
+  @override
+  void initState() {
+    super.initState();
+    _loadShippingAddresses(); // Tải địa chỉ giao hàng
+  }
+
+  Future<void> _loadShippingAddresses() async {
+    try {
+      final addresses = await controller.fetchTTNhanHangByCustomer(widget.customerId); // Sử dụng mã khách hàng
+      setState(() {
+        shippingAddresses = addresses;
+        if (shippingAddresses.isNotEmpty) {
+          selectedAddress = shippingAddresses.first; // Chọn địa chỉ đầu tiên làm mặc định
+        }
+      });
+    } catch (e) {
+      print('Lỗi khi tải địa chỉ giao hàng: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +70,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   _buildSectionCard(
                     title: 'Thông tin nhận hàng',
-                    content: selectedAddress.isNotEmpty
+                    content: selectedAddress != null
                         ? _buildAddressContent()
                         : Text('Chưa có thông tin nhận hàng'),
                     onTap: () => _showShippingAddresses(context),
@@ -128,9 +143,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('${selectedAddress['name']} | ${selectedAddress['phone']}'),
+        Text('${selectedAddress!.hoTen} | ${selectedAddress!.sdt}'),
         const SizedBox(height: 4),
-        Text(selectedAddress['address']!),
+        Text(selectedAddress!.diaChi),
       ],
     );
   }
@@ -174,7 +189,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       context,
       MaterialPageRoute(
         builder: (context) => PromoCodePage(
-          selectedPromoCode: selectedPromoCode, // Tham số này cần tồn tại
+          selectedPromoCode: selectedPromoCode,
           promoCodes: promoCodes,
         ),
       ),
@@ -186,7 +201,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       });
     }
   }
-
 
   Widget _buildSummarySection() {
     return Container(
@@ -244,12 +258,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Future<void> _showShippingAddresses(BuildContext context) async {
-    final selected = await Navigator.push<Map<String, String>>(
+    final selected = await Navigator.push<TTNhanHang?>(
       context,
       MaterialPageRoute(
         builder: (context) => SelectAddressPage(
           shippingAddresses: shippingAddresses,
-          selectedAddress: selectedAddress,
+          selectedAddress: selectedAddress ?? shippingAddresses.first, maKH: '',
         ),
       ),
     );

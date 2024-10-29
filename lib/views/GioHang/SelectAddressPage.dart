@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../../config/IpConfig.dart';
+import '../../controllers/TTNhanHangController.dart';
+import '../../models/TTNhanHang.dart';
+
 
 class SelectAddressPage extends StatefulWidget {
-  final List<Map<String, String>> shippingAddresses;
-  final Map<String, String> selectedAddress;
+  final String maKH; // Thêm mã khách hàng vào tham số
+  final TTNhanHang selectedAddress;
 
   SelectAddressPage({
-    required this.shippingAddresses,
-    required this.selectedAddress,
+    required this.maKH, // Thay đổi để nhận mã khách hàng
+    required this.selectedAddress, required List<TTNhanHang> shippingAddresses,
   });
 
   @override
@@ -14,12 +21,27 @@ class SelectAddressPage extends StatefulWidget {
 }
 
 class _SelectAddressPageState extends State<SelectAddressPage> {
-  late Map<String, String> currentSelectedAddress;
+  late TTNhanHang currentSelectedAddress; // Địa chỉ đã chọn
+  final TTNhanHangController controller = TTNhanHangController(); // Khởi tạo controller
+  List<TTNhanHang> shippingAddresses = []; // Danh sách địa chỉ nhận hàng
 
   @override
   void initState() {
     super.initState();
     currentSelectedAddress = widget.selectedAddress;
+    _loadShippingAddresses(); // Gọi hàm để tải danh sách địa chỉ
+  }
+
+  Future<void> _loadShippingAddresses() async {
+    try {
+      List<TTNhanHang> addresses = await controller.fetchTTNhanHangByCustomer(widget.maKH);
+      setState(() {
+        shippingAddresses = addresses; // Cập nhật danh sách địa chỉ nhận hàng
+      });
+    } catch (e) {
+      print('Error loading shipping addresses: $e');
+      // Xử lý lỗi nếu cần
+    }
   }
 
   @override
@@ -34,9 +56,9 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: widget.shippingAddresses.length + 1,
+        itemCount: shippingAddresses.length + 1,
         itemBuilder: (context, index) {
-          if (index == widget.shippingAddresses.length) {
+          if (index == shippingAddresses.length) {
             return ElevatedButton.icon(
               icon: Icon(Icons.add),
               label: Text('Thêm địa chỉ mới'),
@@ -47,7 +69,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
             );
           }
 
-          final address = widget.shippingAddresses[index];
+          final address = shippingAddresses[index];
           final isSelected = address == currentSelectedAddress;
 
           return GestureDetector(
@@ -71,11 +93,11 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${address['name']} | ${address['phone']}',
+                    '${address.hoTen} | ${address.sdt}',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  Text(address['address']!),
+                  Text(address.diaChi),
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () => _showAddressForm(context, address),
@@ -102,18 +124,17 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     );
   }
 
-  Future<void> _showAddressForm(BuildContext context,
-      [Map<String, String>? address]) async {
+  Future<void> _showAddressForm(BuildContext context, [TTNhanHang? address]) async {
     final isEditing = address != null;
 
     final nameController = TextEditingController(
-      text: isEditing ? address!['name'] : '',
+      text: isEditing ? address.hoTen : '',
     );
     final phoneController = TextEditingController(
-      text: isEditing ? address!['phone'] : '',
+      text: isEditing ? address.sdt : '',
     );
     final addressController = TextEditingController(
-      text: isEditing ? address!['address'] : '',
+      text: isEditing ? address.diaChi : '',
     );
 
     await showModalBottomSheet(
@@ -145,19 +166,21 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  final newAddress = {
-                    'name': nameController.text,
-                    'phone': phoneController.text,
-                    'address': addressController.text,
-                  };
+                  final newAddress = TTNhanHang(
+                    maTTNH: isEditing ? address.maTTNH : DateTime.now().millisecondsSinceEpoch.toString(),
+                    hoTen: nameController.text,
+                    diaChi: addressController.text,
+                    sdt: phoneController.text,
+                    maKH: widget.maKH, // Sử dụng mã khách hàng hiện tại
+                    macDinh: false,
+                  );
 
                   setState(() {
                     if (isEditing) {
-                      final index =
-                      widget.shippingAddresses.indexOf(address!);
-                      widget.shippingAddresses[index] = newAddress;
+                      final index = shippingAddresses.indexOf(address);
+                      shippingAddresses[index] = newAddress;
                     } else {
-                      widget.shippingAddresses.add(newAddress);
+                      shippingAddresses.add(newAddress);
                     }
                   });
 
