@@ -6,14 +6,14 @@ import '../../config/IpConfig.dart';
 import '../../controllers/TTNhanHangController.dart';
 import '../../models/TTNhanHang.dart';
 
-
 class SelectAddressPage extends StatefulWidget {
-  final String maKH; // Thêm mã khách hàng vào tham số
+  final String? maKH; // Thêm mã khách hàng vào tham số
   final TTNhanHang selectedAddress;
 
   SelectAddressPage({
     required this.maKH, // Thay đổi để nhận mã khách hàng
-    required this.selectedAddress, required List<TTNhanHang> shippingAddresses,
+    required this.selectedAddress,
+    required List<TTNhanHang> shippingAddresses,
   });
 
   @override
@@ -22,22 +22,22 @@ class SelectAddressPage extends StatefulWidget {
 
 class _SelectAddressPageState extends State<SelectAddressPage> {
   late TTNhanHang currentSelectedAddress; // Địa chỉ đã chọn
-  final TTNhanHangController controller = TTNhanHangController(); // Khởi tạo controller
+  final TTNhanHangController controller =
+      TTNhanHangController(); // Khởi tạo controller
   List<TTNhanHang> shippingAddresses = []; // Danh sách địa chỉ nhận hàng
 
   @override
   void initState() {
     super.initState();
-    currentSelectedAddress = widget.selectedAddress;
-    _loadShippingAddresses(); // Gọi hàm để tải danh sách địa chỉ
+    _loadShippingAddresses();
   }
 
   Future<void> _loadShippingAddresses() async {
     try {
-      List<TTNhanHang> addresses = await controller.fetchTTNhanHangByCustomer(widget.maKH);
-      setState(() {
-        shippingAddresses = addresses; // Cập nhật danh sách địa chỉ nhận hàng
-      });
+      List<TTNhanHang> addresses =
+          await controller.fetchTTNhanHangByCustomer(widget.maKH);
+
+      shippingAddresses = addresses; // Cập nhật danh sách địa chỉ nhận hàng
     } catch (e) {
       print('Error loading shipping addresses: $e');
       // Xử lý lỗi nếu cần
@@ -54,77 +54,80 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
           onPressed: () => Navigator.pop(context, currentSelectedAddress),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: shippingAddresses.length + 1,
-        itemBuilder: (context, index) {
-          if (index == shippingAddresses.length) {
-            return ElevatedButton.icon(
-              icon: Icon(Icons.add),
-              label: Text('Thêm địa chỉ mới'),
-              onPressed: () => _showAddressForm(context),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
-              ),
-            );
-          }
-
-          final address = shippingAddresses[index];
-          final isSelected = address == currentSelectedAddress;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                currentSelectedAddress = address;
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
+      body: shippingAddresses.isEmpty
+          ? Center(child: Text('No shipping addresses available.'))
+          : ListView.builder(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.blue[50] : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isSelected ? Colors.blue : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${address.hoTen} | ${address.sdt}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+              itemCount: shippingAddresses.length + 1,
+              itemBuilder: (context, index) {
+                if (index == shippingAddresses.length) {
+                  return ElevatedButton.icon(
+                    icon: Icon(Icons.add),
+                    label: Text('Thêm địa chỉ mới'),
+                    onPressed: () => _showAddressForm(context),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50),
+                    ),
+                  );
+                }
+
+                final address = shippingAddresses[index];
+                final isSelected = address == currentSelectedAddress;
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      currentSelectedAddress = address;
+                    });
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.blue[50] : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected ? Colors.blue : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${address.hoTen} | ${address.sdt}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(address.diaChi),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () => _showAddressForm(context, address),
+                          child: Text('Chỉnh sửa'),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(address.diaChi),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: () => _showAddressForm(context, address),
-                    child: Text('Chỉnh sửa'),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
           onPressed: () {
             Navigator.pop(context, currentSelectedAddress);
           },
-          child: Text('Xác nhận'),
           style: ElevatedButton.styleFrom(
-            minimumSize: Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 50),
           ),
+          child: const Text('Xác nhận'),
         ),
       ),
     );
   }
 
-  Future<void> _showAddressForm(BuildContext context, [TTNhanHang? address]) async {
+  Future<void> _showAddressForm(BuildContext context,
+      [TTNhanHang? address]) async {
     final isEditing = address != null;
 
     final nameController = TextEditingController(
@@ -135,6 +138,9 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     );
     final addressController = TextEditingController(
       text: isEditing ? address.diaChi : '',
+    );
+    final customerController = TextEditingController(
+      text: isEditing ? address.maKH : '',
     );
 
     await showModalBottomSheet(
@@ -167,11 +173,14 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
               ElevatedButton(
                 onPressed: () {
                   final newAddress = TTNhanHang(
-                    maTTNH: isEditing ? address.maTTNH : DateTime.now().millisecondsSinceEpoch.toString(),
+                    maTTNH: isEditing
+                        ? address.maTTNH
+                        : DateTime.now().millisecondsSinceEpoch.toString(),
                     hoTen: nameController.text,
                     diaChi: addressController.text,
                     sdt: phoneController.text,
-                    maKH: widget.maKH, // Sử dụng mã khách hàng hiện tại
+                    maKH: customerController.text,
+                    // Sử dụng mã khách hàng hiện tại
                     macDinh: false,
                   );
 

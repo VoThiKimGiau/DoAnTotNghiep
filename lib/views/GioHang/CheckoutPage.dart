@@ -9,7 +9,7 @@ import '../../models/TTNhanHang.dart';
 
 class CheckoutPage extends StatefulWidget {
   final double totalAmount;
-  final String customerId; // Thêm tham số cho mã khách hàng
+  final String? customerId; // Thêm tham số cho mã khách hàng
 
   CheckoutPage({required this.totalAmount, required this.customerId}); // Cập nhật constructor
 
@@ -39,7 +39,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> _loadShippingAddresses() async {
     try {
-      final addresses = await controller.fetchTTNhanHangByCustomer(widget.customerId); // Sử dụng mã khách hàng
+      final List<TTNhanHang> addresses = await controller.fetchTTNhanHangByCustomer(widget.customerId); // Sử dụng mã khách hàng
       setState(() {
         shippingAddresses = addresses;
         if (shippingAddresses.isNotEmpty) {
@@ -263,7 +263,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       MaterialPageRoute(
         builder: (context) => SelectAddressPage(
           shippingAddresses: shippingAddresses,
-          selectedAddress: selectedAddress ?? shippingAddresses.first, maKH: '',
+          selectedAddress: selectedAddress ?? shippingAddresses.first, maKH: widget.customerId,
         ),
       ),
     );

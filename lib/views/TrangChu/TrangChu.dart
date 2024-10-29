@@ -130,6 +130,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                                     builder: (context) =>
                                         GioHangPage(
                                           maGioHang: maGioHangValue,
+                                          maKH: widget.maKhachHang,
                                         )));
                           },
                           style: ElevatedButton.styleFrom(

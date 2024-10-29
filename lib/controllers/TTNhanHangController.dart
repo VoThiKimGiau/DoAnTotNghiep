@@ -9,15 +9,17 @@ class TTNhanHangController {
   final String baseUrl = 'http://${IpConfig.ipConfig}/api/ttnhanhang';
 
   // Lấy thông tin địa chỉ nhận hàng theo mã khách hàng
-  Future<List<TTNhanHang>> fetchTTNhanHangByCustomer(String maKH) async {
-    final response = await http.get(Uri.parse('$baseUrl/KH1/$maKH'));
+  Future<List<TTNhanHang>> fetchTTNhanHangByCustomer(String? maKH) async {
+    final response =
+        await http.get(Uri.parse('$baseUrl/byCustomer?maKH=$maKH'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => TTNhanHang.fromJson(json)).toList();
     } else {
       print('HTTP Error: ${response.statusCode}');
       print('Response body: ${response.body}');
-      throw Exception('Failed to load TTNhanHang. Status code: ${response.statusCode}');
+      throw Exception(
+          'Failed to load TTNhanHang. Status code: ${response.statusCode}');
     }
   }
 
@@ -30,7 +32,8 @@ class TTNhanHangController {
     } else {
       print('HTTP Error: ${response.statusCode}');
       print('Response body: ${response.body}');
-      throw Exception('Failed to load TTNhanHang. Status code: ${response.statusCode}');
+      throw Exception(
+          'Failed to load TTNhanHang. Status code: ${response.statusCode}');
     }
   }
 }

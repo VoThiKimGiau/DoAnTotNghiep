@@ -7,8 +7,9 @@ import 'CheckoutPage.dart';
 
 class GioHangPage extends StatefulWidget {
   final String maGioHang; // Thêm maGioHang để lấy thông tin giỏ hàng
+  final String? maKH;
 
-  GioHangPage({required this.maGioHang});
+  GioHangPage({required this.maGioHang, required this.maKH});
 
   @override
   _GioHangPageState createState() => _GioHangPageState();
@@ -61,7 +62,7 @@ class _GioHangPageState extends State<GioHangPage> {
     double tongTien = _tinhTongTien();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CheckoutPage(totalAmount: tongTien, customerId: '',),
+        builder: (context) => CheckoutPage(totalAmount: tongTien, customerId: widget.maKH,),
       ),
     );
   }
