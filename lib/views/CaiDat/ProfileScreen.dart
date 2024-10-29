@@ -52,6 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String phone = khachHang!.sdt ?? "Số điện thoại chưa đăng ký"; // Default message if phone is null
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -101,11 +102,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   _showLogoutConfirmationDialog();
                 },
-                child: Text('Đăng xuất',
-                    style: TextStyle(fontSize: 18, color: Colors.red)),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.white,
                 ),
+                child: const Text('Đăng xuất',
+                    style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
