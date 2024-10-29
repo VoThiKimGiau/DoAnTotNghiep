@@ -436,6 +436,9 @@ class CustomBottomSheet {
 
     showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
       builder: (BuildContext context) {
         final screenHeight = MediaQuery
             .of(context)
@@ -446,9 +449,13 @@ class CustomBottomSheet {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.0)),
+              ),
               height: bottomSheetHeight,
               width: double.infinity,
-              color: Colors.white,
               child: SingleChildScrollView(
                 child: Column(
                   children: [

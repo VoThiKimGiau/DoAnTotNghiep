@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../controllers/DanhMucSPController.dart';
+import '../../widgets/girdView_SanPham.dart';
 import '../../widgets/listView_DanhMuc.dart';
 import '../GioHang/GioHangPage.dart';
 
@@ -81,7 +82,9 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Center(
-          child: CircularProgressIndicator()); // Show loading indicator
+          child: CircularProgressIndicator(
+        backgroundColor: Colors.white,
+      )); // Show loading indicator
     }
 
     if (items == null || items!.isEmpty) {
@@ -271,7 +274,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
               ],
             ),
           ),
-          Container(
+          SizedBox(
               height: 280,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -369,8 +372,7 @@ class CustomSearch extends SearchDelegate {
       IconButton(
         onPressed: () {
           query = '';
-          showSuggestions(
-              context); // Show suggestions when the query is cleared
+          showSuggestions(context);
         },
         icon: const Icon(Icons.clear),
       ),
@@ -399,7 +401,7 @@ class CustomSearch extends SearchDelegate {
 
   Widget _buildSearchResults(BuildContext context) {
     if (query.isEmpty) {
-      return _buildCategoryList(); // Show categories by default
+      return _buildCategoryList();
     }
 
     return FutureBuilder<List<SanPham>>(
@@ -422,53 +424,102 @@ class CustomSearch extends SearchDelegate {
           return _buildNoResults(context);
         }
 
-        return ListView.builder(
-          itemCount: results.length,
-          itemBuilder: (context, index) {
-            final item = results[index];
-            return ListTile(
-              title: Text(item.tenSP),
-              onTap: () {
-                close(context, item);
-              },
-            );
-          },
-        );
+        return SafeArea(
+            child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 25),
+            color: Colors.white,
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    width: 110,
+                    height: 45,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        CustomBottomSheet.show(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 2,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                      ),
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Sắp xếp',
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          ),
+                          const SizedBox(width: 4),
+                          SvgPicture.asset('assets/icons/arrowdown.svg'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '${results.length} sản phẩm được tìm thấy',
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GridViewSanPham(
+                    itemsSP: results,
+                    maKH: maKH,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
       },
     );
   }
 
   Widget _buildNoResults(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 100,
-            width: 100,
-            child: Image.asset('assets/images/search_no_result.png'),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 25),
-            child: const Text(
-              'Xin lỗi không có sản phẩm như bạn tìm kiếm',
-              style: TextStyle(fontSize: 25),
-              textAlign: TextAlign.center,
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 100,
+              width: 100,
+              child: Image.asset('assets/images/search_no_result.png'),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              close(context, null);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 25),
+              child: const Text(
+                'Xin lỗi không có sản phẩm như bạn tìm kiếm',
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              ),
             ),
-            child: const Text(
-              'Trở về trang chủ',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+            ElevatedButton(
+              onPressed: () {
+                close(context, null);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+              ),
+              child: const Text(
+                'Trở về trang chủ',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -478,7 +529,10 @@ class CustomSearch extends SearchDelegate {
       future: fetchCategories(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(
+            backgroundColor: Colors.white,
+          ));
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -493,7 +547,8 @@ class CustomSearch extends SearchDelegate {
             children: [
               Container(
                 color: Colors.white,
-                margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 child: const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -516,6 +571,127 @@ class CustomSearch extends SearchDelegate {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+}
+
+class CustomBottomSheet {
+  static void show(BuildContext context) {
+    List<String> data = ['Gợi ý', 'Mới nhất', 'Giá tăng dần', 'Giá giảm dần'];
+    int selectedIndex = -1; // Initialize selected index
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      builder: (BuildContext context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final bottomSheetHeight = screenHeight * 0.5;
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16.0)),
+              ),
+              height: bottomSheetHeight,
+              width: double.infinity,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedIndex = -1;
+                          });
+                        },
+                        child: const Text(
+                          'Clear',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                      ),
+                      const Text(
+                        'Sắp xếp',
+                        style: TextStyle(
+                          fontSize: 25,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.all(0),
+                          minimumSize: const Size(24, 24),
+                          backgroundColor: Colors.white,
+                        ),
+                        label: const SizedBox.shrink(),
+                        icon: const Icon(Icons.close, color: Colors.black),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                          child: Container(
+                            height: 50,
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 24),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: selectedIndex == index
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: selectedIndex == index
+                                    ? AppColors.primaryColor
+                                    : Colors.grey,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  data[index],
+                                  style: TextStyle(
+                                    color: selectedIndex == index
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                if (selectedIndex == index)
+                                  const Icon(Icons.check,
+                                      color: Colors.white, size: 20),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
