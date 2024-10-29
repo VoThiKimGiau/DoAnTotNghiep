@@ -1,4 +1,4 @@
-import 'package:datn_cntt304_bandogiadung/views/TrangChu/SearchResult.dart';
+import 'package:datn_cntt304_bandogiadung/views/TrangChu/SearchSP.dart';
 import 'package:flutter/material.dart';
 
 class SearchBar_SP extends StatelessWidget {
@@ -7,12 +7,12 @@ class SearchBar_SP extends StatelessWidget {
   void _onSearch(BuildContext context) {
     String query = _controller.text;
     if (query.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SearchResultScreen(query: query, maKH: 'KH1',),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => SearchResultScreen(query: query, maKH: 'KH1',),
+      //   ),
+      // );
     }
   }
 
