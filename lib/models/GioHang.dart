@@ -1,44 +1,29 @@
+class GioHang {
+  final String maGioHang;
+  final String khachHang;
+  final double tongTien;
 
-class GiaoHang {
-  String maVanDon;
-  String donHang;
-  DateTime? ngayGui;
-  DateTime? ngayGiao;
-  String trangThai;
-  String hinhThuc;
-  double tienUng;
-
-  GiaoHang({
-    required this.maVanDon,
-    required this.donHang,
-    this.ngayGui,
-    this.ngayGiao,
-    required this.trangThai,
-    required this.hinhThuc,
-    required this.tienUng,
+  GioHang({
+    required this.maGioHang,
+    required this.khachHang,
+    required this.tongTien,
   });
 
-  factory GiaoHang.fromJson(Map<String, dynamic> json) {
-    return GiaoHang(
-      maVanDon: json['mavandon'] as String,
-      donHang: json['madh'] as String,
-      ngayGui: DateTime.tryParse(json['ngaygui'] as String),
-      ngayGiao: DateTime.tryParse(json['ngaygiao'] as String),
-      trangThai: json['trangthai'] as String,
-      hinhThuc: json['hinhthucgiaohang'] as String,
-      tienUng: (json['tienung'] as num).toDouble(),
+  // Phương thức để chuyển từ JSON sang đối tượng GioHang
+  factory GioHang.fromJson(Map<String, dynamic> json) {
+    return GioHang(
+      maGioHang: json['maGioHang'],
+      khachHang: json['khachHang'],
+      tongTien: json['tongTien'].toDouble(), // Chuyển sang kiểu double nếu cần
     );
   }
 
+  // Phương thức để chuyển từ đối tượng GioHang sang JSON
   Map<String, dynamic> toJson() {
     return {
-      'mavandon': maVanDon,
-      'madh': donHang,
-      'ngaygui': ngayGui?.toIso8601String(),
-      'ngaygiao': ngayGiao?.toIso8601String(),
-      'trangthai': trangThai,
-      'hinhthucgiaohang': hinhThuc,
-      'tienung': tienUng,
+      'maGioHang': maGioHang,
+      'khachHang': khachHang,
+      'tongTien': tongTien,
     };
   }
 }

@@ -34,6 +34,7 @@ class ChiTietGioHangController {
     }
   }
 
+  // Thêm chi tiết giỏ hàng
   Future<ChiTietGioHang> themChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
     print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.post(
@@ -50,6 +51,20 @@ class ChiTietGioHangController {
     } else {
       print("Phản hồi lỗi: ${response.body}");
       throw Exception("Không thể thêm chi tiết giỏ hàng: ${response.body}");
+    }
+  }
+
+  // Lấy mã giỏ hàng dựa trên mã khách hàng
+  Future<String> fetchMaGioHang(String maKH) async {
+    final response = await http.get(
+      Uri.parse('http://${IpConfig.ipConfig}/api/giohang?khachHang/$maKH'), // Đường dẫn API
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return jsonResponse['maGioHang']; // Giả sử API trả về maGioHang
+    } else {
+      throw Exception('Không thể lấy mã giỏ hàng');
     }
   }
 }
