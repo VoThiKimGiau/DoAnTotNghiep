@@ -58,6 +58,7 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.green,
       body: SafeArea(
@@ -147,7 +148,7 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
                             child: InfoCard(
                               icon: Icons.label,
                               title: "Dưới định mức tồn",
-                              value: "1",
+                              value: "",
                               iconColor: Colors.yellow,
                             ),
                           ),
@@ -160,7 +161,7 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
                             child: InfoCard(
                               icon: Icons.shopping_cart,
                               title: "Còn hàng để bán",
-                              value: "3",
+                              value: "",
                               iconColor: Colors.green,
                             ),
                           ),
@@ -168,21 +169,11 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
                       ),
                     )
                     ,
+                    SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Row(
                         children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                padding: EdgeInsets.symmetric(vertical: 12),
-                              ),
-                              onPressed: () {},
-                              child: Text("↓ Xuất hàng"),
-                            ),
-                          ),
-                          SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(

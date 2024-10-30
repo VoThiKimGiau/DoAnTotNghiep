@@ -94,13 +94,15 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
 
     try {
       List<ChiTietSP> results = [];
+      List<ChiTietSP> lst = [];
 
       // 1. Fetch base data according to category
       if (selectedCategory != null) {
         final categoryProducts = await chiTietSPController.fetchChiTietSPByCategory(selectedCategory!);
-        results = categoryProducts
+        lst = categoryProducts
             .map((item) => ChiTietSP.fromJson(item))
             .toList();
+
       } else {
         results = await chiTietSPController.fetchLowQuantity();
       }
@@ -178,6 +180,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
             onChanged: _onSearchChanged,
           ),
           SizedBox(height: 16),
+          // First Row for Category Dropdown
           Row(
             children: [
               Expanded(
@@ -205,7 +208,12 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                   },
                 ),
               ),
-              SizedBox(width: 16),
+            ],
+          ),
+          SizedBox(height: 16), // Add spacing between rows
+          // Second Row for Supplier Dropdown
+          Row(
+            children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
                   decoration: InputDecoration(
@@ -304,8 +312,6 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                   : filteredProducts.isEmpty
                   ? Center(child: Text('Không có sản phẩm nào'))
                   : ListView.builder(
-                shrinkWrap: true,
-                physics: ClampingScrollPhysics(),
                 itemCount: filteredProducts.length,
                 itemBuilder: (context, index) => _buildProductItem(filteredProducts[index]),
               ),
