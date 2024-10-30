@@ -7,7 +7,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/NhanVienController.dart';
   import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
   import 'package:flutter/material.dart';
-  
+  import 'package:datn_cntt304_bandogiadung/views/NhapHang/TrangChuQuanLy.dart';
   import '../../models/KhachHang.dart';
 import '../../models/NhanVien.dart';
   
@@ -77,7 +77,7 @@ import '../../models/NhanVien.dart';
             {
               String maNV=nhanVien?.maNV??'';
               Navigator.push(context,
-              MaterialPageRoute(builder: (context)=>PurchaseOrderList(maNV:maNV ))
+              MaterialPageRoute(builder: (context)=> ShopDashboard (maNV:maNV ))
               );
             }
         }
