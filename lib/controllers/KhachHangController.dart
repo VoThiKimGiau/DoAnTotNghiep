@@ -18,11 +18,11 @@ class KhachHangController {
       return null;
     }
   }
+
   Future<KhachHang?> login(String tenTK, String matKhau) async {
     final response = await http.post(
       Uri.parse('$baseUrl/login?tenTK=$tenTK&matKhau=$matKhau'),
       headers: {'Content-Type': 'application/json'},
-
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonResponse = json.decode(response.body);
@@ -33,5 +33,35 @@ class KhachHangController {
     }
   }
 
+  Future<List<KhachHang>> fetchAllCustomer() async {
+    String baseUrl = 'http://${IpConfig.ipConfig}/api/khachhang';
 
+    final response = await http.get(
+      Uri.parse(baseUrl),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      return jsonResponse.map((item) => KhachHang.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load KhachHang data');
+    }
+  }
+
+  Future<KhachHang> insertCustomer(KhachHang kh) async {
+    final response = await http.post(
+      Uri.parse('http://${IpConfig.ipConfig}/api/khachhang'),
+      headers: <String, String>{
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(kh.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return KhachHang.fromJson(json.decode(response.body));
+    } else {
+      throw Exception("Không thể tạo khách hàng mới");
+    }
+  }
 }

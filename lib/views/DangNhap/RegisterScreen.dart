@@ -1,115 +1,278 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
-import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
+import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 
-import '../../controllers/TaiKhoanController.dart';
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreen createState() => _RegisterScreen();
+}
 
-class RegisterScreen extends StatelessWidget {
-  final TaiKhoanController controller = TaiKhoanController();
+class _RegisterScreen extends State<RegisterScreen> {
+  KhachHangController khachHangController = KhachHangController();
+  List<KhachHang>? dsKH;
+
+  final TextEditingController tenKHController = TextEditingController();
+  final TextEditingController sdtController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController tenTKController = TextEditingController();
+  final TextEditingController matKhauController = TextEditingController();
+  final TextEditingController nhapLaiMatKhauController = TextEditingController();
+
+  bool showPassword = false;
+  bool showConfirmPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchKH();
+  }
+
+  Future<void> fetchKH() async {
+    try {
+      List<KhachHang> fetchedItems = await khachHangController.fetchAllCustomer();
+      setState(() {
+        dsKH = fetchedItems;
+      });
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        dsKH = [];
+      });
+    }
+  }
+
+  int getMaxID(List<KhachHang> dsKH) {
+    int maxId = 0;
+    for (KhachHang kh in dsKH) {
+      if (kh.maKH!.startsWith('KH')) {
+        int id = int.parse(kh.maKH!.substring(2));
+        if (id > maxId) {
+          maxId = id;
+        }
+      }
+    }
+    return maxId;
+  }
+
+  String generateCustomerCode() {
+    int currentMaxId = getMaxID(dsKH!);
+    currentMaxId++;
+    return 'KH$currentMaxId';
+  }
+
+  @override
+  void dispose() {
+    tenKHController.dispose();
+    sdtController.dispose();
+    emailController.dispose();
+    tenTKController.dispose();
+    matKhauController.dispose();
+    nhapLaiMatKhauController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Column(
-          children: [
-            Container(
-              alignment: AlignmentDirectional.topStart,
-              margin: const EdgeInsets.only(left: 10.0, top: 20.0),
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(10),
-                  backgroundColor: const Color(0xFFF4F4F4),
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) =>
-                  //           LoginScreen(controller: controller)),
-                  // );
-                },
-                icon: const Icon(Icons.arrow_back_ios_new),
-                label: const SizedBox.shrink(),
-              ),
-            ),
-            const Center(
-                child: Text(
-              'Tạo tài khoản',
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            )),
-            Container(
-              height: 350,
-              margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
-              child: Column(
-                children: [
-                  const TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Tên',
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Họ',
-                      ),
-                    ),
-                  ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Email',
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Mật khẩu',
-                      ),
-                    ),
-                  ),
-                  const TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Nhập lại mật khẩu',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
                 child: Container(
-              margin: const EdgeInsets.only(top: 40.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 342.0,
-                    child: ElevatedButton(
-                        onPressed: () {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //         builder: (context) => LoginScreen(controller: controller)));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Tạo tài khoản')),
-                  )
-                ],
+                  width: 40,
+                  height: 40,
+                  margin: const EdgeInsets.only(left: 27, top: 63, bottom: 24),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(12),
+                      backgroundColor: Colors.white,
+                    ),
+                    child: SvgPicture.asset('assets/icons/arrowleft.svg'),
+                  ),
+                ),
               ),
-            ))
-          ],
+              const Center(
+                child: Text(
+                  'Tạo tài khoản',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: tenKHController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Họ và tên',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: sdtController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Số điện thoại',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      onChanged: (value) {
+                        if (value.length == 1 && value != '0') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Số điện thoại phải bắt đầu bằng 0!'),
+                            ),
+                          );
+                        }
+                      },
+                      onSubmitted: (value) {
+                        if (value.length != 10) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Số điện thoại phải có đúng 10 số và bắt đầu bằng 0!'),
+                            ),
+                          );
+                        } else if (!value.startsWith('0')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Số điện thoại phải bắt đầu bằng 0!'),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Email',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: tenTKController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Tên tài khoản',
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: matKhauController,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        hintText: 'Mật khẩu',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        suffixIcon: IconButton(
+                          icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off),
+                          onPressed: () {
+                            setState(() {
+                              showPassword = !showPassword;
+                            });
+                          },
+                        ),
+                      ),
+                      obscureText: !showPassword,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nhapLaiMatKhauController,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        hintText: 'Nhập lại mật khẩu',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        suffixIcon: IconButton(
+                          icon: Icon(showConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                          onPressed: () {
+                            setState(() {
+                              showConfirmPassword = !showConfirmPassword;
+                            });
+                          },
+                        ),
+                      ),
+                      obscureText: !showConfirmPassword,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 40),
+                child: ElevatedButton(
+                  onPressed: () {
+                    String tenKH = tenKHController.text;
+                    String sdt = sdtController.text;
+                    String email = emailController.text;
+                    String tenTK = tenTKController.text;
+                    String matKhau = matKhauController.text;
+                    String nhapLaiMatKhau = nhapLaiMatKhauController.text;
+
+                    if (sdt.length != 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Số điện thoại phải có đúng 10 số!'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (matKhau == nhapLaiMatKhau) {
+                      khachHangController.insertCustomer(
+                        KhachHang(
+                          maKH: generateCustomerCode(),
+                          tenKH: tenKH,
+                          sdt: sdt,
+                          email: email,
+                          tenTK: tenTK,
+                          matKhau: matKhau,
+                          hoatDong: true,
+                        ),
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Tạo tài khoản thành công!'),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Mật khẩu không khớp! Vui lòng kiểm tra lại'),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text(
+                    'Tạo tài khoản',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
