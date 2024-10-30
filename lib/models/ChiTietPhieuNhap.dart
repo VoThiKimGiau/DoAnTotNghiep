@@ -14,8 +14,8 @@ class ChiTietPhieuNhap {
   // Phương thức từ JSON
   factory ChiTietPhieuNhap.fromJson(Map<String, dynamic> json) {
     return ChiTietPhieuNhap(
-      maPN: json['maPhieu'].trim(), // Loại bỏ khoảng trắng nếu cần
-      maCTSP: json['maSP'].trim(), // Loại bỏ khoảng trắng nếu cần
+      maPN: json['maPhieu'].trim(),
+      maCTSP: json['maSP'].trim(),
       soLuong: json['soLuong'],
       donGia: json['donGia'].toDouble(),
     );

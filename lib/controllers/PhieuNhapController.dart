@@ -71,4 +71,29 @@ class PhieuNhapController{
       print('Đã xảy ra lỗi khi cập nhật phiếu nhập: $error');
     }
   }
+  Future<List<PhieuNhap>> getPhieuNhapByTrangThai(String trangThai) async {
+    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap/trangthai/$trangThai'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<PhieuNhap> phieuNhapList = body.map((dynamic item) => PhieuNhap.fromJson(item)).toList();
+      return phieuNhapList;
+    } else {
+      throw Exception('Failed to load PhieuNhap');
+    }
+  }
+
+
+  // Phương thức lọc phiếu nhập giữa hai ngày
+  Future<List<PhieuNhap>> filterPhieuNhapBetweenDates(String startDate, String endDate) async {
+    final url = Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap/between-dates?startDate=$startDate&endDate=$endDate');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = jsonDecode(response.body);
+      return jsonData.map((item) => PhieuNhap.fromJson(item)).toList();
+    } else {
+      throw Exception('Không thể lấy danh sách phiếu nhập giữa hai ngày');
+    }
+  }
 } 
