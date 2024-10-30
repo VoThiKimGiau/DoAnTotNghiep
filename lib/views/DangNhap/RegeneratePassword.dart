@@ -6,14 +6,16 @@ import '../../controllers/TaiKhoanController.dart';
 
 class RegeneratePassword extends StatelessWidget {
   final TaiKhoanController controller = TaiKhoanController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.only(top: 200.0),
+            margin: const EdgeInsets.only(top: 200.0),
             child: SizedBox(
               width: 150,
               height: 150,
@@ -21,28 +23,30 @@ class RegeneratePassword extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(vertical: 24.0),
-              child: Text('Chúng tôi đã gửi email tạo lại mật khẩu cho bạn', style: TextStyle(fontSize: 25), textAlign: TextAlign.center,)
-          ),
+              margin: const EdgeInsets.symmetric(vertical: 24.0),
+              child: const Text(
+                'Chúng tôi đã gửi email tạo lại mật khẩu cho bạn',
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              )),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
                   child: ElevatedButton(
-                      onPressed: (){
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => LoginScreen(controller: controller)),
-                        // );
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Trở về đăng nhập')
-                  ),
+                      child: const Text('Trở về đăng nhập')),
                 )
               ],
             ),
