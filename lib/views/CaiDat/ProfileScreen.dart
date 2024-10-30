@@ -1,20 +1,17 @@
 import 'dart:convert';
-
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/TaiKhoanController.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/KhachHang.dart';
+import 'SanPhamYeuThich.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? makh;
 
-
   const ProfileScreen({
     Key? key,
     required this.makh,
-
   }) : super(key: key);
 
   @override
@@ -30,8 +27,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     fetchKhachHang();
   }
+
   Future<void> fetchKhachHang() async {
-    KhachHang? fetchedKhachHang = await KhachHangController().getKhachHang(widget.makh);
+    KhachHang? fetchedKhachHang =
+        await KhachHangController().getKhachHang(widget.makh);
     setState(() {
       khachHang = fetchedKhachHang;
     });
@@ -40,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (khachHang == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: Colors.white,
         body: Center(
           child: CircularProgressIndicator(),
@@ -48,8 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
     String name = utf8.decode((khachHang!.tenKH?.runes.toList()) ?? []);
-    String email = khachHang!.email ?? "Email chưa đăng ký"; // Default message if email is null
-    String phone = khachHang!.sdt ?? "Số điện thoại chưa đăng ký"; // Default message if phone is null
+    String email = khachHang!.email ?? "Email chưa đăng ký";
+    String phone = khachHang!.sdt ?? "Số điện thoại chưa đăng ký";
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -60,44 +59,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const CircleAvatar(
                 radius: 50,
-                //backgroundImage: NetworkImage(''), // Add a proper image URL if needed
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 name,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
                 email,
-                style: TextStyle(fontSize: 16, color: Colors.black54), // Style for email
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 phone,
-                style: TextStyle(fontSize: 16, color: Colors.black54), // Style for phone number
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
                       // Handle edit profile action
                     },
-                    child: Text(
+                    child: const Text(
                       'Chỉnh sửa',
                       style: TextStyle(fontSize: 16, color: Colors.blue),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 24),
-              _buildMenuItem('Địa chỉ giao hàng', Icons.location_on),
-              _buildMenuItem('Sản phẩm yêu thích', Icons.favorite),
-              _buildMenuItem('Hỗ trợ', Icons.help),
-              Spacer(),
+              const SizedBox(height: 24),
+              _buildMenuItem('Địa chỉ giao hàng', Icons.location_on, () {
+                // Handle navigation if needed
+              }),
+              _buildMenuItem('Sản phẩm yêu thích', Icons.favorite, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SanPhamYeuThichScreen(
+                            maKH: widget.makh,
+                          )),
+                );
+              }),
+              _buildMenuItem('Hỗ trợ', Icons.help, () {
+                // Handle support action if needed
+              }),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () {
                   _showLogoutConfirmationDialog();
@@ -105,9 +116,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                   backgroundColor: Colors.white,
+                  elevation: 2,
                 ),
                 child: const Text('Đăng xuất',
-                    style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -116,45 +131,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenuItem(String title, IconData icon) {
+  Widget _buildMenuItem(String title, IconData icon, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, size: 24, color: Colors.black54),
-          SizedBox(width: 16),
-          Text(title, style: TextStyle(fontSize: 18)),
-          Spacer(),
-          Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black54),
-        ],
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Icon(icon, size: 24, color: Colors.black54),
+            const SizedBox(width: 16),
+            Text(title, style: const TextStyle(fontSize: 18)),
+            const Spacer(),
+            const Icon(Icons.arrow_forward_ios,
+                size: 16, color: Colors.black54),
+          ],
+        ),
       ),
     );
   }
+
   void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Xác nhận"),
-          content: Text("Bạn có chắc chắn muốn đăng xuất không?"),
+          title: const Text("Xác nhận"),
+          content: const Text("Bạn có chắc chắn muốn đăng xuất không?"),
           actions: [
             TextButton(
-              child: Text("Hủy"),
+              child: const Text("Hủy"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Đồng ý"),
+              child: const Text("Đồng ý"),
               onPressed: () {
                 Navigator.of(context).pop();
 
                 // Proceed with logout
-                KhachHangController controller = new KhachHangController();
+                KhachHangController controller = KhachHangController();
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),
-                      (Route<dynamic> route) => false, // Remove all routes from the stack
+                  (Route<dynamic> route) => false,
                 );
               },
             ),
@@ -163,6 +183,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-
-
 }
