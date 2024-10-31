@@ -20,6 +20,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
   int todayOrdersCount = 0;
   int doneOrdersCount=0;
   double totalRevenue=0.0;
+  double profit=0.0;
   @override
   void initState() {
     super.initState();
@@ -35,6 +36,8 @@ class _ShopDashboardState extends State<ShopDashboard> {
       processingOrdersCount = todayStats['processingOrders'] ?? 0;
       todayOrdersCount = todayStats['todayOrders'] ?? 0;
       doneOrdersCount=todayStats['doneOrdersCount']??0;
+      totalRevenue=todayStats['totalRevenue']??0.0;
+      profit=todayStats['profit']??0.0;
     });
   }
   @override
@@ -84,9 +87,9 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
-                  _buildStatCard('Doanh thu', '0', Icons.bar_chart, Colors.orange),
-                  _buildStatCard('Đơn mới', processingOrdersCount.toString(), Icons.new_releases, Colors.blue),
-                  _buildStatCard('Lợi nhuận', '0', Icons.attach_money, Colors.green),
+                  _buildStatCard('Doanh thu', totalRevenue.toString(), Icons.bar_chart, Colors.orange),
+                  _buildStatCard('Đơn mới', todayOrdersCount.toString(), Icons.new_releases, Colors.blue),
+                  _buildStatCard('Lợi nhuận', profit.toString(), Icons.attach_money, Colors.green),
                   _buildStatCard('Đơn đã giao', doneOrdersCount.toString(), Icons.check_circle_outline, Colors.yellow),
                 ],
               ),

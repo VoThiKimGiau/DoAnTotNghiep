@@ -61,6 +61,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
         nccController.fetchSuppliers(),
       ]);
 
+      // Lấy danh sách sản phẩm sắp hết hàng
       final lowQuantityProducts = futures[0] as List<ChiTietSP>;
 
       setState(() {
@@ -69,7 +70,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
         suppliers = futures[2] as List<NhaCungCap>;
       });
 
-      // Fetch product details
+      // Cập nhật cache
       for (var product in lowQuantityProducts) {
         if (!productDetailsCache.containsKey(product.maCTSP)) {
           productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
@@ -86,33 +87,35 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       });
     }
   }
-
+  // Đầu tiên, sửa lại hàm _applyFilters():
   Future<void> _applyFilters() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      List<ChiTietSP> results = [];
-      List<ChiTietSP> lst = [];
+      // Lấy danh sách các sản phẩm sắp hết hàng ban đầu
+      List<ChiTietSP> lowQuantityProducts = await chiTietSPController.fetchLowQuantity();
+      List<ChiTietSP> results = lowQuantityProducts;
 
-      // 1. Fetch base data according to category
+      // 1. Lọc theo danh mục nếu có
       if (selectedCategory != null) {
-        final categoryProducts = await chiTietSPController.fetchChiTietSPByCategory(selectedCategory!);
-        lst = categoryProducts
-            .map((item) => ChiTietSP.fromJson(item))
-            .toList();
+        List<dynamic> categoryProducts = await chiTietSPController.fetchChiTietSPByCategory(selectedCategory!);
+        Set<String> categoryProductIds = categoryProducts
+            .map((item) => item['maSanPham'].toString())
+            .toSet();
 
-      } else {
-        results = await chiTietSPController.fetchLowQuantity();
+        results = results.where((product) =>
+            categoryProductIds.contains(product.maSP)).toList();
       }
 
-      // 2. Filter by supplier if selected
+      // 2. Lọc theo nhà cung cấp nếu có
       if (selectedSupplier != null) {
-        results = results.where((product) => product.maNCC == selectedSupplier).toList();
+        results = results.where((product) =>
+        product.maNCC == selectedSupplier).toList();
       }
 
-      // 3. Apply search filter if text exists
+      // 3. Lọc theo từ khóa tìm kiếm nếu có
       final searchQuery = searchController.text.toLowerCase();
       if (searchQuery.isNotEmpty) {
         results = results.where((product) {
@@ -122,7 +125,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
         }).toList();
       }
 
-      // 4. Fetch any missing product details
+      // Cập nhật cache cho các sản phẩm mới
       for (var product in results) {
         if (!productDetailsCache.containsKey(product.maCTSP)) {
           productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
@@ -143,7 +146,6 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       });
     }
   }
-
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(Duration(milliseconds: 500), () {

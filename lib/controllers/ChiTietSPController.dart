@@ -164,4 +164,55 @@ class ChiTietSPController{
       throw Exception('Failed to load ChiTietSP');
     }
   }
+  Future<List<ChiTietSP>> locChiTietSPTheoDanhMuc(List<ChiTietSP> danhSachChiTietSP, String maDanhMuc) async {
+    try {
+      // Gọi API để lấy danh sách chi tiết sản phẩm theo danh mục
+      final response = await http.get(
+          Uri.parse('$baseUrl/api/chitietsp/by-category?maDanhMuc=$maDanhMuc')
+      );
+
+      if (response.statusCode == 200) {
+        // Parse response thành List các mã sản phẩm thuộc danh mục
+        List<dynamic> dsSPThuocDanhMuc = json.decode(response.body);
+        Set<String> maSPThuocDanhMuc = dsSPThuocDanhMuc
+            .map<String>((item) => item['maSanPham'].toString())
+            .toSet();
+
+        // Lọc danh sách chi tiết SP dựa trên các maSP thuộc danh mục
+        return danhSachChiTietSP
+            .where((ctsp) => maSPThuocDanhMuc.contains(ctsp.maSP))
+            .toList();
+      } else {
+        throw Exception('Không thể lấy danh sách sản phẩm theo danh mục');
+      }
+    } catch (e) {
+      print('Lỗi khi lọc sản phẩm theo danh mục: $e');
+      return [];
+    }
+  }
+  // Thêm vào ChiTietSPController
+  Future<List<ChiTietSP>> filterLowQuantityProducts(
+      List<ChiTietSP> products,
+      {String? maDanhMuc, String? maNCC}) async {
+
+    List<ChiTietSP> results = products;
+
+    if (maDanhMuc != null) {
+      // Lấy danh sách mã sản phẩm thuộc danh mục
+      List<dynamic> categoryProducts = await fetchChiTietSPByCategory(maDanhMuc);
+      Set<String> categoryProductIds = categoryProducts
+          .map((item) => item['maSanPham'].toString())
+          .toSet();
+
+      results = results.where((product) =>
+          categoryProductIds.contains(product.maSP)).toList();
+    }
+
+    if (maNCC != null) {
+      results = results.where((product) =>
+      product.maNCC == maNCC).toList();
+    }
+
+    return results;
+  }
 }
