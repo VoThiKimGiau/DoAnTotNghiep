@@ -23,7 +23,7 @@ class SelectAddressPage extends StatefulWidget {
 class _SelectAddressPageState extends State<SelectAddressPage> {
   late TTNhanHang currentSelectedAddress; // Địa chỉ đã chọn
   final TTNhanHangController controller =
-      TTNhanHangController(); // Khởi tạo controller
+  TTNhanHangController(); // Khởi tạo controller
   List<TTNhanHang> shippingAddresses = []; // Danh sách địa chỉ nhận hàng
 
   @override
@@ -34,15 +34,18 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
 
   Future<void> _loadShippingAddresses() async {
     try {
-      List<TTNhanHang> addresses =
-          await controller.fetchTTNhanHangByCustomer(widget.maKH);
+      List<TTNhanHang> addresses = await controller.fetchTTNhanHangByCustomer(widget.maKH);
 
-      shippingAddresses = addresses; // Cập nhật danh sách địa chỉ nhận hàng
+      setState(() {
+        shippingAddresses = addresses; // Cập nhật danh sách địa chỉ nhận hàng và cập nhật giao diện
+        currentSelectedAddress = addresses.isNotEmpty ? addresses.first : widget.selectedAddress; // Đặt địa chỉ mặc định nếu có
+      });
     } catch (e) {
       print('Error loading shipping addresses: $e');
       // Xử lý lỗi nếu cần
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,60 +60,60 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
       body: shippingAddresses.isEmpty
           ? Center(child: Text('No shipping addresses available.'))
           : ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: shippingAddresses.length + 1,
+        itemBuilder: (context, index) {
+          if (index == shippingAddresses.length) {
+            return ElevatedButton.icon(
+              icon: Icon(Icons.add),
+              label: Text('Thêm địa chỉ mới'),
+              onPressed: () => _showAddressForm(context),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 50),
+              ),
+            );
+          }
+
+          final address = shippingAddresses[index];
+          final isSelected = address == currentSelectedAddress;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                currentSelectedAddress = address;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
-              itemCount: shippingAddresses.length + 1,
-              itemBuilder: (context, index) {
-                if (index == shippingAddresses.length) {
-                  return ElevatedButton.icon(
-                    icon: Icon(Icons.add),
-                    label: Text('Thêm địa chỉ mới'),
-                    onPressed: () => _showAddressForm(context),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50),
-                    ),
-                  );
-                }
-
-                final address = shippingAddresses[index];
-                final isSelected = address == currentSelectedAddress;
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      currentSelectedAddress = address;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue[50] : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected ? Colors.blue : Colors.transparent,
-                        width: 2,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${address.hoTen} | ${address.sdt}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(address.diaChi),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => _showAddressForm(context, address),
-                          child: Text('Chỉnh sửa'),
-                        ),
-                      ],
-                    ),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue[50] : Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isSelected ? Colors.blue : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${address.hoTen} | ${address.sdt}',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                );
-              },
+                  const SizedBox(height: 4),
+                  Text(address.diaChi),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () => _showAddressForm(context, address),
+                    child: Text('Chỉnh sửa'),
+                  ),
+                ],
+              ),
             ),
+          );
+        },
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
