@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:flutter/material.dart';
 import 'PaymentMethodPage.dart';
 import 'PromoCodePage.dart';
@@ -31,10 +32,39 @@ class _CheckoutPageState extends State<CheckoutPage> {
   TTNhanHang? selectedAddress;
   final TTNhanHangController controller = TTNhanHangController(); // Khởi tạo controller
 
+  GiaoHangController giaoHangController = GiaoHangController();
+  double? soKM = 0;
+  String? origin;
+  String? destination;
+
   @override
   void initState() {
     super.initState();
     _loadShippingAddresses(); // Tải địa chỉ giao hàng
+    loadKMShip();
+  }
+
+  Future<void> loadKMShip() async{
+    try {
+      String? dcDau = await giaoHangController.getCoordinatesFromAddress('Phường 13, Quận Tân Bình, TP.HCM, Việt Nam');
+      String? dcDich = await giaoHangController.getCoordinatesFromAddress('Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam');
+
+      print('Origin coordinates: $dcDau');
+      print('Destination coordinates: $dcDich');
+
+      if (dcDich != null && dcDau != null) {
+        destination = dcDich;
+        origin = dcDau;
+        double? fetchedDistance = await giaoHangController.getDistanceOSRM(origin!, destination!);
+        setState(() {
+          soKM = fetchedDistance;
+        });
+    }} catch (e) {
+      print('Error: $e'); // Handle error
+      setState(() {
+        soKM = 0;
+      });
+    }
   }
 
   Future<void> _loadShippingAddresses() async {
@@ -218,7 +248,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       child: Column(
         children: [
           _buildSummaryRow('Tạm tính', widget.totalAmount),
-          _buildSummaryRow('Phí giao hàng', 8.0),
+          _buildSummaryRow('Phí giao hàng', 0),
           _buildSummaryRow('Tổng cộng', widget.totalAmount + 8.0, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
