@@ -72,7 +72,7 @@ class DonHangController {
           'Content-Type': 'application/json; charset=UTF-8', // Thêm charset
           'Accept': 'application/json',
         },
-        body: jsonEncode(newStatus),  
+        body: newStatus,
       );
 
       if (response.statusCode == 200) {
@@ -90,8 +90,7 @@ class DonHangController {
   }
   Future<List<DonHang>> fetchDonHangByDateRange(String startDate, String endDate) async {
     final String url =
-        '${IpConfig
-        .ipConfig}api/donhang/by-date-range?startDate=$startDate&endDate=$endDate';
+        '${IpConfig.ipConfig}api/donhang/by-date-range?startDate=$startDate&endDate=$endDate';
 
 
     final response = await http.get(Uri.parse(url),headers: {

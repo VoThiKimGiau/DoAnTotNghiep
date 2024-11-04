@@ -1,5 +1,6 @@
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/BaoCaoScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
+import 'package:datn_cntt304_bandogiadung/views/DonHang/QuanLyDonHang.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/DonHangController.dart';
@@ -105,8 +106,20 @@ class _ShopDashboardState extends State<ShopDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildOrderStatusItem('Chờ xác nhận', processingOrdersCount.toString(), Colors.red),
-                  _buildOrderStatusItem('Tổng đơn hàng', todayOrdersCount.toString(), Colors.blue),
+                  _buildOrderStatusItem(
+                    'Chờ xác nhận',
+                    processingOrdersCount.toString(),
+                    Colors.red,
+                    onTap: () {
+                      // Navigate to the waiting orders screen or perform another action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => (TodaysOrdersScreen()), // Replace with your actual screen
+                        ),
+                      );
+                    },
+                  ),_buildOrderStatusItem('Tổng đơn hàng', todayOrdersCount.toString(), Colors.blue),
                 ],
               ),
               SizedBox(height: 20),
@@ -220,15 +233,19 @@ class _ShopDashboardState extends State<ShopDashboard> {
     );
   }
 
-  Widget _buildOrderStatusItem(String title, String count, Color color) {
-    return Column(
-      children: [
-        Text(title, style: TextStyle(color: color)),
-        SizedBox(height: 5),
-        Text(count, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-      ],
+  Widget _buildOrderStatusItem(String title, String count, Color color, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Text(title, style: TextStyle(color: color)),
+          SizedBox(height: 5),
+          Text(count, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+        ],
+      ),
     );
   }
+
 
   Widget _buildActionButton(String title, IconData icon, {String? badge, VoidCallback? onPressed}) {
     return InkWell(

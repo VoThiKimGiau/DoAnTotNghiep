@@ -87,7 +87,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       });
     }
   }
-  // Đầu tiên, sửa lại hàm _applyFilters():
+
   Future<void> _applyFilters() async {
     setState(() {
       isLoading = true;
@@ -159,6 +159,16 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       details['productName'] = await sanPhamController.getProductNameByMaSP(ctsp.maSP);
       details['size'] = await kichCoController.layTenKichCo(ctsp.maKichCo);
       details['color'] = await mauSPController.layTenMauByMaMau(ctsp.maMau);
+      NhaCungCap? fetchSup= await nccController.fetchSupById(ctsp.maNCC);
+      if(fetchSup!=null)
+        {
+          details['sup']=fetchSup.tenNCC;
+        }
+      else
+        {
+          details['sup']=' ';
+        }
+
     } catch (e) {
       print('Error fetching product details: $e');
     }
@@ -271,6 +281,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${details['size'] ?? ''} - ${details['color'] ?? ''}'),
+            Text('${details['sup']}'),
             Text(
               'Số lượng: ${product.slKho}',
               style: TextStyle(

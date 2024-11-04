@@ -107,7 +107,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                       setState(() {
                         isButtonDisabled = true;
                       });
-                      await phieuNhapController.updatePhieuNhapDaGiao(widget.pn.maPhieuNhap); // Gọi hàm cập nhật
+                      await phieuNhapController.updatePhieuNhapDaGiao(widget.pn.maPhieuNhap);
                     },
                     child: Text('Đã nhập hàng'),
                   ),
