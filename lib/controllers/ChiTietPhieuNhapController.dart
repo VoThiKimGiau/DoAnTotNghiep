@@ -9,13 +9,13 @@ class ChiTietPhieuNhapController{
   {
     String endpoint = "";
     if (maPhieu.length > 0) {
-      endpoint = "/api/chitietphieunhap?maPhieu=$maPhieu";
+      endpoint = "api/chitietphieunhap?maPhieu=$maPhieu";
     }
     else {
-      endpoint = "/api/chitietphieunhap";
+      endpoint = "api/chitietphieunhap";
     }
     final response = await http.get(
-        Uri.parse('http://${IpConfig.ipConfig}' + endpoint));
+        Uri.parse('${IpConfig.ipConfig}' + endpoint));
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => (ChiTietPhieuNhap.fromJson(item)))
@@ -27,7 +27,7 @@ class ChiTietPhieuNhapController{
   }
   Future<ChiTietPhieuNhap> themChiTietPhieuNhap(ChiTietPhieuNhap chiTietPhieuNhap) async {
     final response = await http.post(
-      Uri.parse('http://${IpConfig.ipConfig}/api/chitietphieunhap'),
+      Uri.parse('${IpConfig.ipConfig}api/chitietphieunhap'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',

@@ -61,7 +61,8 @@ class _OrderSummaryState extends State<OrderSummary> {
     String tenMau='';
     try {
       tenMau = await mauSPController.layTenMauByMaMau(maMau);
-      return tenMau;
+      String mau=utf8.decode(tenMau.runes.toList());
+      return mau;
     } catch (error) {
       return 'Lỗi hiển thị màu';
     }
@@ -71,7 +72,8 @@ class _OrderSummaryState extends State<OrderSummary> {
     String tenKC='';
     try {
       tenKC = await kichCoController.layTenKichCo(maKichCo);
-      return tenKC;
+      String kc=utf8.decode(tenKC.runes.toList());
+      return kc;
     } catch (error) {
       return 'Lỗi hiển thị kích cỡ';
     }
@@ -195,7 +197,7 @@ class _OrderSummaryState extends State<OrderSummary> {
                 return Text('Error: ${productDetailsSnapshot.error}');
               } else {
                 final productDetails = productDetailsSnapshot.data ?? ['', '', '', ''];
-                String productName = utf8.decode(productDetails[0].runes.toList());
+                String productName = productDetails[0];
                 String productColor = productDetails[1];
                 String productSize = productDetails[2];
                 String productImageUrl = productDetails[3]; // Image URL from Firebase

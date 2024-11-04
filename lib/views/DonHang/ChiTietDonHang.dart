@@ -175,7 +175,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
 
   Widget _buildOrderStatus() {
-    String decodedStatus = utf8.decode(widget.donHang.trangThaiDH.runes.toList());
+    String decodedStatus = widget.donHang.trangThaiDH;
     bool isDelivered = decodedStatus == 'Đã giao hàng';
     bool isShipping = decodedStatus == 'Đang giao hàng' || isDelivered;
     bool isConfirmed = decodedStatus == 'Đã xác nhận' || isShipping;
@@ -250,7 +250,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               children: [
 
                 Text(
-                  utf8.decode((tTNhanHang?.diaChi ?? 'Địa chỉ không có sẵn').runes.toList()),
+                  tTNhanHang?.diaChi ?? 'Địa chỉ không có sẵn',
                   style: TextStyle(fontFamily: 'Comfortaa', fontSize: 18, color: Colors.black),
                 ),
               ],
@@ -275,11 +275,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
   bool _isCancelButtonVisible() {
-    String decodedStatus = utf8.decode(widget.donHang.trangThaiDH.runes.toList());
+    String decodedStatus = widget.donHang.trangThaiDH;
     return decodedStatus == 'Đang xử lý' || decodedStatus == 'Đã xác nhận';
   }
   bool _isButtonsVisible() {
-    String decodedStatus = utf8.decode(widget.donHang.trangThaiDH.runes.toList());
+    String decodedStatus = widget.donHang.trangThaiDH;
     return decodedStatus == 'Đã giao hàng';
   }
 }

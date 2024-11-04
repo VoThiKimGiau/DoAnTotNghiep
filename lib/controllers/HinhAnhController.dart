@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class HinhAnhController {
 
   Future<String> fetchDuongDan(String maHinhAnh) async {
-    final url = 'http://${IpConfig.ipConfig}/api/hinhanh/$maHinhAnh';
+    final url = '${IpConfig.ipConfig}api/hinhanh/$maHinhAnh';
     try {
       final response = await http.get(Uri.parse(url));
 

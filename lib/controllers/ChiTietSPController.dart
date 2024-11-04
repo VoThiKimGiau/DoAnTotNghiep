@@ -4,10 +4,10 @@ import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:http/http.dart' as http;
 class ChiTietSPController{
-  final baseUrl="http://${IpConfig.ipConfig}";
+  final baseUrl="${IpConfig.ipConfig}";
   Future<ChiTietSP> layCTSPTheoMa(String maCTSP) async
   {
-   final response=await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/chitietsp/detail/mactsp?maCTSP=$maCTSP'));
+   final response=await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp/detail/mactsp?maCTSP=$maCTSP'));
    if(response.statusCode==200)
      {
        return ChiTietSP.fromJson(json.decode(response.body));
@@ -16,7 +16,7 @@ class ChiTietSPController{
      throw Exception("Lỗi khi lay san pham");
   }
   Future<List<ChiTietSP>> layDanhSachCTSPTheoMaSP(String maSP) async {
-    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/chitietsp/detail?maSanPham=$maSP'));
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp/detail?maSanPham=$maSP'));
 
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
@@ -34,7 +34,7 @@ class ChiTietSPController{
     bool hasNextPage = true;
 
     while (hasNextPage) {
-      final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/chitietsp?page=$page&size=$pageSize&maNCC=$maNCC'));
+      final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp?page=$page&size=$pageSize&maNCC=$maNCC'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = json.decode(response.body)['data'];
@@ -57,7 +57,7 @@ class ChiTietSPController{
     return allChiTietSPs;
   }
   Future<int> getTotalSlKho() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/chitietsp/tong-slkho'));
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-slkho'));
     if (response.statusCode == 200) {
       return int.parse(response.body);
     } else {
@@ -67,7 +67,7 @@ class ChiTietSPController{
 
   // Get total inventory value
   Future<double> getTotalInventoryValue() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/chitietsp/tong-gia-tri-ton'));
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-ton'));
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -77,7 +77,7 @@ class ChiTietSPController{
 
   // Get total sold inventory value
   Future<double> getTotalSoldValue() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/chitietsp/tong-gia-tri-da-ban'));
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-da-ban'));
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -87,7 +87,7 @@ class ChiTietSPController{
 
   // Get total number of products below stock threshold
   Future<int> getItemsWithLowInventory(int threshold) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'));
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'));
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;
@@ -98,7 +98,7 @@ class ChiTietSPController{
 
   // Get total number of products available for sale
   Future<int> getAvailableItems() async {
-    final response = await http.get(Uri.parse('$baseUrl/api/chitietsp/con-ton-kho'));
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/con-ton-kho'));
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;
@@ -107,7 +107,7 @@ class ChiTietSPController{
     }
   }
   Future<List<dynamic>> fetchChiTietSPByCategory(String maDanhMuc) async {
-    final url = Uri.parse("$baseUrl/api/chitietsp/by-category?maDanhMuc=$maDanhMuc");
+    final url = Uri.parse("${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc");
 
     try {
       final response = await http.get(url);
@@ -126,7 +126,7 @@ class ChiTietSPController{
 
   // Hàm fetch sản phẩm theo tên sản phẩm (search)
   Future<List<dynamic>> fetchChiTietSPByTenSanPham(String tenSP) async {
-    final url = Uri.parse("$baseUrl/api/chitietsp/search?tenSP=$tenSP");
+    final url = Uri.parse("${baseUrl}api/chitietsp/search?tenSP=$tenSP");
 
     try {
       final response = await http.get(url);
@@ -143,7 +143,7 @@ class ChiTietSPController{
     }
   }
   Future<List<ChiTietSP>> fetchChiTietSP(String maDM, String maNCC) async {
-    final url = Uri.parse('$baseUrl/api/chitietsp/madm/$maDM/mancc/$maNCC');
+    final url = Uri.parse('${baseUrl}api/chitietsp/madm/$maDM/mancc/$maNCC');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       // Decode the JSON response into a List of ChiTietSP objects
@@ -154,7 +154,7 @@ class ChiTietSPController{
     }
   }
   Future<List<ChiTietSP>> fetchLowQuantity() async {
-    final url = Uri.parse('$baseUrl/api/chitietsp/low-stock');
+    final url = Uri.parse('${baseUrl}api/chitietsp/low-stock');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       // Decode the JSON response into a List of ChiTietSP objects
@@ -168,7 +168,7 @@ class ChiTietSPController{
     try {
       // Gọi API để lấy danh sách chi tiết sản phẩm theo danh mục
       final response = await http.get(
-          Uri.parse('$baseUrl/api/chitietsp/by-category?maDanhMuc=$maDanhMuc')
+          Uri.parse('${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc')
       );
 
       if (response.statusCode == 200) {

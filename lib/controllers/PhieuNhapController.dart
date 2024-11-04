@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class PhieuNhapController{
   Future<List<PhieuNhap>> layDanhSachPhieuNhap() async
   {
-    final response= await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap'));
+    final response= await http.get(Uri.parse('${IpConfig.ipConfig}api/phieunhap'));
     if(response.statusCode==200)
       {
         List<dynamic> jsonResponse=json.decode(response.body);
@@ -27,7 +27,7 @@ class PhieuNhapController{
   }
   Future<PhieuNhap> taoPhieuNhap(PhieuNhap phieuNhap) async {
     final response = await http.post(
-      Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap'),
+      Uri.parse('${IpConfig.ipConfig}api/phieunhap'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ class PhieuNhapController{
     }
   }
   Future<void> updatePhieuNhapDaGiao(String maPN) async {
-    final String url = 'http://${IpConfig.ipConfig}/api/phieunhap/daGiaoHang/$maPN';
+    final String url = '${IpConfig.ipConfig}api/phieunhap/daGiaoHang/$maPN';
 
     try {
       final response = await http.put(
@@ -72,7 +72,7 @@ class PhieuNhapController{
     }
   }
   Future<List<PhieuNhap>> getPhieuNhapByTrangThai(String trangThai) async {
-    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap/trangthai/$trangThai'));
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/phieunhap/trangthai/$trangThai'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -86,7 +86,7 @@ class PhieuNhapController{
 
   // Phương thức lọc phiếu nhập giữa hai ngày
   Future<List<PhieuNhap>> filterPhieuNhapBetweenDates(String startDate, String endDate) async {
-    final url = Uri.parse('http://${IpConfig.ipConfig}/api/phieunhap/between-dates?startDate=$startDate&endDate=$endDate');
+    final url = Uri.parse('${IpConfig.ipConfig}api/phieunhap/between-dates?startDate=$startDate&endDate=$endDate');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

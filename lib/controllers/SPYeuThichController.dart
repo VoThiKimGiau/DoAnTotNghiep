@@ -9,7 +9,7 @@ import '../models/SanPham.dart';
 class SPYeuThichController {
   Future<List<SPYeuThich>> fetchSPYeuThichByKH(String? maKH) async {
     String baseUrl =
-        'http://${IpConfig.ipConfig}/api/sp-yeu-thich/khach-hang/$maKH';
+        '${IpConfig.ipConfig}api/sp-yeu-thich/khach-hang/$maKH';
 
     final response = await http.get(
       Uri.parse(baseUrl),

@@ -7,7 +7,7 @@ class GioHangController{
   Future<String> getMaGHByMaKH(String? maKH) async {
     final response = await http.get(
       Uri.parse(
-          'http://${IpConfig.ipConfig}/api/giohang?khachHang=$maKH'),
+          '${IpConfig.ipConfig}api/giohang?khachHang=$maKH'),
     );
 
     if (response.statusCode == 200) {

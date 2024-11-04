@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 
 class KhachHangController {
-  final String baseUrl = 'http://${IpConfig.ipConfig}/api/khachhang';
+  final String baseUrl = '${IpConfig.ipConfig}api/khachhang';
 
   Future<KhachHang?> getKhachHang(String? maKH) async {
     final response = await http.get(Uri.parse('$baseUrl/$maKH'));

@@ -6,7 +6,7 @@ import '../config/IpConfig.dart';
 import '../models/GiaoHang.dart';
 
 class GiaoHangController {
-  final String baseUrl = 'http://${IpConfig.ipConfig}/api/giaohang';
+  final String baseUrl = '${IpConfig.ipConfig}api/giaohang';
 
   Future<GiaoHang?> fetchGiaoHang(String donHang) async {
     final response = await http.get(Uri.parse('$baseUrl/donHang?donHang=$donHang'));

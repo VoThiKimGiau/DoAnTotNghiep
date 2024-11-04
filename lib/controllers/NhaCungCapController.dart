@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class NCCController{
   Future<List<NhaCungCap>> fetchSuppliers() async {
-    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/nhacungcap'));
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/nhacungcap'));
 
     if (response.statusCode == 200) {
       List<dynamic> jsonList = json.decode(response.body);

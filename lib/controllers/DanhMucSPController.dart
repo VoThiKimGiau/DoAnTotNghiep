@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 class DanhMucSPController {
   Future<List<DanhMucSP>> fetchDanhMucSP() async {
-    String baseUrl = 'http://${IpConfig.ipConfig}/api/danhmucsp';
+    String baseUrl = '${IpConfig.ipConfig}api/danhmucsp';
 
     final response = await http.get(
       Uri.parse(baseUrl),
@@ -23,7 +23,7 @@ class DanhMucSPController {
 
   Future<List<SanPham>> fetchProductByCategory(String? maDM) async {
     String baseUrl =
-        'http://${IpConfig.ipConfig}/api/sanpham/byCategory?maDanhMuc=$maDM';
+        '${IpConfig.ipConfig}api/sanpham/byCategory?maDanhMuc=$maDM';
 
     final response = await http.get(
       Uri.parse(baseUrl),
@@ -38,7 +38,7 @@ class DanhMucSPController {
   }
 
   Future<String?> fetchTenDM(String? maDM) async {
-    String baseUrl = 'http://${IpConfig.ipConfig}/api/danhmucsp/$maDM';
+    String baseUrl = '${IpConfig.ipConfig}api/danhmucsp/$maDM';
 
     final response = await http.get(
       Uri.parse(baseUrl),

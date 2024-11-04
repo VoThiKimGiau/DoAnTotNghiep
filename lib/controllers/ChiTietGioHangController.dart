@@ -23,7 +23,7 @@ class ChiTietGioHangController {
   Future<List<ChiTietGioHang>> fetchListProduct(String maGioHang) async {
     final response = await http.get(
       Uri.parse(
-          'http://${IpConfig.ipConfig}/api/chitietgiohang?maGioHang=$maGioHang'),
+          '${IpConfig.ipConfig}api/chitietgiohang?maGioHang=$maGioHang'),
     );
 
     if (response.statusCode == 200) {
@@ -38,7 +38,7 @@ class ChiTietGioHangController {
   Future<ChiTietGioHang> themChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
     print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.post(
-      Uri.parse('http://${IpConfig.ipConfig}/api/chitietgiohang'),
+      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',

@@ -12,20 +12,47 @@ class DonHangController {
   ChiTietDonHangController chiTietDonHangController=ChiTietDonHangController();
   ChiTietPhieuNhapController chiTietPhieuNhapController=ChiTietPhieuNhapController();
   Future<List<DonHang>> fetchDonHang(String? maKH) async {
-    final response = await http.get(
-      Uri.parse('http://${IpConfig.ipConfig}/api/donhang/byCustomer?maKH=$maKH'),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('${IpConfig.ipConfig}api/donhang/byCustomer?maKH=$maKH'),
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Accept': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((donHang) => DonHang.fromJson(donHang)).toList();
-    } else {
-      throw Exception('Failed to load DonHang');
+      if (response.statusCode == 200) {
+        // Decode UTF-8 từ bodyBytes thay vì dùng response.body trực tiếp
+        String decodedBody = utf8.decode(response.bodyBytes);
+        List<dynamic> jsonResponse = json.decode(decodedBody);
+
+        // Debug: In ra để kiểm tra dữ liệu
+        print('Decoded response: $decodedBody');
+
+        return jsonResponse.map((donHang) {
+          try {
+            return DonHang.fromJson(donHang);
+          } catch (e) {
+            print('Error parsing DonHang: $e');
+            print('Problematic data: $donHang');
+            rethrow;
+          }
+        }).toList();
+      } else {
+        throw Exception('Failed to load DonHang: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error in fetchDonHang: $e');
+      throw Exception('Error fetching DonHang: $e');
     }
   }
   Future<DonHang> fetchDetailDonHang(String? maDH) async {
     final response = await http.get(
-      Uri.parse('http://${IpConfig.ipConfig}/api/donhang/$maDH'),
+      Uri.parse('${IpConfig.ipConfig}api/donhang/$maDH'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+      },
     );
 
     if (response.statusCode == 200) {
@@ -36,13 +63,14 @@ class DonHangController {
     }
   }
   Future<bool> updateOrderStatus(String orderId, String newStatus) async {
-    final String apiUrl = 'http://${IpConfig.ipConfig}/api/donhang/$orderId';
+    final String apiUrl = '${IpConfig.ipConfig}api/donhang/$orderId';
 
     try {
       final response = await http.put(
         Uri.parse(apiUrl),
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8', // Thêm charset
+          'Accept': 'application/json',
         },
         body: jsonEncode(newStatus),  
       );
@@ -62,11 +90,14 @@ class DonHangController {
   }
   Future<List<DonHang>> fetchDonHangByDateRange(String startDate, String endDate) async {
     final String url =
-        'http://${IpConfig
-        .ipConfig}/api/donhang/by-date-range?startDate=$startDate&endDate=$endDate';
+        '${IpConfig
+        .ipConfig}api/donhang/by-date-range?startDate=$startDate&endDate=$endDate';
 
 
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(url),headers: {
+      'Content-Type': 'application/json; charset=UTF-8', // Thêm charset
+      'Accept': 'application/json',
+    },);
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);

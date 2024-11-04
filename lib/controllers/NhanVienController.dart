@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 class NhanVienController{
   Future<NhanVien?> dangNhapNV(String tk,String mk) async
   {
-    final response=await http.post(Uri.parse('http://${IpConfig.ipConfig}/api/nhanvien/login?tenTK=$tk&matKhau=$mk'));
+    final response=await http.post(Uri.parse('${IpConfig.ipConfig}api/nhanvien/login?tenTK=$tk&matKhau=$mk'));
     if(response.statusCode==200)
       {
         final Map<String,dynamic> jsonResponse=json.decode(response.body);

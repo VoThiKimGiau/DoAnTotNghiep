@@ -5,7 +5,7 @@ import '../config/IpConfig.dart';
 import '../models/KMDH.dart';
 
 class KMDHController {
-  final String baseUrl = 'http://${IpConfig.ipConfig}/api/kmdh/madh';
+  final String baseUrl = '${IpConfig.ipConfig}api/kmdh/madh';
 
   Future<List<KMDH>> fetchKMDH(String madh) async {
     final response = await http.get(Uri.parse('$baseUrl?madh=$madh'));

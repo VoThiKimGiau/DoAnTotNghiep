@@ -5,7 +5,7 @@ import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:http/http.dart' as http;
 
 class SanPhamController {
-  final String baseUrl = 'http://${IpConfig.ipConfig}/api/sanpham/search';
+  final String baseUrl = '${IpConfig.ipConfig}api/sanpham/search';
 
   Future<String?> getProductNameByMaSP(String maSP) async {
     final response = await http.get(Uri.parse('$baseUrl?maSP=$maSP'));
@@ -20,7 +20,7 @@ class SanPhamController {
   }
 
   final String baseUrl_AllSP =
-      'http://${IpConfig.ipConfig}/api/sanpham?page=1&size=10';
+      '${IpConfig.ipConfig}api/sanpham?page=1&size=10';
 
   Future<List<SanPham>> fetchSanPham() async {
     final response = await http.get(
@@ -55,7 +55,7 @@ class SanPhamController {
 
   Future<List<SanPham>> getProductByCategory(String maDanhMuc) async {
     const String baseUrl_Cate =
-        'http://${IpConfig.ipConfig}/api/sanpham/byCategory';
+        '${IpConfig.ipConfig}api/sanpham/byCategory';
     final response = await http.get(Uri.parse('$baseUrl_Cate?maDanhMuc=$maDanhMuc'));
 
     if (response.statusCode == 200) {

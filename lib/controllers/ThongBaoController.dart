@@ -7,7 +7,7 @@ import '../models/ThongBao.dart';
 class ThongBaoController{
   Future<List<TBKH>> fetchTBKH(String? makh) async {
     final response = await http.get(
-        Uri.parse('http://${IpConfig.ipConfig}/api/tbkh/makh/$makh'));
+        Uri.parse('${IpConfig.ipConfig}api/tbkh/makh/$makh'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -19,7 +19,7 @@ class ThongBaoController{
     }
   }
   Future<ThongBao> fetchThongBao(String maThongBao) async {
-    final response = await http.get(Uri.parse('http://${IpConfig.ipConfig}/api/thongbao/$maThongBao'));
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/thongbao/$maThongBao'));
 
     if (response.statusCode == 200) {
       return ThongBao.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));

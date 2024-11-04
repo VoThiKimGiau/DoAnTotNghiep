@@ -7,7 +7,7 @@ import '../models/DonHang.dart';
 class ChiTietDonHangController {
   Future<int> fetchProductCount(String madh) async {
     final response = await http.get(
-      Uri.parse('http://${IpConfig.ipConfig}/api/chitietdonhang/count?madh=$madh'),
+      Uri.parse('${IpConfig.ipConfig}api/chitietdonhang/count?madh=$madh'),
     );
     if (response.statusCode == 200) {
       return int.parse(response.body);
@@ -17,7 +17,7 @@ class ChiTietDonHangController {
   }
   Future<List<ChiTietDonHang>> fetchListProduct(String madh) async {
     final response = await http.get(
-      Uri.parse('http://${IpConfig.ipConfig}/api/chitietdonhang/maDonHang?madh=$madh'),
+      Uri.parse('${IpConfig.ipConfig}api/chitietdonhang/maDonHang?madh=$madh'),
     );
 
     if (response.statusCode == 200) {
