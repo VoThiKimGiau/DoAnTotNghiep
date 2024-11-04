@@ -30,7 +30,7 @@ class SanPhamItem extends StatelessWidget {
                   service.getImageUrl(item.hinhAnhMacDinh),
                   fit: BoxFit.cover,
                   width: 160,
-                  height: 200,
+                  height: 190,
                 ),
               ),
               Container(
@@ -45,7 +45,7 @@ class SanPhamItem extends StatelessWidget {
                     ),
                   )),
               Container(
-                margin: const EdgeInsets.only(left: 10),
+                margin: const EdgeInsets.only(left: 10, bottom: 12),
                 height: 15,
                 child: Align(
                   alignment: Alignment.centerLeft,

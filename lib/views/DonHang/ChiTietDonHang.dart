@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/views/DonHang/HuyDH.dart';
+import 'package:datn_cntt304_bandogiadung/views/DonHang/TBTraHang.dart';
 import 'package:flutter/material.dart';
 import '/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
@@ -30,7 +32,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Future<void> fetchTTNhanHang() async {
     TTNhanHangController controller = TTNhanHangController();
     try {
-      tTNhanHang = await controller.fetchTTNhanHang(widget.donHang.thongTinNhanHang);
+      tTNhanHang =
+          await controller.fetchTTNhanHang(widget.donHang.thongTinNhanHang);
     } catch (error) {
       print('Failed to load TTNhanHang: $error');
     } finally {
@@ -43,16 +46,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text('Đơn hàng #${widget.donHang.maDH}'),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: TextStyle(color: Colors.black, fontSize: 25, fontFamily: 'Comfortaa'),
+        titleTextStyle: const TextStyle(
+            color: Colors.black, fontSize: 25, fontFamily: 'Comfortaa'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -61,25 +66,45 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildOrderStatus(),
-              SizedBox(height: 24.0),
-              Text('Chi tiết đơn hàng', style: TextStyle(fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
-              SizedBox(height: 12.0),
+              const SizedBox(height: 24.0),
+              const Text('Chi tiết đơn hàng',
+                  style: TextStyle(
+                      fontFamily: 'Comfortaa',
+                      fontSize: 22,
+                      color: Colors.black87)),
+              const SizedBox(height: 12.0),
               _buildProductDetails(context),
-              SizedBox(height: 24.0),
-              Text('Địa chỉ', style: TextStyle(fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
-              SizedBox(height: 12.0),
-              isLoading ? Center(child: CircularProgressIndicator()) : _buildAddressDetails(),
-              SizedBox(height: 24.0),
-
+              const SizedBox(height: 24.0),
+              const Text('Địa chỉ',
+                  style: TextStyle(
+                      fontFamily: 'Comfortaa',
+                      fontSize: 22,
+                      color: Colors.black87)),
+              const SizedBox(height: 12.0),
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildAddressDetails(),
+              const SizedBox(height: 24.0),
               if (_isCancelButtonVisible())
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red, // Màu nền của nút
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12), // Padding cho nút
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 12), // Padding cho nút
                     ),
-                    onPressed: () {  },
-                    child: Text('Hủy đơn hàng', style: TextStyle(color: Colors.white, fontSize: 18)), // Nội dung của nút
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HuyDHScreen(
+                                    maKH: widget.donHang.khachHang,
+                                  )));
+                    },
+                    child: const Text('Hủy đơn hàng',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18)), // Nội dung của nút
                   ),
                 ),
               if (_isButtonsVisible())
@@ -92,40 +117,50 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
-                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 12),
                           ),
                           onPressed: () {
                             // Hành động cho nút "Đã nhận hàng"
                           },
-                          child: Text(
+                          child: const Text(
                             'Đã nhận hàng',
-                            style: TextStyle(fontFamily: 'Comfortaa', color: Colors.black, fontSize: 18),
+                            style: TextStyle(
+                                fontFamily: 'Comfortaa',
+                                color: Colors.black,
+                                fontSize: 18),
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                       SizedBox(
                         width: 400,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.yellowAccent,
-                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 12),
                           ),
                           onPressed: () {
-                            // Hành động cho nút "Trả hàng hoàn tiền"
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                            builder: (context) => TBTraHangScreen(
+                            maKH: widget.donHang.khachHang,
+                            )));
                           },
-                          child: Text(
+                          child: const Text(
                             'Trả hàng hoàn tiền',
-                            style: TextStyle(fontFamily: 'Comfortaa', color: Colors.black, fontSize: 18),
+                            style: TextStyle(
+                                fontFamily: 'Comfortaa',
+                                color: Colors.black,
+                                fontSize: 18),
                           ),
                         ),
                       ),
                     ],
                   ),
                 )
-
-
-
             ],
           ),
         ),
@@ -143,7 +178,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             color: isActive ? AppColors.primaryColor : Colors.grey.shade400,
             size: 20,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,7 +194,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 if (date != null && date.isNotEmpty)
                   Text(
                     date,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Comfortaa',
                       fontSize: 20,
                       color: Colors.black45,
@@ -173,7 +208,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-
   Widget _buildOrderStatus() {
     String decodedStatus = widget.donHang.trangThaiDH;
     bool isDelivered = decodedStatus == 'Đã giao hàng';
@@ -184,19 +218,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Trạng thái đơn hàng', style: TextStyle(fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
-        SizedBox(height: 12.0),
+        const Text('Trạng thái đơn hàng',
+            style: TextStyle(
+                fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
+        const SizedBox(height: 12.0),
         _buildStatusItem('Đã giao hàng', isDelivered, date: ''),
         _buildStatusItem('Đang giao hàng', isShipping, date: ''),
         _buildStatusItem('Đã xác nhận', isConfirmed, date: ''),
-          _buildStatusItem('Đang xử lý', isProcessing, date: DateFormat('dd/MM/yyyy').format(DateTime.parse(widget.donHang.ngayDat.toString()))),
+        _buildStatusItem('Đang xử lý', isProcessing,
+            date: DateFormat('dd/MM/yyyy')
+                .format(DateTime.parse(widget.donHang.ngayDat.toString()))),
       ],
     );
   }
 
   Widget _buildProductDetails(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.bgColor,
         border: Border.all(color: Colors.grey.shade300),
@@ -205,10 +243,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(Icons.shopping_cart, color: Colors.black54, size: 28),
+          const Icon(Icons.shopping_cart, color: Colors.black54, size: 28),
           Text(
             '${widget.productCount} sản phẩm',
-            style: TextStyle(fontSize: 18, fontFamily: 'Comfortaa', color: Colors.black87),
+            style: const TextStyle(
+                fontSize: 18, fontFamily: 'Comfortaa', color: Colors.black87),
           ),
           TextButton(
             onPressed: () {
@@ -219,7 +258,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               );
             },
-            child: Text(
+            child: const Text(
               'Xem tất cả',
               style: TextStyle(
                 fontFamily: 'Comfortaa',
@@ -248,10 +287,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Text(
                   tTNhanHang?.diaChi ?? 'Địa chỉ không có sẵn',
-                  style: TextStyle(fontFamily: 'Comfortaa', fontSize: 18, color: Colors.black),
+                  style: const TextStyle(
+                      fontFamily: 'Comfortaa',
+                      fontSize: 18,
+                      color: Colors.black),
                 ),
               ],
             ),
@@ -260,7 +301,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             onPressed: () {
               // Edit address action
             },
-            child: Text(
+            child: const Text(
               'Sửa',
               style: TextStyle(
                 fontFamily: 'Comfortaa',
@@ -271,13 +312,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
         ],
       ),
-
     );
   }
+
   bool _isCancelButtonVisible() {
     String decodedStatus = widget.donHang.trangThaiDH;
     return decodedStatus == 'Đang xử lý' || decodedStatus == 'Đã xác nhận';
   }
+
   bool _isButtonsVisible() {
     String decodedStatus = widget.donHang.trangThaiDH;
     return decodedStatus == 'Đã giao hàng';

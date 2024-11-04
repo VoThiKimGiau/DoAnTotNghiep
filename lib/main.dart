@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
             body: WelcomeScreen(),
           )
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

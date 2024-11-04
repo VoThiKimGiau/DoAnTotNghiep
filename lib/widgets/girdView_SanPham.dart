@@ -51,7 +51,8 @@ class GridViewSanPham extends StatelessWidget {
                       Image.network(
                         storageService
                             .getImageUrl(itemsSP![index].hinhAnhMacDinh),
-                        height: 185,
+                        height: 150,
+                        fit: BoxFit.cover,
                       ),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -69,7 +70,7 @@ class GridViewSanPham extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.only(
-                              left: 4, right: 4, bottom: 16),
+                              left: 4, right: 4, bottom: 8),
                           child: Text(
                             sharedFunction
                                 .formatCurrency(itemsSP![index].giaMacDinh),
