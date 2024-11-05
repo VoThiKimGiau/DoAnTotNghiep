@@ -57,7 +57,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: const TextStyle(
-            color: Colors.black, fontSize: 25, fontFamily: 'Comfortaa'),
+            color: Colors.black, fontSize: 25),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -69,7 +69,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               const SizedBox(height: 24.0),
               const Text('Chi tiết đơn hàng',
                   style: TextStyle(
-                      fontFamily: 'Comfortaa',
                       fontSize: 22,
                       color: Colors.black87)),
               const SizedBox(height: 12.0),
@@ -77,7 +76,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               const SizedBox(height: 24.0),
               const Text('Địa chỉ',
                   style: TextStyle(
-                      fontFamily: 'Comfortaa',
                       fontSize: 22,
                       color: Colors.black87)),
               const SizedBox(height: 12.0),
@@ -126,7 +124,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           child: const Text(
                             'Đã nhận hàng',
                             style: TextStyle(
-                                fontFamily: 'Comfortaa',
                                 color: Colors.black,
                                 fontSize: 18),
                           ),
@@ -152,7 +149,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           child: const Text(
                             'Trả hàng hoàn tiền',
                             style: TextStyle(
-                                fontFamily: 'Comfortaa',
                                 color: Colors.black,
                                 fontSize: 18),
                           ),
@@ -186,7 +182,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Text(
                   status,
                   style: TextStyle(
-                    fontFamily: 'Comfortaa',
                     fontSize: 20,
                     color: isActive ? AppColors.primaryColor : Colors.black54,
                   ),
@@ -195,7 +190,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   Text(
                     date,
                     style: const TextStyle(
-                      fontFamily: 'Comfortaa',
                       fontSize: 20,
                       color: Colors.black45,
                     ),
@@ -247,7 +241,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Text(
             '${widget.productCount} sản phẩm',
             style: const TextStyle(
-                fontSize: 18, fontFamily: 'Comfortaa', color: Colors.black87),
+                fontSize: 18, color: Colors.black87),
           ),
           TextButton(
             onPressed: () {
@@ -261,7 +255,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: const Text(
               'Xem tất cả',
               style: TextStyle(
-                fontFamily: 'Comfortaa',
                 fontSize: 18,
                 color: AppColors.primaryColor,
               ),
@@ -290,7 +283,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Text(
                   tTNhanHang?.diaChi ?? 'Địa chỉ không có sẵn',
                   style: const TextStyle(
-                      fontFamily: 'Comfortaa',
                       fontSize: 18,
                       color: Colors.black),
                 ),
@@ -304,7 +296,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: const Text(
               'Sửa',
               style: TextStyle(
-                fontFamily: 'Comfortaa',
                 fontSize: 16,
                 color: AppColors.primaryColor,
               ),

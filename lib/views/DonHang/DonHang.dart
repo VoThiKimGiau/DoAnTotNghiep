@@ -34,7 +34,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(
+        title: const Text(
           'Đơn hàng',
           style: TextStyle(
             fontSize: 25,
@@ -50,16 +50,16 @@ class _OrderListScreenState extends State<OrderListScreen> {
         future: futureDonHangs,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
                 'Có lỗi xảy ra: ${snapshot.error}',
-                style: TextStyle(color: Colors.red, fontSize: 16),
+                style: const TextStyle(color: Colors.red, fontSize: 16),
               ),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+            return const Center(
               child: Text(
                 'Không có đơn hàng nào.',
                 style: TextStyle(fontSize: 18, fontFamily: 'Comfortaa'),
@@ -71,7 +71,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
           return ListView.separated(
             itemCount: donHangs.length,
-            separatorBuilder: (context, index) => Divider(height: 1),
+            separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final donHang = donHangs[index];
 
@@ -106,9 +106,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
       ),
       title: Text(
         'Đơn hàng: ${donHang.maDH}',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 22, // Updated text size for ListTile title
-          fontFamily: 'Comfortaa',
           color: Colors.black87,
         ),
       ),
@@ -116,7 +115,6 @@ class _OrderListScreenState extends State<OrderListScreen> {
         subtitle,
         style: TextStyle(
           fontSize: 20, // Updated text size for ListTile subtitle
-          fontFamily: 'Comfortaa',
           color: Colors.grey[700],
         ),
       ),
