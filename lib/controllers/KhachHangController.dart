@@ -34,7 +34,7 @@ class KhachHangController {
   }
 
   Future<List<KhachHang>> fetchAllCustomer() async {
-    String baseUrl = 'http://${IpConfig.ipConfig}/api/khachhang';
+    String baseUrl = '${IpConfig.ipConfig}api/khachhang';
 
     final response = await http.get(
       Uri.parse(baseUrl),
@@ -50,7 +50,7 @@ class KhachHangController {
 
   Future<KhachHang> insertCustomer(KhachHang kh) async {
     final response = await http.post(
-      Uri.parse('http://${IpConfig.ipConfig}/api/khachhang'),
+      Uri.parse('${IpConfig.ipConfig}api/khachhang'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',

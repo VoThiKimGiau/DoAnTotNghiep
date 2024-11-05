@@ -1,145 +1,231 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/main.dart';
+import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
-
-import '../../controllers/KhachHangController.dart';
-import '../../models/KhachHang.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class CompleteInformation extends StatefulWidget {
+  final String maKH;
+  final String tenKH;
+  final String sdt;
+  final String email;
+  final String tenTK;
+  final String matKhau;
+
+  CompleteInformation({
+    required this.maKH,
+    required this.tenKH,
+    required this.sdt,
+    required this.email,
+    required this.tenTK,
+    required this.matKhau,
+  });
+
   @override
   _CompleteInformationState createState() => _CompleteInformationState();
 }
 
 class _CompleteInformationState extends State<CompleteInformation> {
-  int _age = 18; // Giá trị mặc định cho độ tuổi
-  int _selectedAge = 18;
+  DateTime? _selectedDate;
+  String? _selectedGender = 'Nam';
+  KhachHangController khachHangController = KhachHangController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      locale: const Locale('vi', ''),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  void _createAccount() {
+    bool gTinh = _selectedGender == 'Nam' ? false : true;
+
+    khachHangController.insertCustomer(new KhachHang(
+      maKH: widget.maKH,
+      tenKH: widget.tenKH,
+      sdt: widget.sdt,
+      email: widget.email,
+      tenTK: widget.tenTK,
+      matKhau: widget.matKhau,
+      hoatDong: true,
+      gioiTinh: gTinh,
+      ngaySinh: _selectedDate,
+    ));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Đã tạo tài khoản thành công'),
+        duration: Duration(seconds: 5),
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    String displayDate = _selectedDate != null
+        ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+        : DateFormat('dd/MM/yyyy').format(DateTime.now());
+
     return SafeArea(
       child: Scaffold(
-        body: Container(
-            margin: const EdgeInsets.only(top: 161.0),
-            child: Column(
-              children: [
-              const Align(
-              alignment: Alignment.center,
-              child: Text(
-                'Thông tin về bạn',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 50.0, left: 20.0),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Bạn là?',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 24.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      print('Nam');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(161, 50),
-                    ),
-                    child: const Text('Nam'),
-                  ),
-                  OutlinedButton(
-                    onPressed: () {
-                      print('Nữ');
-                    },
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primaryColor,
-                      minimumSize: const Size(161, 50),
-                    ),
-                    child: const Text('Nữ'),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 50.0, left: 20.0),
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Bạn bao nhiêu tuổi?',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            ),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        backgroundColor: Colors.white,
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Container(
-                        margin: EdgeInsets.only(left: 20.0),
-                        child: Text('Độ tuổi')
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        margin: const EdgeInsets.only(
+                            left: 27, top: 63, bottom: 24),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.all(12),
+                            backgroundColor: Colors.white,
+                          ),
+                          child: SvgPicture.asset('assets/icons/arrowleft.svg'),
+                        ),
+                      ),
+                    ),
+                    const Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Thông tin về bạn',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.bold),
+                      ),
                     ),
                     Container(
-                      width: 250,
+                      margin: const EdgeInsets.only(top: 50.0, left: 20.0),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Bạn là?',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 24.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedGender = 'Nam';
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _selectedGender == 'Nam'
+                                  ? AppColors.primaryColor
+                                  : Colors.white,
+                              foregroundColor: _selectedGender == 'Nam'
+                                  ? Colors.white
+                                  : Colors.black,
+                              minimumSize: const Size(161, 50),
+                            ),
+                            child: const Text('Nam'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedGender = 'Nữ';
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _selectedGender == 'Nữ'
+                                  ? AppColors.primaryColor
+                                  : Colors.white,
+                              foregroundColor: _selectedGender == 'Nữ'
+                                  ? Colors.white
+                                  : Colors.black,
+                              minimumSize: const Size(161, 50),
+                            ),
+                            child: const Text('Nữ'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 50.0, left: 20.0),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Ngày sinh của bạn?',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Container(
                       margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: DropdownButton<int>(
-                        value: _selectedAge,
-                        onChanged: (int? newValue) {
-                          setState(() {
-                            _selectedAge = newValue!;
-                          });
-                        },
-                        isExpanded: true,
-                        items: List.generate(83, (index) => index + 18).map((
-                            age) {
-                          return DropdownMenuItem<int>(
-                            value: age,
-                            child: Text(age.toString()),
-                          );
-                        }).toList(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            displayDate,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _selectDate(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            child: const Text(
+                              'Chọn Ngày',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
-                )
-              ],
+                ),
+              ),
             ),
-            Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 342.0,
-                        child: ElevatedButton(
-                            onPressed: (){
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => LoginScreen()));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryColor,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: const Text('Hoàn thành')
-                        ),
-                      )
-                    ],
-                  ),
-            )
-        ],
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: ElevatedButton(
+                onPressed: _createAccount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text('Tạo tài khoản'),
+              ),
+            ),
+          ],
+        ),
       ),
-    ),)
-    ,
     );
   }
 }

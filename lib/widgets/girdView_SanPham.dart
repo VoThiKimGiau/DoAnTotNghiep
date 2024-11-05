@@ -5,6 +5,8 @@ import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart'
 import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../colors/color.dart';
+
 class GridViewSanPham extends StatelessWidget {
   final List<SanPham> itemsSP;
   final String? maKH;
@@ -62,7 +64,7 @@ class GridViewSanPham extends StatelessWidget {
                               horizontal: 4, vertical: 8),
                           child: Text(
                             itemsSP![index].tenSP,
-                            style: const TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
                       ),
@@ -75,7 +77,7 @@ class GridViewSanPham extends StatelessWidget {
                             sharedFunction
                                 .formatCurrency(itemsSP![index].giaMacDinh),
                             style: const TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
+                                fontSize: 14, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),

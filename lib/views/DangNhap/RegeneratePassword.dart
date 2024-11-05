@@ -25,7 +25,7 @@ class RegeneratePassword extends StatelessWidget {
           Container(
               margin: const EdgeInsets.symmetric(vertical: 24.0),
               child: const Text(
-                'Chúng tôi đã gửi email tạo lại mật khẩu cho bạn',
+                'Chúng tôi đã gửi email cấp lại mật khẩu cho bạn',
                 style: TextStyle(fontSize: 25),
                 textAlign: TextAlign.center,
               )),

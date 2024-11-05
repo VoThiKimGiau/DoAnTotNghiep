@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/CompleteInformation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,7 +20,8 @@ class _RegisterScreen extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController tenTKController = TextEditingController();
   final TextEditingController matKhauController = TextEditingController();
-  final TextEditingController nhapLaiMatKhauController = TextEditingController();
+  final TextEditingController nhapLaiMatKhauController =
+      TextEditingController();
 
   bool showPassword = false;
   bool showConfirmPassword = false;
@@ -32,7 +34,8 @@ class _RegisterScreen extends State<RegisterScreen> {
 
   Future<void> fetchKH() async {
     try {
-      List<KhachHang> fetchedItems = await khachHangController.fetchAllCustomer();
+      List<KhachHang> fetchedItems =
+          await khachHangController.fetchAllCustomer();
       setState(() {
         dsKH = fetchedItems;
       });
@@ -61,6 +64,11 @@ class _RegisterScreen extends State<RegisterScreen> {
     int currentMaxId = getMaxID(dsKH!);
     currentMaxId++;
     return 'KH$currentMaxId';
+  }
+
+  bool isValidEmail(String email) {
+    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return regex.hasMatch(email);
   }
 
   @override
@@ -107,7 +115,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
+                margin:
+                    const EdgeInsets.only(left: 20.0, right: 20.0, top: 28.0),
                 child: Column(
                   children: [
                     const SizedBox(height: 16),
@@ -136,7 +145,8 @@ class _RegisterScreen extends State<RegisterScreen> {
                         if (value.length == 1 && value != '0') {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Số điện thoại phải bắt đầu bằng 0!'),
+                              content:
+                                  Text('Số điện thoại phải bắt đầu bằng 0!'),
                             ),
                           );
                         }
@@ -145,13 +155,15 @@ class _RegisterScreen extends State<RegisterScreen> {
                         if (value.length != 10) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Số điện thoại phải có đúng 10 số và bắt đầu bằng 0!'),
+                              content: Text(
+                                  'Số điện thoại phải có đúng 10 số và bắt đầu bằng 0!'),
                             ),
                           );
                         } else if (!value.startsWith('0')) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Số điện thoại phải bắt đầu bằng 0!'),
+                              content:
+                                  Text('Số điện thoại phải bắt đầu bằng 0!'),
                             ),
                           );
                         }
@@ -183,7 +195,9 @@ class _RegisterScreen extends State<RegisterScreen> {
                         hintText: 'Mật khẩu',
                         hintStyle: const TextStyle(color: Colors.grey),
                         suffixIcon: IconButton(
-                          icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off),
+                          icon: Icon(showPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                           onPressed: () {
                             setState(() {
                               showPassword = !showPassword;
@@ -201,7 +215,9 @@ class _RegisterScreen extends State<RegisterScreen> {
                         hintText: 'Nhập lại mật khẩu',
                         hintStyle: const TextStyle(color: Colors.grey),
                         suffixIcon: IconButton(
-                          icon: Icon(showConfirmPassword ? Icons.visibility : Icons.visibility_off),
+                          icon: Icon(showConfirmPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                           onPressed: () {
                             setState(() {
                               showConfirmPassword = !showConfirmPassword;
@@ -215,15 +231,37 @@ class _RegisterScreen extends State<RegisterScreen> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 40),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 23, vertical: 40),
                 child: ElevatedButton(
                   onPressed: () {
-                    String tenKH = tenKHController.text;
-                    String sdt = sdtController.text;
-                    String email = emailController.text;
-                    String tenTK = tenTKController.text;
-                    String matKhau = matKhauController.text;
-                    String nhapLaiMatKhau = nhapLaiMatKhauController.text;
+                    String tenKH = tenKHController.text.trim();
+                    String sdt = sdtController.text.trim();
+                    String email = emailController.text.trim();
+                    String tenTK = tenTKController.text.trim();
+                    String matKhau = matKhauController.text.trim();
+                    String nhapLaiMatKhau = nhapLaiMatKhauController.text.trim();
+
+                    if (tenKH.isEmpty || sdt.isEmpty || email.isEmpty || tenTK.isEmpty || matKhau.isEmpty || nhapLaiMatKhau.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Vui lòng điền tất cả các thông tin!'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    for(KhachHang kh in dsKH!){
+                      if(kh.tenTK == tenTK.trim())
+                        {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Tên tài khoản đã có người sử dụng vui lòng nhập lại tên khác.'),
+                            ),
+                          );
+                          return;
+                        }
+                    }
 
                     if (sdt.length != 10) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -234,28 +272,53 @@ class _RegisterScreen extends State<RegisterScreen> {
                       return;
                     }
 
-                    if (matKhau == nhapLaiMatKhau) {
-                      khachHangController.insertCustomer(
-                        KhachHang(
-                          maKH: generateCustomerCode(),
-                          tenKH: tenKH,
-                          sdt: sdt,
-                          email: email,
-                          tenTK: tenTK,
-                          matKhau: matKhau,
-                          hoatDong: true,
-                        ),
-                      );
+                    for(KhachHang kh in dsKH!){
+                      if(kh.sdt == sdt.trim())
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Số điện thoại này đã có tài khoản. Vui lòng kiểm tra lại'),
+                          ),
+                        );
+                        return;
+                      }
+                    }
 
+                    if (!isValidEmail(email)) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Tạo tài khoản thành công!'),
+                          content: Text('Email không hợp lệ! Vui lòng nhập lại.'),
                         ),
                       );
+                      return;
+                    }
+
+                    if (matKhau.length < 8 || matKhau.length > 30) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Mật khẩu phải có ít nhất 8 ký tự và nhiều nhất 30 ký tự!'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (matKhau == nhapLaiMatKhau) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CompleteInformation(
+                                  maKH: generateCustomerCode(),
+                                  tenKH: tenKH,
+                                  sdt: sdt,
+                                  email: email,
+                                  tenTK: tenTK,
+                                  matKhau: matKhau)));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Mật khẩu không khớp! Vui lòng kiểm tra lại'),
+                          content: Text(
+                              'Mật khẩu không khớp! Vui lòng kiểm tra lại'),
                         ),
                       );
                     }
@@ -266,7 +329,7 @@ class _RegisterScreen extends State<RegisterScreen> {
                     minimumSize: const Size(double.infinity, 50),
                   ),
                   child: const Text(
-                    'Tạo tài khoản',
+                    'Tiếp tục',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
