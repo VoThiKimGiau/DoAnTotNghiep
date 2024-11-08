@@ -1,10 +1,12 @@
+import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:flutter/material.dart';
 
 class PromoCodePage extends StatefulWidget {
   final String selectedPromoCode;
-  final List<String> promoCodes;
+  final List<Promotion> promotions;
 
-  PromoCodePage({required this.selectedPromoCode, required this.promoCodes});
+  const PromoCodePage(
+      {super.key, required this.selectedPromoCode, required this.promotions});
 
   @override
   _PromoCodePageState createState() => _PromoCodePageState();
@@ -26,14 +28,15 @@ class _PromoCodePageState extends State<PromoCodePage> {
         title: Text('Chọn mã khuyến mãi'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context, selectedCode), // Trả về mã đã chọn
+          onPressed: () =>
+              Navigator.pop(context, selectedCode), // Trả về mã đã chọn
         ),
       ),
       body: Column(
-        children: widget.promoCodes.map((code) {
+        children: widget.promotions.map((code) {
           return RadioListTile<String>(
-            title: Text(code),
-            value: code,
+            title: Text(code.moTa),
+            value: code.maKm,
             groupValue: selectedCode,
             onChanged: (value) {
               setState(() {

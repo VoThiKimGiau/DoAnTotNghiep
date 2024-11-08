@@ -1,4 +1,8 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
+import 'package:datn_cntt304_bandogiadung/models/KMKH.dart';
+import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:flutter/material.dart';
 import 'PaymentMethodPage.dart';
 import 'PromoCodePage.dart';
@@ -12,7 +16,11 @@ class CheckoutPage extends StatefulWidget {
   final double totalAmount;
   final String? customerId; // Thêm tham số cho mã khách hàng
 
-  CheckoutPage({required this.totalAmount, required this.customerId}); // Cập nhật constructor
+  const CheckoutPage({
+    super.key,
+    required this.totalAmount,
+    required this.customerId,
+  }); // Cập nhật constructor
 
   @override
   _CheckoutPageState createState() => _CheckoutPageState();
@@ -22,15 +30,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
   String selectedPromoCode = '';
-  List<String> promoCodes = [
-    'Giảm tối đa \$30',
-    'Giảm 9%',
-    'Giảm tối đa \$70',
-  ];
+  List<Promotion> promoCodes = [];
+  final CheckoutController checkoutController = CheckoutController();
 
   List<TTNhanHang> shippingAddresses = [];
   TTNhanHang? selectedAddress;
-  final TTNhanHangController controller = TTNhanHangController(); // Khởi tạo controller
+  final TTNhanHangController controller =
+      TTNhanHangController(); // Khởi tạo controller
 
   GiaoHangController giaoHangController = GiaoHangController();
   double? soKM = 0;
@@ -41,13 +47,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void initState() {
     super.initState();
     _loadShippingAddresses(); // Tải địa chỉ giao hàng
+    _loadPromotion();
     loadKMShip();
   }
 
-  Future<void> loadKMShip() async{
+  _loadPromotion() async {
+    List<KMKH> kmkhs = await checkoutController.fetchKMKH(widget.customerId!);
+    kmkhs.forEach((element) async {
+      final promo = await checkoutController.fetchDetailKM(element.khuyenMai);
+      setState(() {
+        promoCodes.add(promo);
+      });
+    });
+  }
+
+  Future<void> loadKMShip() async {
     try {
-      String? dcDau = await giaoHangController.getCoordinatesFromAddress('Phường 13, Quận Tân Bình, TP.HCM, Việt Nam');
-      String? dcDich = await giaoHangController.getCoordinatesFromAddress('Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam');
+      String? dcDau = await giaoHangController.getCoordinatesFromAddress(
+          'Phường 13, Quận Tân Bình, TP.HCM, Việt Nam');
+      String? dcDich = await giaoHangController
+          .getCoordinatesFromAddress('Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam');
 
       print('Origin coordinates: $dcDau');
       print('Destination coordinates: $dcDich');
@@ -55,11 +74,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       if (dcDich != null && dcDau != null) {
         destination = dcDich;
         origin = dcDau;
-        double? fetchedDistance = await giaoHangController.getDistanceOSRM(origin!, destination!);
+        double? fetchedDistance =
+            await giaoHangController.getDistanceOSRM(origin!, destination!);
         setState(() {
           soKM = fetchedDistance;
         });
-    }} catch (e) {
+      }
+    } catch (e) {
       print('Error: $e'); // Handle error
       setState(() {
         soKM = 0;
@@ -69,11 +90,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> _loadShippingAddresses() async {
     try {
-      final List<TTNhanHang> addresses = await controller.fetchTTNhanHangByCustomer(widget.customerId); // Sử dụng mã khách hàng
+      final List<TTNhanHang> addresses =
+          await controller.fetchTTNhanHangByCustomer(
+              widget.customerId); // Sử dụng mã khách hàng
       setState(() {
         shippingAddresses = addresses;
         if (shippingAddresses.isNotEmpty) {
-          selectedAddress = shippingAddresses.first; // Chọn địa chỉ đầu tiên làm mặc định
+          selectedAddress =
+              shippingAddresses.first; // Chọn địa chỉ đầu tiên làm mặc định
         }
       });
     } catch (e) {
@@ -220,7 +244,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       MaterialPageRoute(
         builder: (context) => PromoCodePage(
           selectedPromoCode: selectedPromoCode,
-          promoCodes: promoCodes,
+          promotions: promoCodes,
         ),
       ),
     );
@@ -235,7 +259,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget _buildSummarySection() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
@@ -249,7 +273,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         children: [
           _buildSummaryRow('Tạm tính', widget.totalAmount),
           _buildSummaryRow('Phí giao hàng', 0),
-          _buildSummaryRow('Tổng cộng', widget.totalAmount + 8.0, isTotal: true),
+          _buildSummaryRow('Tổng cộng', widget.totalAmount, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
@@ -258,9 +282,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 MaterialPageRoute(builder: (context) => SuccessPage()),
               );
             },
-            child: Text('Đặt hàng'),
             style: ElevatedButton.styleFrom(
-              minimumSize: Size(double.infinity, 50),
+              backgroundColor: AppColors.primaryColor,
+              minimumSize: const Size(double.infinity, 50),
+            ),
+            child: const Text(
+              'Đặt hàng',
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
         ],
@@ -293,7 +323,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       MaterialPageRoute(
         builder: (context) => SelectAddressPage(
           shippingAddresses: shippingAddresses,
-          selectedAddress: selectedAddress ?? shippingAddresses.first, maKH: widget.customerId,
+          selectedAddress: selectedAddress ?? shippingAddresses.first,
+          maKH: widget.customerId,
         ),
       ),
     );

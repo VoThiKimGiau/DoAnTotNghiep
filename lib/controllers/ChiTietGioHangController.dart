@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
-import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:http/http.dart' as http;
 import '../models/ChiTietGioHang.dart';
 
@@ -30,7 +29,7 @@ class ChiTietGioHangController {
       List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => ChiTietGioHang.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to load product list');
+      return [];
     }
   }
 
@@ -65,6 +64,60 @@ class ChiTietGioHangController {
       return jsonResponse['maGioHang']; // Giả sử API trả về maGioHang
     } else {
       throw Exception('Không thể lấy mã giỏ hàng');
+    }
+  }
+
+  // Update cart
+  Future<ChiTietGioHang> capnhatChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
+    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
+    final response = await http.put(
+      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/update'),
+      headers: <String, String>{
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(chiTietGioHang.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return ChiTietGioHang.fromJson(json.decode(response.body));
+    } else {
+      print("Phản hồi lỗi: ${response.body}");
+      throw Exception("Không thể cap nhat chi tiết giỏ hàng: ${response.body}");
+    }
+  }
+
+  //Delete item cart
+  Future<bool> xoaChiTietGioHang(String maGioHang, String maCTSP) async {
+    final response = await http.delete(
+      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/delete/$maGioHang/$maCTSP'),
+      headers: <String, String>{
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception("Không thể cap nhat chi tiết giỏ hàng: ${response.body}");
+    }
+  }
+
+  // Delete cart
+  Future<bool> xoaTatCaGioHang(String maGioHang) async {
+    final response = await http.delete(
+      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/delete-all/$maGioHang'),
+      headers: <String, String>{
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception("Không thể cap nhat chi tiết giỏ hàng: ${response.body}");
     }
   }
 }

@@ -46,6 +46,7 @@ class _CircleButtonColor extends State<CircleButtonColor> {
       }
 
       setState(() {
+        
         dsMauSP = fetchedItems;
         if (dsMauSP.isNotEmpty) {
           selectedIndex = 0; // Set default selection to the first item

@@ -58,21 +58,25 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
         child: ElevatedButton(
           onPressed: () async {
             // Chuyển qua trang PromoCodePage và nhận mã khuyến mãi đã chọn
-            final selectedPromoCode = await Navigator.push<String>(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PromoCodePage(
-                  selectedPromoCode: '', // Giá trị ban đầu của mã khuyến mãi
-                  promoCodes: ['Giảm tối đa \$30', 'Giảm 9%', 'Giảm tối đa \$70'], // Danh sách mã khuyến mãi
-                ),
-              ),
-            );
+            // // final selectedPromoCode = await Navigator.push<String>(
+            // //   context,
+            // //   MaterialPageRoute(
+            // //     builder: (context) => PromoCodePage(
+            // //       selectedPromoCode: '', // Giá trị ban đầu của mã khuyến mãi
+            // //       promotions: [
+            // //         'Giảm tối đa \$30',
+            // //         'Giảm 9%',
+            // //         'Giảm tối đa \$70'
+            // //       ], // Danh sách mã khuyến mãi
+            // //     ),
+            // //   ),
+            // // );
 
-            // Nếu người dùng chọn mã khuyến mãi, xử lý mã được chọn tại đây
-            if (selectedPromoCode != null) {
-              print('Mã khuyến mãi đã chọn: $selectedPromoCode');
-              // Bạn có thể xử lý tiếp hoặc lưu mã này lại tùy vào logic của bạn
-            }
+            // // Nếu người dùng chọn mã khuyến mãi, xử lý mã được chọn tại đây
+            // if (selectedPromoCode != null) {
+            //   print('Mã khuyến mãi đã chọn: $selectedPromoCode');
+            //   // Bạn có thể xử lý tiếp hoặc lưu mã này lại tùy vào logic của bạn
+            // }
           },
           child: Text('Tiếp tục'),
           style: ElevatedButton.styleFrom(

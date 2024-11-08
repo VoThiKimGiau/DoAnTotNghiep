@@ -1,9 +1,13 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
+import 'package:datn_cntt304_bandogiadung/views/GioHang/Widgets/cart_item.dart';
+import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import '../../controllers/ChiTietGioHangController.dart';
 import '../../models/ChiTietGioHang.dart';
 import '../../services/storage/storage_service.dart';
 import 'CheckoutPage.dart';
-
 
 class GioHangPage extends StatefulWidget {
   final String maGioHang; // Thêm maGioHang để lấy thông tin giỏ hàng
@@ -20,6 +24,7 @@ class _GioHangPageState extends State<GioHangPage> {
   late StorageService _storageService;
   List<ChiTietGioHang> gioHangItems = [];
   bool _isLoading = true; // Biến để theo dõi trạng thái tải
+  ChiTietSPController _chiTietSPController = ChiTietSPController();
 
   @override
   void initState() {
@@ -62,16 +67,19 @@ class _GioHangPageState extends State<GioHangPage> {
     double tongTien = _tinhTongTien();
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => CheckoutPage(totalAmount: tongTien, customerId: widget.maKH,),
+        builder: (context) => CheckoutPage(
+          totalAmount: tongTien,
+          customerId: widget.maKH,
+        ),
       ),
     );
   }
 
   // Hàm xóa toàn bộ giỏ hàng
-  void _xoaTatCa() {
-    setState(() {
-      gioHangItems.clear();
-    });
+  void _xoaTatCa() async {
+    await _controller.xoaTatCaGioHang(widget.maGioHang);
+    _fetchGioHangItems();
+    setState(() {});
   }
 
   @override
@@ -87,117 +95,143 @@ class _GioHangPageState extends State<GioHangPage> {
         centerTitle: true,
         title: Text(
           'Giỏ hàng',
-          style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
-          TextButton(
-            onPressed: _xoaTatCa,
-            child: Text('Xoá tất cả', style: TextStyle(color: Colors.black, fontSize: 16)),
-          ),
+          if (gioHangItems.isNotEmpty)
+            TextButton(
+              onPressed: _xoaTatCa,
+              child: const Text(
+                'Xoá tất cả',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                ),
+              ),
+            ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: _isLoading
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : gioHangItems.isEmpty
-            ? Center(
-          child: Text(
-            'Giỏ hàng trống',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-        )
-            : Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: gioHangItems.length,
-                itemBuilder: (context, index) {
-                  final item = gioHangItems[index];
-                  final imageUrl = _storageService.getImageUrl(item.maCTSP);
-
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          // Hiển thị hình ảnh sản phẩm
-                          Image.network(
-                            imageUrl,
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.broken_image, size: 80);
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(child: CircularProgressIndicator());
-                            },
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/icons/badge.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Giỏ hàng trống',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
+                        ),
+                        const SizedBox(height: 20),
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Trở về trang chủ'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: gioHangItems.length,
+                          itemBuilder: (context, index) {
+                            final item = gioHangItems[index];
+                            final imageUrl =
+                                _storageService.getImageUrl(item.maCTSP);
+
+                            return CartItem(
+                              imageUrl: imageUrl,
+                              item: item,
+                              maKH: widget.maKH!,
+                              onDelete: () async {
+                                await _controller.xoaChiTietGioHang(
+                                  widget.maGioHang,
                                   item.maCTSP,
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10),
-                                Text('Giá: \$${item.donGia.toStringAsFixed(2)}'),
-                              ],
+                                );
+                                _fetchGioHangItems();
+                                setState(() {});
+                              },
+                              onDecrease: () async {
+                                if (item.soLuong > 1) {
+                                  _controller.capnhatChiTietGioHang(
+                                    item.copyWith(
+                                      soLuong: item.soLuong - 1,
+                                    ),
+                                  );
+                                  _fetchGioHangItems();
+                                  setState(() {});
+                                }
+                              },
+                              onIncreate: () async {
+                                _controller.capnhatChiTietGioHang(
+                                  item.copyWith(
+                                    soLuong: item.soLuong + 1,
+                                  ),
+                                );
+                                _fetchGioHangItems();
+                                setState(() {});
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Tổng cộng:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.remove),
-                                onPressed: () {
-                                  if (item.soLuong > 1) {
-                                    //_capNhatSoLuong(index, item.soLuong - 1);
-                                  }
-                                },
-                              ),
-                              Text(item.soLuong.toString(), style: TextStyle(fontSize: 16)),
-                              IconButton(
-                                icon: Icon(Icons.add),
-                                onPressed: () {
-                                  //_capNhatSoLuong(index, item.soLuong + 1);
-                                },
-                              ),
-                            ],
+                          Text(
+                            '\$${_tinhTongTien().toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Tổng cộng:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('\$${_tinhTongTien().toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _datHang,
-              child: Text('Đặt hàng', style: TextStyle(fontSize: 18)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                minimumSize: Size(double.infinity, 50),
-              ),
-            ),
-          ],
-        ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _datHang,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        child: const Text(
+                          'Đặt hàng',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
       ),
     );
   }

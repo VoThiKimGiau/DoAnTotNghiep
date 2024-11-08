@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class StorageService {
-  final String storageBucketUrl = 'https://firebasestorage.googleapis.com/v0/b/cntt304-bansanphamgiadun-10457.appspot.com/o/';
+  final String storageBucketUrl =
+      'https://firebasestorage.googleapis.com/v0/b/cntt304-bansanphamgiadun-10457.appspot.com/o/';
 
   String getImageUrl(String imageName) {
+    print('$storageBucketUrl$imageName.jpg?alt=media');
     return '$storageBucketUrl$imageName.jpg?alt=media';
   }
 }

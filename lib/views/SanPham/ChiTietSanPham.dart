@@ -80,7 +80,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   Future<void> fetchChiTietSP(String maSanPham) async {
     try {
       List<ChiTietSP> fetchedItems =
-      await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
+          await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
       List<String> mauSP = await getDSMau(fetchedItems);
       List<String> kichCo = await getDSKichCo(fetchedItems);
       String maGioH = await fetchMaGH(widget.maKH);
@@ -109,7 +109,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   Future<void> fetchSPTuongTu(String maDanhMuc) async {
     try {
       List<SanPham> fetchedItems =
-      await sanPhamController.getProductByCategory(maDanhMuc);
+          await sanPhamController.getProductByCategory(maDanhMuc);
       setState(() {
         itemsSP = fetchedItems;
         removeSPHienTai();
@@ -195,199 +195,197 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
               ),
               isLoading
                   ? const Center(
-                  child:
-                  CircularProgressIndicator()) // Display loader while loading
+                      child:
+                          CircularProgressIndicator()) // Display loader while loading
                   : item == null
-                  ? const Center(child: Text('Không tìm thấy sản phẩm.'))
-                  : Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 250,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: dsHinhSP.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                    top: 24,
-                                    bottom: 24,
-                                    left: 24,
-                                    right: 10),
-                                child: ClipRRect(
-                                  borderRadius:
-                                  BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    storageService
-                                        .getImageUrl(dsHinhSP[index]),
-                                    fit: BoxFit.cover,
-                                    width: 160,
+                      ? const Center(child: Text('Không tìm thấy sản phẩm.'))
+                      : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
                                     height: 250,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: dsHinhSP.length,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 24,
+                                              bottom: 24,
+                                              left: 24,
+                                              right: 10),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: Image.network(
+                                              storageService
+                                                  .getImageUrl(dsHinhSP[index]),
+                                              fit: BoxFit.cover,
+                                              width: 160,
+                                              height: 250,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 24),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            item!.tenSP,
-                            style: const TextStyle(
-                                fontSize: 25,
-                                color: Colors.black,
-                                fontFamily: 'Gabarito',
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            sharedFunction
-                                .formatCurrency(item!.giaMacDinh),
-                            style: const TextStyle(
-                                fontSize: 16,
-                                color: AppColors.primaryColor,
-                                fontFamily: 'Gabarito',
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                        left: 23, top: 24, right: 25),
-                    height: 150,
-                    child: SingleChildScrollView(
-                      child: Text(
-                        item!.moTa,
-                        style: const TextStyle(fontSize: 16),
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
-                  ),
-                  Container(
-                      margin:
-                      const EdgeInsets.only(left: 23, top: 24),
-                      child: const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Sản phẩm tương tự ',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Gabarito'),
-                        ),
-                      )),
-                  Container(
-                      height: 280,
-                      margin: const EdgeInsets.only(left: 24),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: itemsSP != null
-                            ? (itemsSP!.length >= 5
-                            ? 5
-                            : itemsSP!.length)
-                            : 0,
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ChiTietSanPhamScreen(
-                                        maSP: itemsSP![index].maSP,
-                                        maKH: widget.maKH,),
+                              ],
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 24),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item!.tenSP,
+                                      style: const TextStyle(
+                                          fontSize: 25,
+                                          color: Colors.black,
+                                          fontFamily: 'Gabarito',
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    Text(
+                                      sharedFunction
+                                          .formatCurrency(item!.giaMacDinh),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: AppColors.primaryColor,
+                                          fontFamily: 'Gabarito',
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                            child: SanPhamItem(item: itemsSP![index]),
-                          );
-                        },
-                      )),
-                  Container(
-                    margin: const EdgeInsets.all(24),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          CustomBottomSheet.show(
-                              context,
-                              "Đặt hàng",
-                              dsCTSP,
-                              dsMauSP,
-                              dsKichCo,
-                              _quantity,
-                              maSanPham ?? '',
-                              maGH ?? '',
-                          (newPrice)
-                          {
-                            setState(() {
-                              // Cập nhật giá trong widget cha
-                              var currentPrice = newPrice;
-                            });
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 23, top: 24, right: 25),
+                              height: 150,
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  item!.moTa,
+                                  style: const TextStyle(fontSize: 16),
+                                  textAlign: TextAlign.justify,
+                                ),
+                              ),
+                            ),
+                            Container(
+                                margin:
+                                    const EdgeInsets.only(left: 23, top: 24),
+                                child: const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Sản phẩm tương tự ',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Gabarito'),
+                                  ),
+                                )),
+                            Container(
+                                height: 280,
+                                margin: const EdgeInsets.only(left: 24),
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: itemsSP != null
+                                      ? (itemsSP!.length >= 5
+                                          ? 5
+                                          : itemsSP!.length)
+                                      : 0,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChiTietSanPhamScreen(
+                                              maSP: itemsSP![index].maSP,
+                                              maKH: widget.maKH,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: SanPhamItem(item: itemsSP![index]),
+                                    );
+                                  },
+                                )),
+                            Container(
+                              margin: const EdgeInsets.all(24),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    CustomBottomSheet.show(
+                                        context,
+                                        "Đặt hàng",
+                                        dsCTSP,
+                                        dsMauSP,
+                                        dsKichCo,
+                                        _quantity,
+                                        maSanPham ?? '',
+                                        maGH ?? '', (newPrice) {
+                                      setState(() {
+                                        // Cập nhật giá trong widget cha
+                                        var currentPrice = newPrice;
+                                      });
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                  ),
+                                  child: const Text(
+                                    'Đặt hàng',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 24),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    CustomBottomSheet.show(
+                                      context,
+                                      "Thêm vào giỏ hàng",
+                                      dsCTSP,
+                                      dsMauSP,
+                                      dsKichCo,
+                                      _quantity,
+                                      maSanPham ?? '',
+                                      maGH ?? '',
+                                      (newPrice) {
+                                        setState(() {
+                                          var currentPrice = newPrice;
+                                        });
+                                      },
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryColor,
+                                  ),
+                                  child: const Text(
+                                    'Thêm vào giỏ hàng',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          'Đặt hàng',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin:
-                    const EdgeInsets.symmetric(horizontal: 24),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          CustomBottomSheet.show(
-                            context,
-                            "Thêm vào giỏ hàng",
-                            dsCTSP,
-                            dsMauSP,
-                            dsKichCo,
-                            _quantity,
-                            maSanPham ?? '',
-                            maGH ?? '',
-                                  (newPrice)
-                              {
-                                setState(() {
-                                  // Cập nhật giá trong widget cha
-                                  var currentPrice = newPrice;
-                                });
-                              });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                        ),
-                        child: const Text(
-                          'Thêm vào giỏ hàng',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -397,7 +395,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
 }
 
 class CustomBottomSheet {
-  static void show(BuildContext context,
+  static void show(
+      BuildContext context,
       String buttonText,
       List<ChiTietSP> dsCTSP,
       List<String> dsMau,
@@ -411,8 +410,8 @@ class CustomBottomSheet {
     String? selectedKichCo;
     ChiTietSP? chiTietSP;
 
-    Future<ChiTietSP?> getCTSP(String maMau, String maKichCo,
-        String maSP) async {
+    Future<ChiTietSP?> getCTSP(
+        String maMau, String maKichCo, String maSP) async {
       for (ChiTietSP ct in dsCTSP) {
         if (ct.maMau == maMau && ct.maKichCo == maKichCo && ct.maSP == maSP) {
           return ct;
@@ -423,8 +422,8 @@ class CustomBottomSheet {
 
     Future<void> loadChiTietSP() async {
       if (selectedMau != null && selectedKichCo != null && maSP != null) {
-        ChiTietSP? chiTietSP = await getCTSP(
-            selectedMau!, selectedKichCo!, maSP!);
+        ChiTietSP? chiTietSP =
+            await getCTSP(selectedMau!, selectedKichCo!, maSP!);
         if (chiTietSP != null) {
           print("Chi tiết sản phẩm: $chiTietSP");
           onPriceUpdate(chiTietSP.giaBan);
@@ -440,10 +439,7 @@ class CustomBottomSheet {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
       ),
       builder: (BuildContext context) {
-        final screenHeight = MediaQuery
-            .of(context)
-            .size
-            .height;
+        final screenHeight = MediaQuery.of(context).size.height;
         final bottomSheetHeight = screenHeight * 0.75;
 
         return StatefulBuilder(
@@ -451,8 +447,7 @@ class CustomBottomSheet {
             return Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16.0)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
               ),
               height: bottomSheetHeight,
               width: double.infinity,
@@ -493,16 +488,15 @@ class CustomBottomSheet {
                     ),
                     if (dsMau.isEmpty)
                       const Center(child: CircularProgressIndicator())
-                    else
-                      if (dsMau.isNotEmpty)
-                        CircleButtonColor(
-                          items: dsMau,
-                          onSelected: (value) {
-                            setState(() {
-                              selectedMau = value; // Capture selected color
-                            });
-                          },
-                        ),
+                    else if (dsMau.isNotEmpty)
+                      CircleButtonColor(
+                        items: dsMau,
+                        onSelected: (value) {
+                          setState(() {
+                            selectedMau = value; // Capture selected color
+                          });
+                        },
+                      ),
                     Container(
                       margin: const EdgeInsets.only(top: 17, left: 25),
                       child: const Align(
@@ -560,7 +554,7 @@ class CustomBottomSheet {
                               ),
                               Container(
                                 margin:
-                                const EdgeInsets.symmetric(horizontal: 22),
+                                    const EdgeInsets.symmetric(horizontal: 22),
                                 child: Text('$quantity',
                                     style: const TextStyle(fontSize: 20)),
                               ),
@@ -595,14 +589,17 @@ class CustomBottomSheet {
                           if (buttonText == "Thêm vào giỏ hàng") {
                             print(
                                 "Selected mau: $selectedMau, selected kich co: $selectedKichCo, maSP: $maSP");
-                            if (selectedMau != null && selectedKichCo != null &&
+                            if (selectedMau != null &&
+                                selectedKichCo != null &&
                                 maSP != null) {
                               chiTietSP = await getCTSP(
                                   selectedMau!, selectedKichCo!, maSP);
                               if (chiTietSP == null) {
                                 print("Không có chi tiết sản phẩm này");
                               } else {
-                                ChiTietGioHangController chiTietGioHangController = ChiTietGioHangController();
+                                ChiTietGioHangController
+                                    chiTietGioHangController =
+                                    ChiTietGioHangController();
                                 chiTietGioHangController.themChiTietGioHang(
                                   ChiTietGioHang(
                                     maGioHang: maGH,

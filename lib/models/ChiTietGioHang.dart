@@ -25,7 +25,21 @@ class ChiTietGioHang {
       'maGioHang': maGioHang,
       'maSanPham': maCTSP,
       'soLuong': soLuong,
-      'donGia': donGia,
+      'gia': donGia,
     };
+  }
+
+  ChiTietGioHang copyWith({
+    String? maGioHang,
+    String? maCTSP,
+    int? soLuong,
+    double? donGia,
+  }) {
+    return ChiTietGioHang(
+      maGioHang: maGioHang ?? this.maGioHang,
+      maCTSP: maCTSP ?? this.maCTSP,
+      soLuong: soLuong ?? this.soLuong,
+      donGia: donGia ?? this.donGia,
+    );
   }
 }
