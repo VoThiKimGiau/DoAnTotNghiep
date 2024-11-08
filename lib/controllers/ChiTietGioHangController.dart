@@ -76,7 +76,7 @@ class ChiTietGioHangController {
         'accept': '*/*',
         'Content-Type': 'application/json',
       },
-      body: json.encode(chiTietGioHang.toJson()),
+      body: json.encode(chiTietGioHang.toJsonForUpdate()),
     );
 
     if (response.statusCode == 200) {

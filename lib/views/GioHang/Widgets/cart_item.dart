@@ -121,8 +121,9 @@ class _CartItemState extends State<CartItem> {
                       style: const TextStyle(fontSize: 16),
                     ),
                     IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: widget.onIncreate),
+                      icon: const Icon(Icons.add),
+                      onPressed: widget.onIncreate,
+                    ),
                   ],
                 ),
               ],

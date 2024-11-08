@@ -367,9 +367,11 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                       maSanPham ?? '',
                                       maGH ?? '',
                                       (newPrice) {
-                                        setState(() {
-                                          var currentPrice = newPrice;
-                                        });
+                                        setState(
+                                          () {
+                                            var currentPrice = newPrice;
+                                          },
+                                        );
                                       },
                                     );
                                   },
@@ -379,7 +381,9 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                   child: const Text(
                                     'Thêm vào giỏ hàng',
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -409,6 +413,7 @@ class CustomBottomSheet {
     String? selectedMau;
     String? selectedKichCo;
     ChiTietSP? chiTietSP;
+    bool isLoading = false;
 
     Future<ChiTietSP?> getCTSP(
         String maMau, String maKichCo, String maSP) async {
@@ -530,9 +535,10 @@ class CustomBottomSheet {
                           const Text(
                             'Số lượng',
                             style: TextStyle(
-                                fontFamily: 'Gabarito',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
+                              fontFamily: 'Gabarito',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           Row(
                             children: [
@@ -586,7 +592,8 @@ class CustomBottomSheet {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (buttonText == "Thêm vào giỏ hàng") {
+                          if (buttonText == "Thêm vào giỏ hàng" &&
+                              isLoading == false) {
                             print(
                                 "Selected mau: $selectedMau, selected kich co: $selectedKichCo, maSP: $maSP");
                             if (selectedMau != null &&
@@ -600,7 +607,11 @@ class CustomBottomSheet {
                                 ChiTietGioHangController
                                     chiTietGioHangController =
                                     ChiTietGioHangController();
-                                chiTietGioHangController.themChiTietGioHang(
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                await chiTietGioHangController
+                                    .themChiTietGioHang(
                                   ChiTietGioHang(
                                     maGioHang: maGH,
                                     maCTSP: chiTietSP!.maCTSP,
@@ -608,6 +619,14 @@ class CustomBottomSheet {
                                     donGia: chiTietSP!.giaBan,
                                   ),
                                 );
+                                setState(() {
+                                  isLoading = false;
+                                  Navigator.of(context).pop();
+                                });
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Thêm vào giỏ hàng thành công"),
+                                ));
                               }
                             } else {
                               print("Màu sắc hoặc kích cỡ chưa được chọn.");
@@ -629,11 +648,15 @@ class CustomBottomSheet {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              buttonText,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 16),
-                            ),
+                            isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : Text(
+                                    buttonText,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                  ),
                           ],
                         ),
                       ),

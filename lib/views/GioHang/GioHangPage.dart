@@ -168,27 +168,27 @@ class _GioHangPageState extends State<GioHangPage> {
                                   widget.maGioHang,
                                   item.maCTSP,
                                 );
-                                _fetchGioHangItems();
+                                await _fetchGioHangItems();
                                 setState(() {});
                               },
                               onDecrease: () async {
                                 if (item.soLuong > 1) {
-                                  _controller.capnhatChiTietGioHang(
+                                  await _controller.capnhatChiTietGioHang(
                                     item.copyWith(
                                       soLuong: item.soLuong - 1,
                                     ),
                                   );
-                                  _fetchGioHangItems();
+                                  await _fetchGioHangItems();
                                   setState(() {});
                                 }
                               },
                               onIncreate: () async {
-                                _controller.capnhatChiTietGioHang(
+                                await _controller.capnhatChiTietGioHang(
                                   item.copyWith(
                                     soLuong: item.soLuong + 1,
                                   ),
                                 );
-                                _fetchGioHangItems();
+                                await _fetchGioHangItems();
                                 setState(() {});
                               },
                             );

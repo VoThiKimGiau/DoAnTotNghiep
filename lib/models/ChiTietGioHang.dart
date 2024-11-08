@@ -25,7 +25,16 @@ class ChiTietGioHang {
       'maGioHang': maGioHang,
       'maSanPham': maCTSP,
       'soLuong': soLuong,
-      'gia': donGia,
+      'donGia': donGia,
+    };
+  }
+
+  Map<String, dynamic> toJsonForUpdate() {
+    return {
+      'gioHang': maGioHang,
+      'sanPham': maCTSP,
+      'soLuong': soLuong,
+      'donGia': donGia,
     };
   }
 
