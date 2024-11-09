@@ -2,7 +2,7 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/NhanVienController.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/CompleteInformation.dart';
-import 'package:datn_cntt304_bandogiadung/views/DangNhap/FogotPassword.dart';
+import 'package:datn_cntt304_bandogiadung/views/DangNhap/ForgotPassword.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/RegisterScreen.dart';
 import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
@@ -196,7 +196,7 @@ class _LoginScreen extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FogotPassword(),
+                                builder: (context) => ForgotPassword(),
                               ),
                             );
                           },

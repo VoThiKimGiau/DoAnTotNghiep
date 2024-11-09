@@ -251,18 +251,6 @@ class _RegisterScreen extends State<RegisterScreen> {
                       return;
                     }
 
-                    for(KhachHang kh in dsKH!){
-                      if(kh.tenTK == tenTK.trim())
-                        {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Tên tài khoản đã có người sử dụng vui lòng nhập lại tên khác.'),
-                            ),
-                          );
-                          return;
-                        }
-                    }
-
                     if (sdt.length != 10) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -273,11 +261,31 @@ class _RegisterScreen extends State<RegisterScreen> {
                     }
 
                     for(KhachHang kh in dsKH!){
+                      if(kh.tenTK == tenTK.trim())
+                        {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Tên tài khoản đã có người sử dụng vui lòng nhập lại tên khác.'),
+                            ),
+                          );
+                          return;
+                        }
+
                       if(kh.sdt == sdt.trim())
                       {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Số điện thoại này đã có tài khoản. Vui lòng kiểm tra lại'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      if(kh.email == email.trim())
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Email này đã có tài khoản. Vui lòng kiểm tra lại'),
                           ),
                         );
                         return;

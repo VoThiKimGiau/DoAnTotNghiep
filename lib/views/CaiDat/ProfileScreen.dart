@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
-    String name = utf8.decode((khachHang!.tenKH?.runes.toList()) ?? []);
+    String name = khachHang!.tenKH ?? "Tên chưa đăng ký";
     String email = khachHang!.email ?? "Email chưa đăng ký";
     String phone = khachHang!.sdt ?? "Số điện thoại chưa đăng ký";
 

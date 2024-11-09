@@ -39,7 +39,6 @@ class _CompleteInformationState extends State<CompleteInformation> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      locale: const Locale('vi', ''),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -66,11 +65,11 @@ class _CompleteInformationState extends State<CompleteInformation> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Đã tạo tài khoản thành công'),
-        duration: Duration(seconds: 5),
+        duration: Duration(seconds: 1),
       ),
     );
 
-    Future.delayed(const Duration(seconds: 5), () {
+    Future.delayed(const Duration(seconds: 1), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
