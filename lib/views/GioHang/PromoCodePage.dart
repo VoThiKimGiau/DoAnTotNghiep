@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
+import 'package:datn_cntt304_bandogiadung/views/GioHang/Widgets/promotion_item.dart';
 import 'package:flutter/material.dart';
 
 class PromoCodePage extends StatefulWidget {
@@ -25,24 +26,34 @@ class _PromoCodePageState extends State<PromoCodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chọn mã khuyến mãi'),
+        title: const Text('Chọn mã khuyến mãi'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () =>
               Navigator.pop(context, selectedCode), // Trả về mã đã chọn
         ),
       ),
       body: Column(
         children: widget.promotions.map((code) {
-          return RadioListTile<String>(
-            title: Text(code.moTa),
-            value: code.maKm,
-            groupValue: selectedCode,
-            onChanged: (value) {
-              setState(() {
-                selectedCode = value;
-              });
+          // return RadioListTile<String>(
+          //   title: Text(code.moTa),
+          //   value: code.moTa,
+          //   groupValue: selectedCode,
+          //   onChanged: (value) {
+          //     setState(() {
+          //       selectedCode = value;
+          //     });
+          //   },
+          // );
+          return InkWell(
+            onTap: () {
+              selectedCode = code.moTa;
+              setState(() {});
             },
+            child: PromotionItem(
+              promotion: code,
+              isSelect: selectedCode == code.moTa,
+            ),
           );
         }).toList(),
       ),

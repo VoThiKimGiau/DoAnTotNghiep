@@ -32,8 +32,46 @@ class CheckoutController {
     );
 
     if (response.statusCode == 200) {
-      dynamic jsonResponse = json.decode(response.body);
+      final decodedJson = utf8.decode(response.bodyBytes);
+      dynamic jsonResponse = json.decode(decodedJson);
       return Promotion.fromJson(jsonResponse);
+    } else {
+      throw Exception('Failed to load product count');
+    }
+  }
+
+  Future<String> checkOut(
+      String maTTNH, maKH, hTTT, pTTT, double thanhTien, bool datt) async {
+    final response = await http.post(
+      Uri.parse('${IpConfig.ipConfig}api/donhang/add'),
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Accept': 'application/json',
+      },
+      body: json.encode({
+        "daThanhToan": datt,
+        "maTTNH": maTTNH,
+        "maKH": maKH,
+        "hinhThucGiaoHang": hTTT,
+        "phuongThucThanhToan": pTTT,
+        "thanhTien": thanhTien,
+      }),
+    );
+
+    print(json.encode({
+      "daThanhToan": datt,
+      "maTTNH": maTTNH,
+      "maKH": maKH,
+      "hinhThucGiaoHang": hTTT,
+      "phuongThucThanhToan": pTTT,
+      "thanhTien": thanhTien,
+    }));
+
+    if (response.statusCode == 200) {
+      final decodedJson = utf8.decode(response.bodyBytes);
+      dynamic jsonResponse = json.decode(decodedJson);
+      print(jsonResponse["maDH"]);
+      return jsonResponse["maDH"];
     } else {
       throw Exception('Failed to load product count');
     }

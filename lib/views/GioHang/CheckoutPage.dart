@@ -179,14 +179,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   content,
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey,
+            ),
           ],
         ),
       ),
@@ -276,10 +283,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
           _buildSummaryRow('Tổng cộng', widget.totalAmount, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
-              // Logic để xử lý đặt hàng
-              Navigator.of(context).push(
+            onPressed: () async {
+              await checkoutController.checkOut(
+                "TT1",
+                widget.customerId,
+                "Hoa toc",
+                "Thanh toan sau khi nhan hang",
+                0,
+                true,
+              );
+              Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => SuccessPage()),
+                (route) => route.isFirst,
               );
             },
             style: ElevatedButton.styleFrom(
