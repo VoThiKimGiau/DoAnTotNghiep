@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/views/DoiTra/DanhSachSanPhamDoiTra.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/HuyDH.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/TBTraHang.dart';
 import 'package:flutter/material.dart';
@@ -142,8 +143,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             Navigator.push(
                             context,
                             MaterialPageRoute(
-                            builder: (context) => TBTraHangScreen(
-                            maKH: widget.donHang.khachHang,
+                            builder: (context) => Danhsachsanphamdoitra(
+                            donHang: widget.donHang,
                             )));
                           },
                           child: const Text(

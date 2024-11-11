@@ -13,8 +13,8 @@ class ChiTietDoiTra {
 
   Map<String, dynamic> toJson() {
     return {
-      'madoitra': maDoiTra,
-      'mactsp': maCTSP,
+      'maDoiTra': maDoiTra,
+      'maCTSP': maCTSP,
       'gia': gia,
       'soluong': soluong,
     };
@@ -22,8 +22,8 @@ class ChiTietDoiTra {
 
   factory ChiTietDoiTra.fromJson(Map<String, dynamic> json) {
     return ChiTietDoiTra(
-      maDoiTra: json['madoitra'],
-      maCTSP: json['mactsp'],
+      maDoiTra: json['maDoiTra'],
+      maCTSP: json['maCTSP'],
       gia: json['gia'],
       soluong: json['soluong'],
     );

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
+import 'package:datn_cntt304_bandogiadung/views/DoiTra/ImageUploadScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
@@ -15,6 +16,8 @@ import 'package:datn_cntt304_bandogiadung/models/ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/KMDH.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 
+import '../../dto/ChiTietDoiTraDTO.dart';
+import '../../dto/DoiTraDTO.dart';
 import '../../models/ChiTietDoiTra.dart';
 
 class Danhsachsanphamdoitra extends StatefulWidget {
@@ -74,13 +77,15 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
     double total = 0.0;
     for (var item in orderDetailsList) {
       if (selectedProducts[item.sanPham] == true) {
-        total += item.donGia;
+        int quantity = productQuantities[item.sanPham] ?? 1;
+        total += item.donGia * quantity;
       }
     }
     setState(() {
       totalRefundAmount = total;
     });
   }
+
   void incrementQuantity(String maCTSP) {
     int currentQuantity = productQuantities[maCTSP] ?? 0;
     int maxQuantity = orderDetailsList.firstWhere((item) => item.sanPham == maCTSP).soLuong;
@@ -99,8 +104,15 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
         productQuantities[maCTSP] = currentQuantity - 1;
         updateTotalRefundAmount();
       });
+    } else if (currentQuantity == 1) {
+      setState(() {
+        productQuantities[maCTSP] = 0;
+        selectedProducts[maCTSP] = false;
+        updateTotalRefundAmount();
+      });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,8 +158,8 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
             ElevatedButton(
               child: Text('Tiếp theo'),
               onPressed: () {
-                // Navigate to the next screen (e.g., to upload evidence)
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => UploadEvidenceScreen()));
+
+                 Navigator.push(context, MaterialPageRoute(builder: (context) => MultiImageCaptureAndUpload(doiTraDTO: buildDoiTraDTO(),donHang: widget.donHang)));
               },
             ),
           ],
@@ -155,6 +167,29 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
       ),
     );
   }
+  DoiTraDTO buildDoiTraDTO() {
+    double totalRefundAmount = 0.0;
+    List<ChiTietDoiTraDTO> selectedProductsDetails = [];
+
+    selectedProducts.forEach((maCTSP, isSelected) {
+      if (isSelected) {
+        final quantity = productQuantities[maCTSP] ?? 1;
+        final price = orderDetailsList.firstWhere((item) => item.sanPham == maCTSP).donGia;
+
+        totalRefundAmount += price * quantity;
+
+        selectedProductsDetails.add(ChiTietDoiTraDTO(
+          maCTSP: maCTSP,
+          gia: price,
+          soLuong: quantity,
+        ));
+      }
+    });
+
+    return DoiTraDTO(tongTien: totalRefundAmount, chiTietDoiTras: selectedProductsDetails);
+  }
+
+
 
   Widget _buildProductRow(String maCTSP, List<String> productDetails, String quantity, String price) {
     String productName = productDetails[0];
