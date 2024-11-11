@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/BaoCaoScreen.dart';
+import 'package:datn_cntt304_bandogiadung/views/BaoCao/StoreReport.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/QuanLyDonHang.dart';
 import 'package:flutter/material.dart';
@@ -41,11 +42,24 @@ class _ShopDashboardState extends State<ShopDashboard> {
       profit=todayStats['profit']??0.0;
     });
   }
+  String formatCurrency(double value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return value.toStringAsFixed(1);
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+      return false; // Return false để chặn không cho quay lại
+    },
+    child:Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
+        automaticallyImplyLeading: false,
         title: Row(
           children: [
             CircleAvatar(
@@ -77,7 +91,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Hôm nay', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('Báo cáo chi tiết >', style: TextStyle(color: Colors.green)),
+
                 ],
               ),
               SizedBox(height: 10),
@@ -88,9 +102,9 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
-                  _buildStatCard('Doanh thu', totalRevenue.toString(), Icons.bar_chart, Colors.orange),
+                  _buildStatCard('Doanh thu',formatCurrency( totalRevenue), Icons.bar_chart, Colors.orange),
                   _buildStatCard('Đơn mới', todayOrdersCount.toString(), Icons.new_releases, Colors.blue),
-                  _buildStatCard('Lợi nhuận', profit.toString(), Icons.attach_money, Colors.green),
+                  _buildStatCard('Lợi nhuận',formatCurrency(profit), Icons.attach_money, Colors.green),
                   _buildStatCard('Đơn đã giao', doneOrdersCount.toString(), Icons.check_circle_outline, Colors.yellow),
                 ],
               ),
@@ -99,7 +113,6 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Đơn hàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('Tất cả >', style: TextStyle(color: Colors.green)),
                 ],
               ),
               SizedBox(height: 10),
@@ -111,7 +124,6 @@ class _ShopDashboardState extends State<ShopDashboard> {
                     processingOrdersCount.toString(),
                     Colors.red,
                     onTap: () {
-                      // Navigate to the waiting orders screen or perform another action
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -130,8 +142,15 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
-                  _buildActionButton('Tạo đơn', Icons.add_shopping_cart),
-                  _buildActionButton('Đơn hàng', Icons.list_alt),
+                  _buildActionButton('Đơn hàng', Icons.list_alt,
+                  onPressed:() {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => (TodaysOrdersScreen()), // Replace with your actual screen
+                      ),
+                    );
+                  }),
                   _buildActionButton('Sản phẩm', Icons.inventory),
                   _buildActionButton(
                     'Kho hàng',
@@ -145,9 +164,6 @@ class _ShopDashboardState extends State<ShopDashboard> {
                       );
                     },
                   ),
-                  _buildActionButton('Khách hàng', Icons.people),
-                  _buildActionButton('Thu chi', Icons.swap_vert),
-                  _buildActionButton('Sổ nợ', Icons.account_balance_wallet),
                   _buildActionButton(
                     'Báo cáo',
                     Icons.insert_chart,
@@ -156,7 +172,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BaoCaoScreen(), // Change to your report screen
+                          builder: (context) => StoreReport(),
                         ),
                       );
                     },
@@ -173,46 +189,12 @@ class _ShopDashboardState extends State<ShopDashboard> {
                   },),
                 ],
               ),
-              SizedBox(height: 20),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Website của hàng', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 10),
-                      Text('https://0334492438.afada.vn', style: TextStyle(color: Colors.green)),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              icon: Icon(Icons.share),
-                              label: Text('Chia sẻ'),
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.green),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              icon: Icon(Icons.settings),
-                              label: Text('Cài đặt'),
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.green),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+
             ],
           ),
         ),
       ),
+    )
     );
   }
 
@@ -236,12 +218,31 @@ class _ShopDashboardState extends State<ShopDashboard> {
   Widget _buildOrderStatusItem(String title, String count, Color color, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
-      child: Column(
-        children: [
-          Text(title, style: TextStyle(color: color)),
-          SizedBox(height: 5),
-          Text(count, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-        ],
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 5),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 2),
+              Text(
+                count,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -251,12 +252,14 @@ class _ShopDashboardState extends State<ShopDashboard> {
     return InkWell(
       onTap: onPressed,
       child: Column(
+        mainAxisSize: MainAxisSize.min,  // Thêm dòng này
         children: [
           Stack(
             children: [
               CircleAvatar(
                 backgroundColor: Colors.green[100],
-                child: Icon(icon, color: Colors.green),
+                radius: 20,  // Giảm kích thước của CircleAvatar
+                child: Icon(icon, color: Colors.green, size: 20),  // Giảm kích thước của Icon
               ),
               if (badge != null)
                 Positioned(
@@ -278,8 +281,14 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 ),
             ],
           ),
-          SizedBox(height: 5),
-          Text(title, style: TextStyle(fontSize: 12), textAlign: TextAlign.center),
+          SizedBox(height: 2),  // Giảm khoảng cách
+          Text(
+            title,
+            style: TextStyle(fontSize: 11),  // Giảm kích thước chữ
+            textAlign: TextAlign.center,
+            maxLines: 1,  // Giới hạn số dòng
+            overflow: TextOverflow.ellipsis,  // Xử lý text bị tràn
+          ),
         ],
       ),
     );

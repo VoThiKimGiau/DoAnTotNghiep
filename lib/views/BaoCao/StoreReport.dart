@@ -16,7 +16,7 @@ class _StoreReportState extends State<StoreReport> {
   String selectedChartView = "Ngày";
   bool saveAsDefault = false;
   String tempSelectedPeriod = "Tháng này";
-  List<DonHang> orders=[];
+  List<DonHang> orders = [];
   final DonHangController _donHangController = DonHangController();
   Map<String, dynamic> statistics = {
     'totalRevenue': 0.0,
@@ -30,6 +30,38 @@ class _StoreReportState extends State<StoreReport> {
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  String _formatChartDate(DateTime date) {
+    switch (selectedChartView) {
+      case "Giờ":
+        return '${date.hour}:00';
+      case "Tuần":
+        return 'Tuần ${((date.day - 1) ~/ 7) + 1}';
+      case "Tháng":
+        return '${date.month}/${date.year}';
+      default: // "Ngày"
+        return '${date.day}/${date.month}';
+    }
+  }
+
+  List<String> _getAvailableChartViews() {
+    switch (selectedPeriod) {
+      case "Hôm nay":
+      case "Hôm qua":
+        return ["Giờ"];
+      case "Tuần này":
+      case "Tuần trước":
+      case "Tháng này":
+      case "Tháng trước":
+      case "30 ngày":
+      case "60 ngày":
+        return ["Ngày", "Tuần"];
+      case "Tất cả thời gian":
+        return ["Ngày", "Tuần", "Tháng"];
+      default:
+        return ["Ngày"];
+    }
   }
 
   Widget _buildChartToggle(String text) {
@@ -48,52 +80,91 @@ class _StoreReportState extends State<StoreReport> {
       child: Text(text),
     );
   }
+
   Future<void> _loadData() async {
     try {
-      // Get date range based on selected period
       DateTimeRange dateRange = _getDateRange();
       String startDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateRange.start);
       String endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateRange.end);
 
-      // Fetch orders
-       orders = await _donHangController.fetchDonHangByDateRange(startDate, endDate);
+      orders = await _donHangController.fetchDonHangByDateRange(startDate, endDate);
       print(orders);
-      // Calculate statistics
       setState(() {
         statistics = _donHangController.calculateStatistics(orders);
       });
     } catch (e) {
       print('Error loading data: $e');
-      // You might want to show an error message to the user
     }
   }
-  List<FlSpot> _generateChartData() {
-    // Group orders by date and sum their revenue
-    Map<DateTime, double> dailyRevenue = {};
 
-    for (var order in orders) {
-      if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
-        DateTime orderDate = DateTime(
-          order.ngayDat!.year,
-          order.ngayDat!.month,
-          order.ngayDat!.day,
-        );
-        dailyRevenue[orderDate] = (dailyRevenue[orderDate] ?? 0) + order.thanhTien!;
-      }
+  List<FlSpot> _generateChartData() {
+    Map<DateTime, double> groupedRevenue = {};
+
+    orders.sort((a, b) => a.ngayDat!.compareTo(b.ngayDat!));
+
+    switch (selectedChartView) {
+      case "Giờ":
+        for (var order in orders) {
+          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
+            DateTime hourKey = DateTime(
+              order.ngayDat!.year,
+              order.ngayDat!.month,
+              order.ngayDat!.day,
+              order.ngayDat!.hour,
+            );
+            groupedRevenue[hourKey] = (groupedRevenue[hourKey] ?? 0) + order.thanhTien!;
+          }
+        }
+        break;
+
+      case "Tuần":
+        for (var order in orders) {
+          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
+            DateTime weekStart = order.ngayDat!.subtract(Duration(days: order.ngayDat!.weekday - 1));
+            DateTime weekKey = DateTime(weekStart.year, weekStart.month, weekStart.day);
+            groupedRevenue[weekKey] = (groupedRevenue[weekKey] ?? 0) + order.thanhTien!;
+          }
+        }
+        break;
+
+      case "Tháng":
+        for (var order in orders) {
+          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
+            DateTime monthKey = DateTime(order.ngayDat!.year, order.ngayDat!.month);
+            groupedRevenue[monthKey] = (groupedRevenue[monthKey] ?? 0) + order.thanhTien!;
+          }
+        }
+        break;
+
+      default: // "Ngày"
+        for (var order in orders) {
+          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
+            DateTime dayKey = DateTime(
+              order.ngayDat!.year,
+              order.ngayDat!.month,
+              order.ngayDat!.day,
+            );
+            groupedRevenue[dayKey] = (groupedRevenue[dayKey] ?? 0) + order.thanhTien!;
+          }
+        }
     }
 
-    // Sort dates
-    var sortedDates = dailyRevenue.keys.toList()..sort();
-
-    // Create spots for the chart
+    var sortedDates = groupedRevenue.keys.toList()..sort();
     return sortedDates.asMap().entries.map((entry) {
       return FlSpot(
           entry.key.toDouble(),
-          dailyRevenue[entry.value]! / 1000 // Convert to thousands for better display
+          groupedRevenue[entry.value]! / 1000 // Convert to thousands for better display
       );
     }).toList();
   }
-
+  String formatCurrency(double value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return value.toStringAsFixed(1);
+  }
   Widget _buildRevenueChart() {
     final spots = _generateChartData();
     if (spots.isEmpty) {
@@ -101,6 +172,9 @@ class _StoreReportState extends State<StoreReport> {
         child: Text('Không có dữ liệu'),
       );
     }
+
+    // Calculate the number of 2-hour intervals
+    final int intervalCount = 6; // 12 hours / 2-hour intervals
 
     return Container(
       height: 300,
@@ -110,40 +184,36 @@ class _StoreReportState extends State<StoreReport> {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: true,
-            horizontalInterval: 1000,
-            verticalInterval: 5,
+            horizontalInterval: 2000,
+            verticalInterval: 1,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Colors.grey.withOpacity(0.2),
+                strokeWidth: 1,
+              );
+            },
           ),
           titlesData: FlTitlesData(
             show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 5,
-                getTitlesWidget: (value, meta) {
-                  if (spots.isEmpty || value.toInt() >= spots.length) {
-                    return Text('');
-                  }
-                  DateTime date = DateTime.now().subtract(
-                      Duration(days: spots.length - 1 - value.toInt())
-                  );
-                  return Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      '${date.day}/${date.month}',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  );
-                },
-              ),
-            ),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: 1000,
+                interval: 2000,
+                reservedSize: 40,
                 getTitlesWidget: (value, meta) {
+                  if (value == 0) {
+                    return Text('0',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ));
+                  }
                   return Text(
-                    '${NumberFormat.compact().format(value)}k',
-                    style: TextStyle(fontSize: 12),
+                    '${(value / 1000).toStringAsFixed(1)}K',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
                   );
                 },
               ),
@@ -154,16 +224,35 @@ class _StoreReportState extends State<StoreReport> {
             topTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 1,
+                getTitlesWidget: (value, meta) {
+                  final int hour = (value.toInt() * 2 + 12) % 24;
+                  return Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(
+                      '${hour.toString().padLeft(2, '0')}:00',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
           borderData: FlBorderData(
             show: true,
             border: Border(
-              bottom: BorderSide(color: Colors.black12),
-              left: BorderSide(color: Colors.black12),
+              bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
+              left: BorderSide(color: Colors.grey.withOpacity(0.2)),
             ),
           ),
           minX: 0,
-          maxX: spots.length.toDouble() - 1,
+          maxX: intervalCount.toDouble() - 1,
           minY: 0,
           maxY: spots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b) * 1.2,
           lineBarsData: [
@@ -195,11 +284,10 @@ class _StoreReportState extends State<StoreReport> {
               tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
               getTooltipItems: (List<LineBarSpot> touchedSpots) {
                 return touchedSpots.map((LineBarSpot touchedSpot) {
-                  final DateTime date = DateTime.now().subtract(
-                      Duration(days: spots.length - 1 - touchedSpot.x.toInt())
-                  );
+                  final int hour = (touchedSpot.x.toInt() * 2 + 12) % 24;
+                  final DateTime date = DateTime(2024, 1, 1, hour, 0);
                   return LineTooltipItem(
-                    '${DateFormat('dd/MM/yyyy').format(date)}\n',
+                    '${DateFormat('HH:mm').format(date)}\n',
                     const TextStyle(color: Colors.white, fontSize: 12),
                     children: [
                       TextSpan(
@@ -220,14 +308,12 @@ class _StoreReportState extends State<StoreReport> {
       ),
     );
   }
-
   void _showFilterBottomSheet() {
-    // Set temporary selection to current selection when opening sheet
     tempSelectedPeriod = selectedPeriod;
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allow bottom sheet to be larger
+      isScrollControlled: true,
       useSafeArea: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -241,7 +327,6 @@ class _StoreReportState extends State<StoreReport> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -259,7 +344,6 @@ class _StoreReportState extends State<StoreReport> {
                     ],
                   ),
                   SizedBox(height: 16),
-
                   Text(
                     'Khoảng thời gian',
                     style: TextStyle(
@@ -268,8 +352,6 @@ class _StoreReportState extends State<StoreReport> {
                     ),
                   ),
                   SizedBox(height: 12),
-
-                  // Time period options with temporary state
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -288,7 +370,6 @@ class _StoreReportState extends State<StoreReport> {
                     ],
                   ),
                   SizedBox(height: 16),
-
                   CheckboxListTile(
                     title: Text('Lưu bộ lọc làm mặc định'),
                     value: saveAsDefault,
@@ -300,13 +381,13 @@ class _StoreReportState extends State<StoreReport> {
                     controlAffinity: ListTileControlAffinity.leading,
                   ),
                   SizedBox(height: 16),
-
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.grey[200],
+
                             foregroundColor: Colors.black,
                           ),
                           child: Text('Đặt về mặc định'),
@@ -327,12 +408,11 @@ class _StoreReportState extends State<StoreReport> {
                           ),
                           child: Text('Áp dụng'),
                           onPressed: () {
-                            // Update main state with temporary selection
                             setState(() {
                               selectedPeriod = tempSelectedPeriod;
                             });
                             Navigator.pop(context);
-                            _loadData(); // Reload data with new period
+                            _loadData();
                           },
                         ),
                       ),
@@ -412,6 +492,7 @@ class _StoreReportState extends State<StoreReport> {
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
+    final availableChartViews = _getAvailableChartViews();
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -426,7 +507,6 @@ class _StoreReportState extends State<StoreReport> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      // Remove the Expanded widget from inside SingleChildScrollView
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -449,9 +529,6 @@ class _StoreReportState extends State<StoreReport> {
                 onPressed: _showFilterBottomSheet,
               ),
             ),
-
-
-            // Metrics grid
             GridView.count(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -501,9 +578,7 @@ class _StoreReportState extends State<StoreReport> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildChartToggle('Ngày')
-              ],
+              children: availableChartViews.map((view) => _buildChartToggle(view)).toList(),
             ),
             Container(
               height: 300,
@@ -536,7 +611,6 @@ class _StoreReportState extends State<StoreReport> {
                   style: TextStyle(
                     color: color,
                     fontSize: 24,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

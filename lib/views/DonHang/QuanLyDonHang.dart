@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../controllers/DonHangController.dart';
@@ -25,25 +24,26 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   List<String> timePeriods = ["Tất cả thời gian", "Hôm nay", "Hôm qua", "Tuần này", "Tuần trước", "Tháng này", "Tháng trước", "30 ngày", "60 ngày", "2 tháng gần đây"];
   String selectedPeriod = "Hôm nay";
   Map<String, String> _customerNames = {};
+
   @override
   void initState() {
     super.initState();
     _fetchOrders();
     tempSelectedStatus = _selectedStatus;
   }
-  Future<void> _fetchCustomerNames() async {
-    KhachHangController khachHangController = KhachHangController();
 
-    for (var order in _filteredOrders) {
-      if (order.khachHang.isNotEmpty && !_customerNames.containsKey(order.khachHang)) {
-        KhachHang? customer = await khachHangController.getKhachHang(order.khachHang);
-        if (customer != null) {
-          setState(() {
-            _customerNames[order.khachHang] = customer.tenKH; // Assuming hoTen is the name field
-          });
-        }
-      }
-    }
+  final ColorScheme colorScheme = ColorScheme.fromSeed(
+    seedColor: Colors.blue,
+    primary: Colors.blue,
+    secondary: Colors.orange,
+    surface: Colors.white,
+    background: Colors.grey[100]!,
+    error: Colors.red,
+  );
+  Future<String> _fetchCustomerNames(String makh) async {
+    KhachHangController khachHangController = KhachHangController();
+    KhachHang? customer = await khachHangController.getKhachHang(makh);
+    return customer?.tenKH ?? 'Customer not found';
   }
 
   void _updateOrderStatus(String madh, String trangThai) async {
@@ -76,29 +76,18 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   void _filterOrders() {
     setState(() {
       _filteredOrders = _orders.where((order) {
-        // Decode trạng thái từ đơn hàng
         String orderStatus = utf8.decode(order.trangThaiDH.runes.toList()).trim();
-
-        // Decode selected status để đảm bảo cùng encoding
         String selectedStatus = _selectedStatus.trim();
-
-        // So sánh sau khi đã normalize cả hai chuỗi
         bool statusMatch = selectedStatus == "Tất cả" ||
             orderStatus.toLowerCase() == selectedStatus.toLowerCase();
-
-        // Lọc theo thời gian
-        bool dateMatch = _getDateRange().start.isBefore(order.ngayDat) &&
-            _getDateRange().end.isAfter(order.ngayDat);
-
-        // In ra để debug
-        print('Order Status: $orderStatus');
-        print('Selected Status: $selectedStatus');
-        print('Status Match: $statusMatch');
-
+        DateTimeRange range = _getDateRange();
+        bool dateMatch = !order.ngayDat.isBefore(range.start) &&
+            !order.ngayDat.isAfter(range.end);
         return statusMatch && dateMatch;
       }).toList();
     });
   }
+
   void _handleStatusChange(String? newValue) {
     if (newValue != null) {
       setState(() {
@@ -108,9 +97,7 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
     }
   }
 
-
   void _showFilterBottomSheet() {
-    // Reset temporary values to current selections
     tempSelectedStatus = _selectedStatus;
     tempSelectedPeriod = selectedPeriod;
 
@@ -141,8 +128,7 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                     ],
                   ),
                   SizedBox(height: 16),
-                  Text('Trạng thái đơn hàng',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text('Trạng thái đơn hàng', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -155,15 +141,13 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                         onSelected: (bool selected) {
                           setSheetState(() {
                             tempSelectedStatus = status;
-                            print('Temporary status selected: $status');
                           });
                         },
                       );
                     }).toList(),
                   ),
                   SizedBox(height: 16),
-                  Text('Khoảng thời gian',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text('Khoảng thời gian', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -176,7 +160,6 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                         onSelected: (bool selected) {
                           setSheetState(() {
                             tempSelectedPeriod = period;
-                            print('Temporary period selected: $period');
                           });
                         },
                       );
@@ -190,9 +173,7 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                       setState(() {
                         selectedPeriod = tempSelectedPeriod;
                         _selectedStatus = tempSelectedStatus;
-                        print('Applied filters - Status: $_selectedStatus, Period: $selectedPeriod');
                         _fetchOrders();
-
                       });
                       Navigator.pop(context);
                     },
@@ -216,7 +197,8 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
         start = DateTime(now.year - 99, now.month, now.day);
         break;
       case "Hôm nay":
-        start = DateTime(now.year, now.month, now.day);
+        start = DateTime(now.year, now.month, now.day, 0, 0, 0);
+        end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
         break;
       case "Hôm qua":
         start = DateTime(now.year, now.month, now.day - 1);
@@ -249,74 +231,155 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
         start = DateTime(now.year, now.month, now.day);
     }
 
-    print('Date range - Start: $start, End: $end');
     return DateTimeRange(start: start, end: end);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Đơn hàng hôm nay"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.filter_list),
-              onPressed: _showFilterBottomSheet
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Added status information display
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Trạng thái: $_selectedStatus'),
-                Text('Thời gian: $selectedPeriod'),
-              ],
+    return Theme(
+      data: ThemeData.from(colorScheme: colorScheme),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Đơn hàng", style: TextStyle(color: colorScheme.onPrimary)),
+          backgroundColor: colorScheme.primary,
+          actions: [
+            IconButton(
+                icon: Icon(Icons.filter_list, color: colorScheme.onPrimary),
+                onPressed: _showFilterBottomSheet
             ),
-          ),
-          // Added count display
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('Số đơn hàng: ${_filteredOrders.length}'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredOrders.length,
-              itemBuilder: (context, index) {
-                final order = _filteredOrders[index];
-                String orderStatus = utf8.decode(order.trangThaiDH.runes.toList());
-                final sharedFunction = SharedFunction();
-                final formattedAmount = sharedFunction.formatCurrency(order.thanhTien);
-                final formattedDate = DateFormat('dd/MM/yyyy').format(order.ngayDat);
-                String customerName = _customerNames[order.khachHang] ?? 'Unknown';
+          ],
+        ),
+        body: Container(
+          color: colorScheme.background,
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                color: colorScheme.surface,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Trạng thái: $_selectedStatus', style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold)),
+                    Text('Thời gian: $selectedPeriod', style: TextStyle(color: colorScheme.secondary, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                color: colorScheme.surface,
+                child: Text(
+                  'Số đơn hàng: ${_filteredOrders.length}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _filteredOrders.length,
+                  itemBuilder: (context, index) {
+                    final order = _filteredOrders[index];
+                    String orderStatus = utf8.decode(order.trangThaiDH.runes.toList());
+                    final sharedFunction = SharedFunction();
+                    final formattedAmount = sharedFunction.formatCurrency(order.thanhTien);
+                    final formattedDate = DateFormat('dd/MM/yyyy').format(order.ngayDat);
 
-                return ListTile(
-                  title: Text('Mã đơn hàng: ${order.maDH}'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Khách hàng: $customerName'),
-                      Text('Tổng tiền: $formattedAmount'),
-                      Text('Ngày đặt: $formattedDate'),
-                    ],
-                  ),
-                  trailing: orderStatus == 'Đang xử lý'
-                      ? IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () => _updateOrderStatus(order.maDH, 'Đã xác nhận'),
-                  )
-                      : null,
-                );
-              },
-            ),
+                    return Card(
+                      elevation: 2,
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.all(16),
+                        title: Text(
+                          'Mã đơn hàng: ${order.maDH}',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: colorScheme.primary),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 8),
+                            FutureBuilder<String>(
+                              future: _fetchCustomerNames(order.khachHang),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Text('Loading...', style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6)));
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}', style: TextStyle(color: colorScheme.error));
+                                } else {
+                                  return Text(
+                                    'Khách hàng: ${utf8.decode((snapshot.data ?? '').runes.toList())}',
+                                    style: TextStyle(color: colorScheme.onSurface),
+                                  );
+                                }
+                              },
+                            ),
+                            SizedBox(height: 4),
+                            Text('Tổng tiền: $formattedAmount', style: TextStyle(color: colorScheme.secondary, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 4),
+                            Text('Ngày đặt: $formattedDate', style: TextStyle(color: colorScheme.onSurface)),
+                            SizedBox(height: 8),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getStatusColor(orderStatus),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                orderStatus,
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: _buildActionButton(order.maDH, orderStatus),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-
-        ],
+        ),
       ),
     );
+  }
+
+  Widget? _buildActionButton(String orderId, String status) {
+    if (status == 'Đang xử lý') {
+      return ElevatedButton.icon(
+        icon: Icon(Icons.check, color: Colors.white),
+        label: Text('Xác nhận', style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.secondary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+        onPressed: () => _updateOrderStatus(orderId, 'Đã xác nhận'),
+      );
+    } else if (status == 'Đã xác nhận') {
+      return ElevatedButton.icon(
+        icon: Icon(Icons.local_shipping, color: Colors.white),
+        label: Text('Giao hàng', style: TextStyle(color: Colors.white)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+        onPressed: () => _updateOrderStatus(orderId, 'Đang giao hàng'),
+      );
+    }
+    return null;
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'Đang xử lý':
+        return Colors.blue;
+      case 'Đã xác nhận':
+        return Colors.green;
+      case 'Đang giao hàng':
+        return Colors.orange;
+      case 'Đã giao':
+        return Colors.purple;
+      case 'Đã hủy':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
