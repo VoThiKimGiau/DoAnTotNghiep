@@ -81,15 +81,13 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     try {
       List<ChiTietSP> fetchedItems =
           await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
-      List<String> mauSP = await getDSMau(fetchedItems);
-      List<String> kichCo = await getDSKichCo(fetchedItems);
       String maGioH = await fetchMaGH(widget.maKH);
 
       setState(() {
         dsCTSP = fetchedItems;
         getDSHinhAnh();
-        dsMauSP = mauSP;
-        dsKichCo = kichCo;
+        getDSMau();
+        getDSKichCo();
         maGH = maGioH;
       });
     } catch (e) {
@@ -98,6 +96,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
         dsCTSP = [];
         dsMauSP = [];
         dsKichCo = [];
+        dsHinhSP = [];
       });
     }
   }
@@ -126,20 +125,12 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     itemsSP?.removeWhere((sp) => sp.maSP == item?.maSP);
   }
 
-  Future<List<String>> getDSMau(List<ChiTietSP> lstCT) async {
-    List<String> lst = [];
-    for (ChiTietSP ct in lstCT) {
-      lst.add(ct.maMau);
-    }
-    return lst;
+  Future<void> getDSMau() async {
+    dsMauSP = dsCTSP.map((ct) => ct.maMau).toSet().toList();
   }
 
-  Future<List<String>> getDSKichCo(List<ChiTietSP> lstCT) async {
-    List<String> lst = [];
-    for (ChiTietSP ct in lstCT) {
-      lst.add(ct.maKichCo);
-    }
-    return lst;
+  Future<void> getDSKichCo() async {
+    dsKichCo = dsCTSP.map((ct) => ct.maKichCo).toSet().toList();
   }
 
   Future<String> fetchMaGH(String? maKH) async {
@@ -255,10 +246,11 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                       sharedFunction
                                           .formatCurrency(item!.giaMacDinh),
                                       style: const TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.primaryColor,
-                                          fontFamily: 'Gabarito',
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 18,
+                                        color: Colors.red,
+                                        fontFamily: 'Gabarito',
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                       textAlign: TextAlign.left,
                                     ),
                                   ],
@@ -318,26 +310,25 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                     );
                                   },
                                 )),
+                            const SizedBox(height: 15,),
                             Container(
-                              margin: const EdgeInsets.all(24),
+                              margin: const EdgeInsets.symmetric(horizontal: 24),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
                                     CustomBottomSheet.show(
-                                        context,
-                                        "Đặt hàng",
-                                        dsCTSP,
-                                        dsMauSP,
-                                        dsKichCo,
-                                        _quantity,
-                                        maSanPham ?? '',
-                                        maGH ?? '', (newPrice) {
-                                      setState(() {
-                                        // Cập nhật giá trong widget cha
-                                        var currentPrice = newPrice;
-                                      });
-                                    });
+                                      context,
+                                      "Đặt hàng",
+                                      dsCTSP,
+                                      dsMauSP,
+                                      dsKichCo,
+                                      _quantity,
+                                      maSanPham ?? '',
+                                      maGH ?? '',
+                                      item!.hinhAnhMacDinh ?? '',
+                                      item!.giaMacDinh ?? 0,
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primaryColor,
@@ -351,8 +342,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                               ),
                             ),
                             Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 24),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 15),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -366,13 +357,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                       _quantity,
                                       maSanPham ?? '',
                                       maGH ?? '',
-                                      (newPrice) {
-                                        setState(
-                                          () {
-                                            var currentPrice = newPrice;
-                                          },
-                                        );
-                                      },
+                                      item!.hinhAnhMacDinh ?? '',
+                                      item!.giaMacDinh ?? 0,
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -408,12 +394,20 @@ class CustomBottomSheet {
       int initialQuantity,
       String maSP,
       String maGH,
-      Function(double) onPriceUpdate) {
+      String maHA,
+      double giaMD) {
     int quantity = initialQuantity;
     String? selectedMau;
     String? selectedKichCo;
     ChiTietSP? chiTietSP;
     bool isLoading = false;
+    List<String> availableSizes = List.from(dsKichCo);
+    List<String> enabledSizes = List.from(dsKichCo);
+    double tongTien = 0;
+    int slKho = 0;
+
+    SharedFunction sharedFunction = SharedFunction();
+    StorageService storageService = StorageService();
 
     Future<ChiTietSP?> getCTSP(
         String maMau, String maKichCo, String maSP) async {
@@ -423,19 +417,6 @@ class CustomBottomSheet {
         }
       }
       return null;
-    }
-
-    Future<void> loadChiTietSP() async {
-      if (selectedMau != null && selectedKichCo != null && maSP != null) {
-        ChiTietSP? chiTietSP =
-            await getCTSP(selectedMau!, selectedKichCo!, maSP!);
-        if (chiTietSP != null) {
-          print("Chi tiết sản phẩm: $chiTietSP");
-          onPriceUpdate(chiTietSP.giaBan);
-        } else {
-          print("Không có chi tiết sản phẩm này");
-        }
-      }
     }
 
     showModalBottomSheet(
@@ -460,35 +441,81 @@ class CustomBottomSheet {
                 child: Column(
                   children: [
                     Container(
+                      height: 185,
                       margin: const EdgeInsets.only(top: 17, left: 25),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Màu sắc',
-                            style: TextStyle(
-                                fontFamily: 'Gabarito',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.black,
-                              size: 16,
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            label: const SizedBox.shrink(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.all(0),
-                              minimumSize: const Size(18, 18),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                storageService.getImageUrl(maHA),
+                                fit: BoxFit.cover,
+                                width: 180,
+                                height: 180,
+                              ),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                sharedFunction.formatCurrency(giaMD),
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Text(
+                                "Kho: $slKho",
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                                size: 16,
+                              ),
+                              label: const SizedBox.shrink(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.all(0),
+                                minimumSize: const Size(18, 18),
+                              ),
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 17, left: 25),
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Màu sắc',
+                          style: TextStyle(
+                              fontFamily: 'Gabarito',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                     if (dsMau.isEmpty)
@@ -498,7 +525,9 @@ class CustomBottomSheet {
                         items: dsMau,
                         onSelected: (value) {
                           setState(() {
-                            selectedMau = value; // Capture selected color
+                            selectedMau = value;
+                            updateAvailableSizes(selectedMau, dsCTSP,
+                                availableSizes, enabledSizes);
                           });
                         },
                       ),
@@ -520,11 +549,30 @@ class CustomBottomSheet {
                     if (dsKichCo.isNotEmpty)
                       CircleButtonSize(
                         items: dsKichCo,
-                        onSelected: (value) {
+                        enabledItems: enabledSizes,
+                        onSelected: (value) async {
                           setState(() {
-                            selectedKichCo = value; // Capture selected size
+                            selectedKichCo = value;
                           });
-                          loadChiTietSP();
+
+                          if (selectedMau != null &&
+                              selectedKichCo != null &&
+                              maSP != null) {
+                            chiTietSP = await getCTSP(
+                                selectedMau!, selectedKichCo!, maSP);
+                            if (chiTietSP != null) {
+                              setState(() {
+                                tongTien = quantity * chiTietSP!.giaBan;
+                                maHA = chiTietSP!.maHinhAnh;
+                                slKho = chiTietSP!.slKho;
+                                giaMD = chiTietSP!.giaBan;
+                                if (slKho == 0)
+                                  quantity = 0;
+                                else
+                                  quantity = 1;
+                              });
+                            }
+                          }
                         },
                       ),
                     Container(
@@ -544,31 +592,11 @@ class CustomBottomSheet {
                             children: [
                               ElevatedButton(
                                 onPressed: () {
-                                  setState(() {
-                                    quantity++; // Tăng số lượng
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryColor,
-                                  minimumSize: const Size(40, 40),
-                                  shape: const CircleBorder(),
-                                  shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.all(12),
-                                ),
-                                child: const Icon(Icons.add,
-                                    color: Colors.white, size: 16),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 22),
-                                child: Text('$quantity',
-                                    style: const TextStyle(fontSize: 20)),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
                                   if (quantity > 1) {
                                     setState(() {
-                                      quantity--; // Giảm số lượng
+                                      quantity--;
+                                      tongTien =
+                                          quantity * (chiTietSP?.giaBan ?? 0);
                                     });
                                   }
                                 },
@@ -582,13 +610,43 @@ class CustomBottomSheet {
                                 child: const Icon(Icons.remove,
                                     color: Colors.white, size: 16),
                               ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 22),
+                                child: Text('$quantity',
+                                    style: const TextStyle(fontSize: 20)),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (quantity < slKho) {
+                                      quantity++;
+                                      tongTien =
+                                          quantity * (chiTietSP?.giaBan ?? 0);
+                                    }
+                                  });
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  minimumSize: const Size(40, 40),
+                                  shape: const CircleBorder(),
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                                child: const Icon(Icons.add,
+                                    color: Colors.white, size: 16),
+                              ),
+                              const SizedBox(
+                                width: 24,
+                              ),
                             ],
                           ),
                         ],
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 15),
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
@@ -602,13 +660,80 @@ class CustomBottomSheet {
                               chiTietSP = await getCTSP(
                                   selectedMau!, selectedKichCo!, maSP);
                               if (chiTietSP == null) {
-                                print("Không có chi tiết sản phẩm này");
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                        'Thông báo',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: const Text(
+                                        'Vui lòng chọn đầy đủ màu sắc và kích cỡ',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Đóng dialog
+                                          },
+                                          child: const Text(
+                                            'Đóng',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else if (chiTietSP!.slKho == 0) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                        'Thông báo',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: const Text(
+                                        'Rất tiếc mặt hàng này đã hết. Xin quý khách vui lòng chọn mặt hàng khác',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Đóng dialog
+                                          },
+                                          child: const Text(
+                                            'Đóng',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
                               } else {
                                 ChiTietGioHangController
                                     chiTietGioHangController =
                                     ChiTietGioHangController();
                                 setState(() {
                                   isLoading = true;
+                                  tongTien = quantity * chiTietSP!.giaBan;
                                 });
                                 await chiTietGioHangController
                                     .themChiTietGioHang(
@@ -628,8 +753,6 @@ class CustomBottomSheet {
                                   content: Text("Thêm vào giỏ hàng thành công"),
                                 ));
                               }
-                            } else {
-                              print("Màu sắc hoặc kích cỡ chưa được chọn.");
                             }
                           }
                         },
@@ -641,9 +764,10 @@ class CustomBottomSheet {
                           children: [
                             Text(
                               selectedMau != null && selectedKichCo != null
-                                  ? '${quantity * (chiTietSP?.giaBan ?? 0)}'
+                                  ? sharedFunction.formatCurrency(tongTien)
                                   : '0',
                               style: const TextStyle(
+                                  fontFamily: 'Gabarito',
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold),
@@ -669,5 +793,21 @@ class CustomBottomSheet {
         );
       },
     );
+  }
+}
+
+void updateAvailableSizes(String? selectedColor, List<ChiTietSP> dsCTSP,
+    List<String> availableSizes, List<String> enabledSizes) {
+  availableSizes.clear();
+  enabledSizes.clear();
+
+  if (selectedColor != null) {
+    final filteredCTSP =
+        dsCTSP.where((ct) => ct.maMau == selectedColor).toList();
+
+    final uniqueSizes = filteredCTSP.map((ct) => ct.maKichCo).toSet();
+
+    availableSizes.addAll(uniqueSizes);
+    enabledSizes.addAll(uniqueSizes);
   }
 }

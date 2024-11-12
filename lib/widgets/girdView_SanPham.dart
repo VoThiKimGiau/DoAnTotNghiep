@@ -77,7 +77,7 @@ class GridViewSanPham extends StatelessWidget {
                             sharedFunction
                                 .formatCurrency(itemsSP![index].giaMacDinh),
                             style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
+                                fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Gabarito'),
                           ),
                         ),
                       ),

@@ -9,7 +9,8 @@ class GiaoHangController {
   final String baseUrl = '${IpConfig.ipConfig}api/giaohang';
 
   Future<GiaoHang?> fetchGiaoHang(String donHang) async {
-    final response = await http.get(Uri.parse('$baseUrl/donHang?donHang=$donHang'));
+    final response =
+        await http.get(Uri.parse('$baseUrl/donHang?donHang=$donHang'));
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       return GiaoHang.fromJson(data);
@@ -18,51 +19,46 @@ class GiaoHangController {
     }
   }
 
-  Future<String?> getCoordinatesFromAddress(String address) async {
-    final url = 'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(address)}&format=json';
+  // Here.com
+  // Mail: cuahanggiadunghuit@gmail.com
+  // Pass: Cntt304cuahanggiadunghuit@
+  // App ID: KnDuhWETcgnVcmXRXS2G
+  // API Key: 8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY
 
-    // Thêm User-Agent vào headers
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        "User-Agent": "datn_cntt304_bandogiadung/1.0 (vothikimgiau16122003@gmail.com)"
-      },
-    );
-
-    print('Nominatim Response status: ${response.statusCode}');
-    print('Nominatim Response body: ${response.body}'); // In ra nội dung phản hồi
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      if (data.isNotEmpty) {
-        return '${data[0]['lat']},${data[0]['lon']}'; // Trả về tọa độ
-      } else {
-        print('Không tìm thấy tọa độ cho địa chỉ: $address');
-      }
-    } else {
-      print('Lỗi khi gọi Nominatim: ${response.statusCode}');
-    }
-    return null;
-  }
-
-  Future<double?> getDistanceOSRM(String origin, String destination) async {
-    final url = 'https://router.project-osrm.org/route/v1/driving/$origin;$destination?overview=false';
+  Future<Map<String, double>> getCoordinates(
+      String address, String apiKey) async {
+    final String url =
+        'https://geocode.search.hereapi.com/v1/geocode?q=$address&apiKey=$apiKey';
 
     final response = await http.get(Uri.parse(url));
 
-    print('OSRM Response status: ${response.statusCode}');
-    print('OSRM Response body: ${response.body}'); // In ra nội dung phản hồi
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final latitude = data['items'][0]['position']['lat'] as double;
+      final longitude = data['items'][0]['position']['lng'] as double;
+      return {'latitude': latitude, 'longitude': longitude};
+    } else {
+      throw Exception('Failed to load coordinates');
+    }
+  }
+
+  Future<double> getDistance(
+      String address1, String address2, String apiKey) async {
+    final coords1 = await getCoordinates(address1, apiKey);
+    final coords2 = await getCoordinates(address2, apiKey);
+
+    final String url =
+        'https://router.hereapi.com/v8/routes?origin=${coords1['latitude']},${coords1['longitude']}&destination=${coords2['latitude']},${coords2['longitude']}&return=summary&transportMode=car&apiKey=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['routes'].isNotEmpty) {
-        return data['routes'][0]['distance'] / 1000; // Trả về khoảng cách tính bằng km
-      } else {
-        print('Không tìm thấy lộ trình.');
-      }
+      final data = jsonDecode(response.body);
+      final distance = data['routes'][0]['sections'][0]['summary']['length']
+          as int; // distance in meters
+      return distance / 1000.0; // convert to kilometers
     } else {
-      print('Lỗi khi gọi OSRM: ${response.statusCode}');
+      throw Exception('Failed to load distance');
     }
-    return null;
   }
 }

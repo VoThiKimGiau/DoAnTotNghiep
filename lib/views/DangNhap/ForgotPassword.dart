@@ -18,6 +18,10 @@ class ForgotPassword extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
+  // Mailjet
+  // email: cuahanggiadunghuit@gmail.com
+  // pass: cntt304cuahanggiadunghuit@
+  
   // subaccount
   // SECRET KEY: e5c3b1db764cc245265b6febd7d4f11f
   // API KEY: 6ca9bb3e1f0c3fc799469ff70eae960f

@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 
 class CircleButtonSize extends StatefulWidget {
   final List<String> items;
+  final List<String> enabledItems;
   final Function(String) onSelected;
 
   CircleButtonSize({
     required this.items,
+    required this.enabledItems,
     required this.onSelected,
   });
 
@@ -17,8 +19,7 @@ class CircleButtonSize extends StatefulWidget {
 }
 
 class _CircleButtonSize extends State<CircleButtonSize> {
-  int selectedIndex = -1; // Không có nút nào được chọn
-
+  int selectedIndex = -1;
   KichCoController kichCoController = KichCoController();
   List<KichCo> dsKichCo = [];
   bool isLoading = false;
@@ -51,9 +52,10 @@ class _CircleButtonSize extends State<CircleButtonSize> {
       setState(() {
         dsKichCo = fetchedItems;
         if (dsKichCo.isNotEmpty) {
-          selectedIndex = 0; // Set default selection to the first item
-          widget.onSelected(dsKichCo[0]
-              .maKichCo); // Notify the parent of the default selection
+          selectedIndex = dsKichCo.indexWhere((kichCo) => widget.enabledItems.contains(kichCo.maKichCo));
+          if (selectedIndex != -1) {
+            widget.onSelected(dsKichCo[selectedIndex].maKichCo);
+          }
         }
         isLoading = false;
       });
@@ -65,6 +67,14 @@ class _CircleButtonSize extends State<CircleButtonSize> {
     }
   }
 
+  void updateSizes(List<String> newItems) {
+    setState(() {
+      selectedIndex = -1;
+      dsKichCo.clear();
+      fetchKichCo();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -74,47 +84,53 @@ class _CircleButtonSize extends State<CircleButtonSize> {
         : SingleChildScrollView(
             child: Column(children: [
               ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: widget.items.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => onSelected(index),
-                      child: Container(
-                        height: 50,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 24),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: selectedIndex == index
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.items.length,
+                itemBuilder: (context, index) {
+                  final isEnabled =
+                      widget.enabledItems.contains(dsKichCo[index].maKichCo);
+                  return GestureDetector(
+                    onTap: isEnabled ? () => onSelected(index) : null,
+                    child: Container(
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: selectedIndex == index && isEnabled
+                            ? AppColors.primaryColor
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: selectedIndex == index && isEnabled
                               ? AppColors.primaryColor
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                            color: selectedIndex == index
-                                ? AppColors.primaryColor
-                                : Colors.grey,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              dsKichCo[index].tenKichCo,
-                              style: TextStyle(
-                                color: selectedIndex == index
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const Icon(Icons.check,
-                                color: Colors.white, size: 20),
-                          ],
+                              : Colors.grey,
                         ),
                       ),
-                    );
-                  }),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            dsKichCo[index].tenKichCo,
+                            style: TextStyle(
+                              color: (selectedIndex == -1)
+                                  ? Colors.black
+                                  : (selectedIndex == index
+                                  ? Colors.white
+                                  : (isEnabled ? Colors.black : Colors.grey)),
+                              fontSize: 16,
+                            ),
+                          ),
+                          if (selectedIndex == index && isEnabled)
+                            const Icon(Icons.check,
+                                color: Colors.white, size: 20),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ]),
           );
   }

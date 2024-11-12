@@ -27,12 +27,17 @@ class CheckoutPage extends StatefulWidget {
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
+  // Here.com
+  // Mail: cuahanggiadunghuit@gmail.com
+  // Pass: Cntt304cuahanggiadunghuit@
+  // App ID: KnDuhWETcgnVcmXRXS2G
+  // API Key: 8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY
+
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
   String selectedPromoCode = '';
   List<Promotion> promoCodes = [];
   final CheckoutController checkoutController = CheckoutController();
-  bool isLoading = false;
 
   List<TTNhanHang> shippingAddresses = [];
   TTNhanHang? selectedAddress;
@@ -43,6 +48,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   double? soKM = 0;
   String? origin;
   String? destination;
+  static const String APIKEY = '8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY';
 
   @override
   void initState() {
@@ -64,19 +70,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> loadKMShip() async {
     try {
-      String? dcDau = await giaoHangController.getCoordinatesFromAddress(
-          'Phường 13, Quận Tân Bình, TP.HCM, Việt Nam');
-      String? dcDich = await giaoHangController
-          .getCoordinatesFromAddress('Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam');
-
-      print('Origin coordinates: $dcDau');
-      print('Destination coordinates: $dcDich');
+      String dcDau = '140 Lê Trọng Tấn, Tây Thạnh, Tân Phú, TP.HCM, Việt Nam';
+      String? dcDich = 'Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam';
+      //String? dcDich = selectedAddress!.diaChi;
 
       if (dcDich != null && dcDau != null) {
         destination = dcDich;
         origin = dcDau;
         double? fetchedDistance =
-            await giaoHangController.getDistanceOSRM(origin!, destination!);
+        await giaoHangController.getDistance(origin!, destination!, APIKEY);
+
         setState(() {
           soKM = fetchedDistance;
         });
@@ -108,60 +111,53 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('Thanh toán'),
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Thanh toán'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Column(
+                children: [
+                  _buildSectionCard(
+                    title: 'Thông tin nhận hàng',
+                    content: selectedAddress != null
+                        ? _buildAddressContent()
+                        : Text('Chưa có thông tin nhận hàng'),
+                    onTap: () => _showShippingAddresses(context),
+                  ),
+                  _buildSectionCard(
+                    title: 'Phương thức thanh toán',
+                    content: Text(selectedPaymentMethod),
+                    onTap: _showPaymentMethodOptions,
+                  ),
+                  _buildSectionCard(
+                    title: 'Phương thức vận chuyển',
+                    content: Text(selectedShippingMethod),
+                    onTap: _showShippingMethodOptions,
+                  ),
+                  _buildSectionCard(
+                    title: 'Áp dụng khuyến mãi',
+                    content: Text(selectedPromoCode.isNotEmpty
+                        ? selectedPromoCode
+                        : 'Không có mã giảm giá'),
+                    onTap: _showPromoCodeOptions,
+                  ),
+                ],
               ),
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    child: Column(
-                      children: [
-                        _buildSectionCard(
-                          title: 'Thông tin nhận hàng',
-                          content: selectedAddress != null
-                              ? _buildAddressContent()
-                              : Text('Chưa có thông tin nhận hàng'),
-                          onTap: () => _showShippingAddresses(context),
-                        ),
-                        _buildSectionCard(
-                          title: 'Phương thức thanh toán',
-                          content: Text(selectedPaymentMethod),
-                          onTap: _showPaymentMethodOptions,
-                        ),
-                        _buildSectionCard(
-                          title: 'Phương thức vận chuyển',
-                          content: Text(selectedShippingMethod),
-                          onTap: _showShippingMethodOptions,
-                        ),
-                        _buildSectionCard(
-                          title: 'Áp dụng khuyến mãi',
-                          content: Text(selectedPromoCode.isNotEmpty
-                              ? selectedPromoCode
-                              : 'Không có mã giảm giá'),
-                          onTap: _showPromoCodeOptions,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                _buildSummarySection(),
-              ],
-            ),
-          );
+          ),
+          _buildSummarySection(),
+        ],
+      ),
+    );
   }
 
   Widget _buildSectionCard({
@@ -287,27 +283,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
       child: Column(
         children: [
           _buildSummaryRow('Tạm tính', widget.totalAmount),
-          _buildSummaryRow('Phí giao hàng', 0),
+          _buildSummaryRow('Phí giao hàng', soKM!),
           _buildSummaryRow('Tổng cộng', widget.totalAmount, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
-              setState(() {
-                isLoading = true;
-              });
               await checkoutController.checkOut(
-                selectedAddress?.maKH ?? shippingAddresses.first.maTTNH,
+                "TT1",
                 widget.customerId,
-                selectedShippingMethod,
-                selectedPromoCode,
-                widget.totalAmount,
+                "Hoa toc",
+                "Thanh toan sau khi nhan hang",
+                0,
                 true,
               );
-              setState(() {
-                isLoading = false;
-              });
-              Navigator.of(context).push(
+              Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => SuccessPage()),
+                (route) => route.isFirst,
               );
             },
             style: ElevatedButton.styleFrom(

@@ -33,6 +33,7 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   late Future<String> maGioHang;
 
   int selectedCategoryIndex = 0;
+  int? selectedSortIndex;
 
   @override
   void initState() {
@@ -148,8 +149,16 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             child: GestureDetector(
               onTap: () {
                 showSearch(
-                    context: context,
-                    delegate: CustomSearch(maKH: widget.maKhachHang));
+                  context: context,
+                  delegate: CustomSearch(
+                    maKH: widget.maKhachHang,
+                    onSortSelected: (index) {
+                      setState(() {
+                        selectedSortIndex = index; // Update selected sort index
+                      });
+                    },
+                  ),
+                );
               },
               child: AbsorbPointer(
                 // Prevents the text field from gaining focus
@@ -221,14 +230,22 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                       width: 140,
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primaryColor : Colors.transparent,
+                        color: isSelected
+                            ? AppColors.primaryColor
+                            : Colors.transparent,
                         border: Border.all(
-                          color: isSelected ? AppColors.primaryColor : Colors.transparent,
+                          color: isSelected
+                              ? AppColors.primaryColor
+                              : Colors.transparent,
                           width: isSelected ? 2 : 1,
                         ),
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: isSelected
-                            ? [BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 5)]
+                            ? [
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5)
+                              ]
                             : [],
                       ),
                       child: Align(
@@ -301,7 +318,12 @@ class CustomSearch extends SearchDelegate {
   final SanPhamController sanPhamController = SanPhamController();
   final String? maKH;
 
-  CustomSearch({this.maKH});
+  int? selectedSortIndex;
+  final Function(int) onSortSelected;
+
+  List<SanPham> searchResults = [];
+
+  CustomSearch({this.maKH, required this.onSortSelected});
 
   Future<List<SanPham>> fetchSP() async {
     try {
@@ -368,12 +390,20 @@ class CustomSearch extends SearchDelegate {
           return _buildNoResults(context);
         }
 
-        final results = snapshot.data!
+        searchResults = snapshot.data!
             .where((item) =>
                 item.tenSP.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
-        if (results.isEmpty) {
+        if (selectedSortIndex != null) {
+          if (selectedSortIndex == 2) {
+            searchResults.sort((a, b) => a.giaMacDinh.compareTo(b.giaMacDinh));
+          } else if (selectedSortIndex == 3) {
+            searchResults.sort((a, b) => b.giaMacDinh.compareTo(a.giaMacDinh));
+          }
+        }
+
+        if (searchResults.isEmpty) {
           return _buildNoResults(context);
         }
 
@@ -393,7 +423,11 @@ class CustomSearch extends SearchDelegate {
                     height: 45,
                     child: ElevatedButton(
                       onPressed: () {
-                        CustomBottomSheet.show(context);
+                        CustomBottomSheet.show(context,
+                            onSortSelected: (index) {
+                          selectedSortIndex = index;
+                          showResults(context);
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -419,7 +453,7 @@ class CustomSearch extends SearchDelegate {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '${results.length} sản phẩm được tìm thấy',
+                      '${searchResults.length} sản phẩm được tìm thấy',
                       style: const TextStyle(fontSize: 16, color: Colors.black),
                       textAlign: TextAlign.left,
                     ),
@@ -427,7 +461,7 @@ class CustomSearch extends SearchDelegate {
                 ),
                 Expanded(
                   child: GridViewSanPham(
-                    itemsSP: results,
+                    itemsSP: searchResults,
                     maKH: maKH,
                   ),
                 ),
@@ -531,7 +565,8 @@ class CustomSearch extends SearchDelegate {
 }
 
 class CustomBottomSheet {
-  static void show(BuildContext context) {
+  static void show(BuildContext context,
+      {required Function(int) onSortSelected}) {
     List<String> data = ['Gợi ý', 'Mới nhất', 'Giá tăng dần', 'Giá giảm dần'];
     int selectedIndex = -1; // Initialize selected index
 
@@ -555,6 +590,9 @@ class CustomBottomSheet {
               width: double.infinity,
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 30,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -592,6 +630,9 @@ class CustomBottomSheet {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 15,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: data.length,
@@ -600,6 +641,8 @@ class CustomBottomSheet {
                           onTap: () {
                             setState(() {
                               selectedIndex = index;
+                              onSortSelected(index);
+                              Navigator.pop(context);
                             });
                           },
                           child: Container(

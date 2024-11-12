@@ -4,8 +4,9 @@ class EmptyCartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Giỏ hàng trống'),
+        title: const Text('Giỏ hàng trống'),
       ),
       body: Center(
         child: Padding(
@@ -13,18 +14,18 @@ class EmptyCartPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Giỏ hàng của bạn hiện đang trống!',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 20),
-              Text(
+              const SizedBox(height: 20),
+              const Text(
                 'Vui lòng thêm sản phẩm vào giỏ hàng để tiếp tục.',
                 style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Quay lại trang giỏ hàng
