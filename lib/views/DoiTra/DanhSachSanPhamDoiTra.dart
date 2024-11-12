@@ -156,12 +156,16 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              child: Text('Tiếp theo'),
-              onPressed: () {
-
-                 Navigator.push(context, MaterialPageRoute(builder: (context) => MultiImageCaptureAndUpload(doiTraDTO: buildDoiTraDTO(),donHang: widget.donHang)));
-              },
+            child: Text('Tiếp theo'),
+            onPressed: totalRefundAmount > 0
+            ? () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MultiImageCaptureAndUpload(doiTraDTO: buildDoiTraDTO(), donHang: widget.donHang,)
+                ,)
+                ,);
+            }
+                : null,
             ),
+
           ],
         ),
       ),

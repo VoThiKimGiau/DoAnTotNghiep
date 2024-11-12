@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:flutter_svg/svg.dart';
-
-import 'ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietDonHangController.dart';
+import 'ChiTietDonHang.dart';
+import 'OrderListFilters.dart';
+
 
 class OrderListScreen extends StatefulWidget {
   final String? maKH;
@@ -17,11 +20,21 @@ class OrderListScreen extends StatefulWidget {
 
 class _OrderListScreenState extends State<OrderListScreen> {
   late Future<List<DonHang>> futureDonHangs;
+  String? selectedStatus;
+  DateTime? selectedDate;
 
   @override
   void initState() {
     super.initState();
-    futureDonHangs = DonHangController().fetchDonHang(widget.maKH);
+    _fetchDonHangs();
+  }
+
+  void _fetchDonHangs() {
+    futureDonHangs = DonHangController().fetchDonHang(
+      widget.maKH,
+      status: selectedStatus,
+      date: selectedDate,
+    );
   }
 
   Future<int> _fetchProductCount(String madh) async {
@@ -46,51 +59,73 @@ class _OrderListScreenState extends State<OrderListScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: FutureBuilder<List<DonHang>>(
-        future: futureDonHangs,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Có lỗi xảy ra: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red, fontSize: 16),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'Không có đơn hàng nào.',
-                style: TextStyle(fontSize: 18, fontFamily: 'Comfortaa'),
-              ),
-            );
-          }
-
-          List<DonHang> donHangs = snapshot.data!;
-
-          return ListView.separated(
-            itemCount: donHangs.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final donHang = donHangs[index];
-
-              return FutureBuilder<int>(
-                future: _fetchProductCount(donHang.maDH),
-                builder: (context, productCountSnapshot) {
-                  if (productCountSnapshot.connectionState == ConnectionState.waiting) {
-                    return _buildOrderTile(donHang, 'Đang lấy số lượng sản phẩm...', null);
-                  } else if (productCountSnapshot.hasError) {
-                    return _buildOrderTile(donHang, 'Có lỗi xảy ra', null);
-                  }
-
-                  int productCount = productCountSnapshot.data ?? 0;
-                  return _buildOrderTile(donHang, 'Số lượng sản phẩm: $productCount', productCount);
-                },
-              );
+      body: Column(
+        children: [
+          OrderListFilters(
+            onStatusChanged: (String? newStatus) {
+              setState(() {
+                selectedStatus = newStatus;
+                _fetchDonHangs();
+              });
             },
-          );
-        },
+            onDateChanged: (DateTime? newDate) {
+              setState(() {
+                selectedDate = newDate;
+                _fetchDonHangs();
+              });
+            },
+            selectedStatus: selectedStatus,
+            selectedDate: selectedDate,
+          ),
+          Expanded(
+            child: FutureBuilder<List<DonHang>>(
+              future: futureDonHangs,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Có lỗi xảy ra: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red, fontSize: 16),
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'Không có đơn hàng nào.',
+                      style: TextStyle(fontSize: 18, fontFamily: 'Comfortaa'),
+                    ),
+                  );
+                }
+
+                List<DonHang> donHangs = snapshot.data!;
+
+                return ListView.separated(
+                  itemCount: donHangs.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final donHang = donHangs[index];
+
+                    return FutureBuilder<int>(
+                      future: _fetchProductCount(donHang.maDH),
+                      builder: (context, productCountSnapshot) {
+                        if (productCountSnapshot.connectionState == ConnectionState.waiting) {
+                          return _buildOrderTile(donHang, 'Đang lấy số lượng sản phẩm...', null);
+                        } else if (productCountSnapshot.hasError) {
+                          return _buildOrderTile(donHang, 'Có lỗi xảy ra', null);
+                        }
+
+                        int productCount = productCountSnapshot.data ?? 0;
+                        return _buildOrderTile(donHang, 'Số lượng sản phẩm: $productCount', productCount);
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -107,16 +142,35 @@ class _OrderListScreenState extends State<OrderListScreen> {
       title: Text(
         'Đơn hàng: ${donHang.maDH}',
         style: const TextStyle(
-          fontSize: 22, // Updated text size for ListTile title
+          fontSize: 22,
           color: Colors.black87,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          fontSize: 20, // Updated text size for ListTile subtitle
-          color: Colors.grey[700],
-        ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.grey[700],
+            ),
+          ),
+          Text(
+            'Trạng thái:  ${utf8.decode( donHang.trangThaiDH.runes.toList()) }',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey[600],
+            ),
+          ),
+          Text(
+            'Ngày đặt: ${donHang.ngayDat.day}/${donHang.ngayDat.month}/${donHang.ngayDat.year}',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
       ),
       trailing: Icon(Icons.arrow_forward_ios, size: 20, color: Colors.blue),
       onTap: () {

@@ -6,13 +6,16 @@ import 'package:datn_cntt304_bandogiadung/models/VatChungDoiTra.dart'; // Import
 class VatChungDoiTraController {
   final String baseUrl = '${IpConfig.ipConfig}api/vatchungdoitra';
 
-
-  Future<List<VatChungDoiTra>> getAllVatChungDoiTra() async {
+  Future<List<VatChungDoiTra>> getAllVatChungDoiTra({String? maDoiTra}) async {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
-      return data.map((item) => VatChungDoiTra.fromJson(item)).toList();
+      List<VatChungDoiTra> vatChungList = data.map((item) => VatChungDoiTra.fromJson(item)).toList();
+      if (maDoiTra != null) {
+        vatChungList = vatChungList.where((item) => item.maDoiTra == maDoiTra).toList();
+      }
+      return vatChungList;
     } else {
       throw Exception('Failed to load VatChungDoiTra');
     }

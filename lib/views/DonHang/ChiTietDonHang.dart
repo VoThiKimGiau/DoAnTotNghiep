@@ -204,7 +204,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget _buildOrderStatus() {
-    String decodedStatus = widget.donHang.trangThaiDH;
+    String decodedStatus =utf8.decode( widget.donHang.trangThaiDH.runes.toList());
     bool isDelivered = decodedStatus == 'Đã giao hàng';
     bool isShipping = decodedStatus == 'Đang giao hàng' || isDelivered;
     bool isConfirmed = decodedStatus == 'Đã xác nhận' || isShipping;
@@ -308,12 +308,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   bool _isCancelButtonVisible() {
-    String decodedStatus = widget.donHang.trangThaiDH;
+    String decodedStatus =utf8.decode(widget.donHang.trangThaiDH.runes.toList()) ;
     return decodedStatus == 'Đang xử lý' || decodedStatus == 'Đã xác nhận';
   }
 
   bool _isButtonsVisible() {
-    String decodedStatus = widget.donHang.trangThaiDH;
+    String decodedStatus =utf8.decode(widget.donHang.trangThaiDH.runes.toList());
     return decodedStatus == 'Đã giao hàng';
   }
 }

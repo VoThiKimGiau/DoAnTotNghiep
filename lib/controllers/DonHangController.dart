@@ -11,41 +11,31 @@ import '../models/DonHang.dart';
 class DonHangController {
   ChiTietDonHangController chiTietDonHangController=ChiTietDonHangController();
   ChiTietPhieuNhapController chiTietPhieuNhapController=ChiTietPhieuNhapController();
-  Future<List<DonHang>> fetchDonHang(String? maKH) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${IpConfig.ipConfig}api/donhang/byCustomer?maKH=$maKH'),
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Accept': 'application/json',
-        },
-      );
+  Future<List<DonHang>> fetchDonHang(String? maKH, {String? status, DateTime? date}) async {
+    final response = await http.get( Uri.parse('${IpConfig.ipConfig}api/donhang/byCustomer?maKH=$maKH'));
 
-      if (response.statusCode == 200) {
-        // Decode UTF-8 từ bodyBytes thay vì dùng response.body trực tiếp
-        String decodedBody = utf8.decode(response.bodyBytes);
-        List<dynamic> jsonResponse = json.decode(decodedBody);
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      List<DonHang> donHangs = jsonResponse.map((item) => DonHang.fromJson(item)).toList();
 
-        // Debug: In ra để kiểm tra dữ liệu
-        print('Decoded response: $decodedBody');
-
-        return jsonResponse.map((donHang) {
-          try {
-            return DonHang.fromJson(donHang);
-          } catch (e) {
-            print('Error parsing DonHang: $e');
-            print('Problematic data: $donHang');
-            rethrow;
-          }
-        }).toList();
-      } else {
-        throw Exception('Failed to load DonHang: ${response.statusCode}');
+      // Apply filters
+      if (status != null) {
+        donHangs = donHangs.where((donHang) => utf8.decode(donHang.trangThaiDH.runes.toList()) == status).toList();
       }
-    } catch (e) {
-      print('Error in fetchDonHang: $e');
-      throw Exception('Error fetching DonHang: $e');
+      if (date != null) {
+        donHangs = donHangs.where((donHang) =>
+        donHang.ngayDat.year == date.year &&
+            donHang.ngayDat.month == date.month &&
+            donHang.ngayDat.day == date.day
+        ).toList();
+      }
+
+      return donHangs;
+    } else {
+      throw Exception('Failed to load don hang');
     }
   }
+
   Future<DonHang> fetchDetailDonHang(String? maDH) async {
     final response = await http.get(
       Uri.parse('${IpConfig.ipConfig}api/donhang/$maDH'),

@@ -50,7 +50,7 @@ class DoiTraController{
   }
   Future<List<DoiTra>> getDoiTraList() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/api/doitra'),
+      Uri.parse('${baseUrl}api/doitra'),
     );
 
     if (response.statusCode == 200) {
@@ -64,12 +64,19 @@ class DoiTraController{
   // Lấy danh sách chi tiết đổi trả theo mã đổi trả
   Future<List<ChiTietDoiTra>> getChiTietDoiTra(String maDoiTra) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/api/chitietdoitra/$maDoiTra'),
+      Uri.parse('${baseUrl}api/chitietdoitra/$maDoiTra'),
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse.map((data) => ChiTietDoiTra.fromJson(data)).toList();
+      dynamic jsonResponse = json.decode(response.body);
+      if (jsonResponse is List) {
+        return jsonResponse.map((data) => ChiTietDoiTra.fromJson(data)).toList();
+      } else if (jsonResponse is Map<String, dynamic>) {
+        // If it's a single object, wrap it in a list
+        return [ChiTietDoiTra.fromJson(jsonResponse)];
+      } else {
+        throw Exception('Unexpected response format');
+      }
     } else {
       throw Exception('Failed to load ChiTietDoiTra list');
     }

@@ -33,4 +33,22 @@ class StorageService {
     print('$storageBucketUrl$imageName.jpg?alt=media');
     return '$storageBucketUrl$imageName.jpg?alt=media';
   }
+  Future<String?> getVCDTImage(String imageName) async {
+    try {
+      String fileName = 'VCDT/$imageName.jpg';
+      String downloadURL = await _firebaseStorage.ref(fileName).getDownloadURL();
+      return downloadURL;
+    } on FirebaseException catch (e) {
+      if (e.code == 'object-not-found') {
+        print('No image found for $imageName');
+        return null;
+      } else {
+        print('Unexpected Firebase error: $e');
+        return null;
+      }
+    } catch (e) {
+      print('Error getting image URL: $e');
+      return null;
+    }
+  }
 }

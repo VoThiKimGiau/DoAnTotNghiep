@@ -28,8 +28,17 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchOrders();
+    _selectedStatus = "Tất cả";
     tempSelectedStatus = _selectedStatus;
+    selectedPeriod = "Hôm nay";
+    tempSelectedPeriod = selectedPeriod;
+
+    // Fetch orders after a brief delay to ensure widget is mounted
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        _fetchOrders();
+      }
+    });
   }
 
   final ColorScheme colorScheme = ColorScheme.fromSeed(
@@ -40,10 +49,10 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
     background: Colors.grey[100]!,
     error: Colors.red,
   );
-  Future<String> _fetchCustomerNames(String makh) async {
+  Future<KhachHang?> _fetchCustomerNames(String makh) async {
     KhachHangController khachHangController = KhachHangController();
     KhachHang? customer = await khachHangController.getKhachHang(makh);
-    return customer?.tenKH ?? 'Customer not found';
+    return customer;
   }
 
   void _updateOrderStatus(String madh, String trangThai) async {
@@ -76,18 +85,27 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   void _filterOrders() {
     setState(() {
       _filteredOrders = _orders.where((order) {
+        // Decode status strings properly
         String orderStatus = utf8.decode(order.trangThaiDH.runes.toList()).trim();
         String selectedStatus = _selectedStatus.trim();
+
+        print('Comparing status: "$orderStatus" with "$selectedStatus"'); // Debug status comparison
+
         bool statusMatch = selectedStatus == "Tất cả" ||
             orderStatus.toLowerCase() == selectedStatus.toLowerCase();
+
         DateTimeRange range = _getDateRange();
-        bool dateMatch = !order.ngayDat.isBefore(range.start) &&
-            !order.ngayDat.isAfter(range.end);
+        bool dateMatch = order.ngayDat.isAfter(range.start.subtract(Duration(seconds: 1))) &&
+            order.ngayDat.isBefore(range.end.add(Duration(seconds: 1)));
+
+        print('Order ${order.maDH} - Status match: $statusMatch, Date match: $dateMatch'); // Debug matching
+
         return statusMatch && dateMatch;
       }).toList();
+
+      print('Filtered orders count: ${_filteredOrders.length}'); // Debug filtered count
     });
   }
-
   void _handleStatusChange(String? newValue) {
     if (newValue != null) {
       setState(() {
@@ -190,7 +208,7 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   DateTimeRange _getDateRange() {
     DateTime now = DateTime.now();
     DateTime start;
-    DateTime end = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    DateTime end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
 
     switch (tempSelectedPeriod) {
       case "Tất cả thời gian":
@@ -198,7 +216,6 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
         break;
       case "Hôm nay":
         start = DateTime(now.year, now.month, now.day, 0, 0, 0);
-        end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
         break;
       case "Hôm qua":
         start = DateTime(now.year, now.month, now.day - 1);
@@ -273,7 +290,24 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                 ),
               ),
               Expanded(
-                child: ListView.builder(
+                child: _filteredOrders.isEmpty
+                    ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.inbox_outlined, size: 48, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        'Không có đơn hàng nào',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+                    : ListView.builder(
                   itemCount: _filteredOrders.length,
                   itemBuilder: (context, index) {
                     final order = _filteredOrders[index];
@@ -295,7 +329,7 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: 8),
-                            FutureBuilder<String>(
+                            FutureBuilder<KhachHang?>(
                               future: _fetchCustomerNames(order.khachHang),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -304,12 +338,13 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                                   return Text('Error: ${snapshot.error}', style: TextStyle(color: colorScheme.error));
                                 } else {
                                   return Text(
-                                    'Khách hàng: ${utf8.decode((snapshot.data ?? '').runes.toList())}',
+                                    'Khách hàng: ${snapshot.data?.tenKH ?? ''}\n${snapshot.data?.sdt ?? ''}',
                                     style: TextStyle(color: colorScheme.onSurface),
                                   );
                                 }
                               },
                             ),
+
                             SizedBox(height: 4),
                             Text('Tổng tiền: $formattedAmount', style: TextStyle(color: colorScheme.secondary, fontWeight: FontWeight.bold)),
                             SizedBox(height: 4),

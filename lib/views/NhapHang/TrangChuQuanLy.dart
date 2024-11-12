@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/BaoCaoScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/StoreReport.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
+import 'package:datn_cntt304_bandogiadung/views/DoiTra/ReturnListScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/QuanLyDonHang.dart';
 import 'package:flutter/material.dart';
 
@@ -160,6 +161,18 @@ class _ShopDashboardState extends State<ShopDashboard> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => WarehouseInfoScreen(maNV: widget.maNV),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildActionButton(
+                    'Đổi trả',
+                    Icons.swap_horiz,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReturnListScreen(), // Thay thế bằng màn hình đổi trả của bạn
                         ),
                       );
                     },
