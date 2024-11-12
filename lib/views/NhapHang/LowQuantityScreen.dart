@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/ChiTietSPController.dart';
@@ -29,7 +31,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
   List<DanhMucSP> categories = [];
   List<NhaCungCap> suppliers = [];
   Map<String, Map<String, String?>> productDetailsCache = {};
-
+  SharedFunction sharedFunction=SharedFunction();
   String? selectedCategory;
   String? selectedSupplier;
   bool isLoading = false;
@@ -240,7 +242,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                     ),
                     ...suppliers.map((supplier) => DropdownMenuItem(
                       value: supplier.maNCC,
-                      child: Text(supplier.tenNCC),
+                      child: Text(utf8.decode(supplier.tenNCC.runes.toList()) ),
                     )),
                   ],
                   onChanged: (value) {
@@ -280,19 +282,18 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${details['size'] ?? ''} - ${details['color'] ?? ''}'),
+            Text('${ utf8.decode((details['size'] ?? '').codeUnits) } - ${details['color'] ?? ''}'),
             Text('${details['sup']}'),
             Text(
               'Số lượng: ${product.slKho}',
               style: TextStyle(
                 color: Colors.red,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
         trailing: Text(
-          '${product.giaBan}đ',
+          '${sharedFunction.formatCurrency(product.giaBan) }',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.blue,

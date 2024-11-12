@@ -398,50 +398,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  PhieuNhap phieuNhap = PhieuNhap(
-                    maPhieuNhap: widget.maPhieuNhap,
-                    nhaCungCap: widget.maNCC,
-                    maNV: widget.maNV,
-                    tongTien: temporaryTotal,
-                    ngayDat: DateTime.now(),
-                    trangThai: 'Đang xử lý',
-                  );
-
-                  List<ChiTietPhieuNhap> danhSachChiTiet = [];
-                  // Iterate over the selected items
-                  for (var entry in selectedItems.entries) {
-                    if (entry.value && quantities[entry.key] != null && quantities[entry.key]! > 0) {
-                      // Ensure 'entry.key' exists in the 'quantities' map
-                      final chiTietSP = chiTietSPs.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
-                      ChiTietPhieuNhap chiTiet = ChiTietPhieuNhap(
-                        maPN: widget.maPhieuNhap,
-                        maCTSP: chiTietSP.maCTSP, // Add the 'maSP' from the matching ChiTietSP
-                        soLuong: quantities[entry.key]!,
-                        donGia: chiTietSP.giaBan,
-                      );
-                      danhSachChiTiet.add(chiTiet);
-                    }
-                  }
-
-                  // Call `themNhieuChiTietPhieuNhap` and wait for the results
-                  try {
-                    List<ChiTietPhieuNhap> ketQua = await chiTietPhieuNhapController.themNhieuChiTietPhieuNhap(danhSachChiTiet);
-                    if (ketQua.isNotEmpty) {
-                      // Success - Show a message or navigate back
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Thêm chi tiết phiếu nhập thành công!')),
-                      );
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>PurchaseOrderList(maNV: widget.maNV)));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Không có sản phẩm nào được thêm.')),
-                      );
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Có lỗi xảy ra: $e')),
-                    );
-                  }
+                  _showConfirmationDialog();
                 },
                 child: Text('Xác nhận (${quantities.entries.where((entry) => entry.value > 0).length})'),
                 style: ElevatedButton.styleFrom(
@@ -455,4 +412,81 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       ),
     );
   }
+  void _addChiTietPhieuNhap()  async{
+    PhieuNhap phieuNhap = PhieuNhap(
+      maPhieuNhap: widget.maPhieuNhap,
+      nhaCungCap: widget.maNCC,
+      maNV: widget.maNV,
+      tongTien: temporaryTotal,
+      ngayDat: DateTime.now(),
+      trangThai: 'Đang xử lý',
+    );
+
+    List<ChiTietPhieuNhap> danhSachChiTiet = [];
+    // Iterate over the selected items
+    for (var entry in selectedItems.entries) {
+      if (entry.value && quantities[entry.key] != null && quantities[entry.key]! > 0) {
+        // Ensure 'entry.key' exists in the 'quantities' map
+        final chiTietSP = chiTietSPs.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
+        ChiTietPhieuNhap chiTiet = ChiTietPhieuNhap(
+          maPN: widget.maPhieuNhap,
+          maCTSP: chiTietSP.maCTSP, // Add the 'maSP' from the matching ChiTietSP
+          soLuong: quantities[entry.key]!,
+          donGia: chiTietSP.giaBan,
+        );
+        danhSachChiTiet.add(chiTiet);
+      }
+    }
+
+    // Call `themNhieuChiTietPhieuNhap` and wait for the results
+    try {
+      List<ChiTietPhieuNhap> ketQua = await chiTietPhieuNhapController.themNhieuChiTietPhieuNhap(danhSachChiTiet);
+      if (ketQua.isNotEmpty) {
+        // Success - Show a message or navigate back
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Thêm chi tiết phiếu nhập thành công!')),
+        );
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>PurchaseOrderList(maNV: widget.maNV)));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không có sản phẩm nào được thêm.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Có lỗi xảy ra: $e')),
+      );
+    }
+  }
+
+  Future<void> _showConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Không cho phép đóng dialog khi bấm ngoài khu vực dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xác nhận'),
+          content: Text('Bạn có chắc chắn muốn thêm chi tiết phiếu nhập?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Đóng dialog và không làm gì
+                Navigator.of(context).pop();
+              },
+              child: Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Thực hiện thêm Chi Tiết Phiếu Nhập tại đây
+                _addChiTietPhieuNhap();
+                Navigator.of(context).pop(); // Đóng dialog
+              },
+              child: Text('Xác nhận'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
