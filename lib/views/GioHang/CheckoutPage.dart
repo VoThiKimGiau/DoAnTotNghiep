@@ -32,6 +32,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String selectedPromoCode = '';
   List<Promotion> promoCodes = [];
   final CheckoutController checkoutController = CheckoutController();
+  bool isLoading = false;
 
   List<TTNhanHang> shippingAddresses = [];
   TTNhanHang? selectedAddress;
@@ -107,53 +108,60 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Thanh toán'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Column(
-                children: [
-                  _buildSectionCard(
-                    title: 'Thông tin nhận hàng',
-                    content: selectedAddress != null
-                        ? _buildAddressContent()
-                        : Text('Chưa có thông tin nhận hàng'),
-                    onTap: () => _showShippingAddresses(context),
-                  ),
-                  _buildSectionCard(
-                    title: 'Phương thức thanh toán',
-                    content: Text(selectedPaymentMethod),
-                    onTap: _showPaymentMethodOptions,
-                  ),
-                  _buildSectionCard(
-                    title: 'Phương thức vận chuyển',
-                    content: Text(selectedShippingMethod),
-                    onTap: _showShippingMethodOptions,
-                  ),
-                  _buildSectionCard(
-                    title: 'Áp dụng khuyến mãi',
-                    content: Text(selectedPromoCode.isNotEmpty
-                        ? selectedPromoCode
-                        : 'Không có mã giảm giá'),
-                    onTap: _showPromoCodeOptions,
-                  ),
-                ],
+    return isLoading
+        ? const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('Thanh toán'),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
               ),
             ),
-          ),
-          _buildSummarySection(),
-        ],
-      ),
-    );
+            body: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    child: Column(
+                      children: [
+                        _buildSectionCard(
+                          title: 'Thông tin nhận hàng',
+                          content: selectedAddress != null
+                              ? _buildAddressContent()
+                              : Text('Chưa có thông tin nhận hàng'),
+                          onTap: () => _showShippingAddresses(context),
+                        ),
+                        _buildSectionCard(
+                          title: 'Phương thức thanh toán',
+                          content: Text(selectedPaymentMethod),
+                          onTap: _showPaymentMethodOptions,
+                        ),
+                        _buildSectionCard(
+                          title: 'Phương thức vận chuyển',
+                          content: Text(selectedShippingMethod),
+                          onTap: _showShippingMethodOptions,
+                        ),
+                        _buildSectionCard(
+                          title: 'Áp dụng khuyến mãi',
+                          content: Text(selectedPromoCode.isNotEmpty
+                              ? selectedPromoCode
+                              : 'Không có mã giảm giá'),
+                          onTap: _showPromoCodeOptions,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                _buildSummarySection(),
+              ],
+            ),
+          );
   }
 
   Widget _buildSectionCard({
@@ -284,17 +292,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
+              setState(() {
+                isLoading = true;
+              });
               await checkoutController.checkOut(
-                "TT1",
+                selectedAddress?.maKH ?? shippingAddresses.first.maTTNH,
                 widget.customerId,
-                "Hoa toc",
-                "Thanh toan sau khi nhan hang",
-                0,
+                selectedShippingMethod,
+                selectedPromoCode,
+                widget.totalAmount,
                 true,
               );
-              Navigator.of(context).pushAndRemoveUntil(
+              setState(() {
+                isLoading = false;
+              });
+              Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => SuccessPage()),
-                (route) => route.isFirst,
               );
             },
             style: ElevatedButton.styleFrom(

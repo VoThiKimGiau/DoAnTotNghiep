@@ -66,10 +66,12 @@ class SuccessPage extends StatelessWidget {
                           AppColors.primaryColor,
                         )),
                         onPressed: () {
-                          Navigator.of(context).pop(); // Trở lại trang trước đó
+                          Navigator.of(context).popUntil(
+                            (route) => route.isFirst,
+                          ); // Trở lại trang trước đó
                         },
                         child: const Text(
-                          'Xem chi tiết đơn hàng',
+                          'Tiếp tục mua sắm',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
