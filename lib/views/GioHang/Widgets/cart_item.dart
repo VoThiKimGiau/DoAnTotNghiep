@@ -15,13 +15,16 @@ class CartItem extends StatefulWidget {
     required this.onDelete,
     required this.onDecrease,
     required this.onIncreate,
+    required this.onCheckboxChanged,
   });
+
   final ChiTietGioHang item;
   final String maKH;
   final String imageUrl;
   final Future<void> Function() onDelete;
   final Future<void> Function() onDecrease;
   final Future<void> Function() onIncreate;
+  final ValueChanged<bool?> onCheckboxChanged;
 
   @override
   State<CartItem> createState() => _CartItemState();
@@ -106,6 +109,33 @@ class _CartItemState extends State<CartItem> {
             ),
             Column(
               children: [
+                // Checkbox được thay thế bằng hiệu ứng sáng/tối
+                GestureDetector(
+                  onTap: () {
+                    widget.onCheckboxChanged(!widget.item.isSelected); // Thay đổi trạng thái khi bấm
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: widget.item.isSelected
+                          ? Colors.blue
+                          : Colors.grey, // Sáng khi chọn, tối khi không chọn
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: widget.item.isSelected
+                          ? const Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                      ) // Hiển thị dấu kiểm khi chọn
+                          : const Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.white, // Hiển thị khi chưa chọn
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 IconButton(
                   onPressed: widget.onDelete,
                   icon: const Icon(Icons.delete),

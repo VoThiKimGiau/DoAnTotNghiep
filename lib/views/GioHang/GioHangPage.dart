@@ -23,6 +23,7 @@ class _GioHangPageState extends State<GioHangPage> {
   late ChiTietGioHangController _controller;
   late StorageService _storageService;
   List<ChiTietGioHang> gioHangItems = [];
+  List<bool> selectedItems = []; // Lưu trạng thái checkbox của từng item
   bool _isLoading = true;
   ChiTietSPController _chiTietSPController = ChiTietSPController();
 
@@ -39,6 +40,7 @@ class _GioHangPageState extends State<GioHangPage> {
       final items = await _controller.fetchListProduct(widget.maGioHang);
       setState(() {
         gioHangItems = items;
+        selectedItems = List.generate(gioHangItems.length, (index) => false); // Khởi tạo trạng thái checkbox
         _isLoading = false;
       });
     } catch (e) {
@@ -53,8 +55,10 @@ class _GioHangPageState extends State<GioHangPage> {
 
   double _tinhTongTien() {
     double tongTien = 0.0;
-    for (var item in gioHangItems) {
-      tongTien += item.donGia * item.soLuong;
+    for (int i = 0; i < gioHangItems.length; i++) {
+      if (selectedItems[i]) {
+        tongTien += gioHangItems[i].donGia * gioHangItems[i].soLuong;
+      }
     }
     return tongTien;
   }
@@ -208,6 +212,11 @@ class _GioHangPageState extends State<GioHangPage> {
                       );
                       await _fetchGioHangItems();
                       setState(() {});
+                    },
+                    onCheckboxChanged: (bool? value) {
+                      setState(() {
+                        selectedItems[index] = value ?? false;
+                      });
                     },
                   );
                 },
