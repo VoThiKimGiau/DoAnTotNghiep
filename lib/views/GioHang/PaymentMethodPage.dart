@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'ShippingMethodPage.dart'; // Import trang chọn phương thức vận chuyển
 
 class PaymentMethodPage extends StatefulWidget {
   final String selectedMethod;
@@ -57,15 +56,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            // Điều hướng sang trang phương thức vận chuyển sau khi bấm "Tiếp tục"
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ShippingMethodPage(
-                  selectedMethod: 'Thường', // Phương thức vận chuyển mặc định
-                ),
-              ),
-            );
+            // Trả về phương thức thanh toán đã chọn cho CheckoutPage
+            Navigator.pop(context, selectedPayment);
           },
           child: Text('Tiếp tục'),
           style: ElevatedButton.styleFrom(

@@ -3,12 +3,14 @@ class ChiTietGioHang {
   final String maCTSP;
   final int soLuong;
   final double donGia;
+  bool isSelected; // Thêm thuộc tính isSelected
 
   ChiTietGioHang({
     required this.maGioHang,
     required this.maCTSP,
     required this.soLuong,
     required this.donGia,
+    this.isSelected = false, // Mặc định là chưa chọn
   });
 
   factory ChiTietGioHang.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class ChiTietGioHang {
       maCTSP: json['sanPham'] ?? '',
       soLuong: json['soLuong'] ?? 0,
       donGia: json['donGia'] ?? 0.0,
+      isSelected: json['isSelected'] ?? false, // Thêm isSelected vào JSON
     );
   }
 
@@ -26,6 +29,7 @@ class ChiTietGioHang {
       'maSanPham': maCTSP,
       'soLuong': soLuong,
       'donGia': donGia,
+      'isSelected': isSelected, // Lưu trạng thái isSelected
     };
   }
 
@@ -35,6 +39,7 @@ class ChiTietGioHang {
       'sanPham': maCTSP,
       'soLuong': soLuong,
       'donGia': donGia,
+      'isSelected': isSelected, // Lưu trạng thái isSelected khi cập nhật
     };
   }
 
@@ -43,12 +48,14 @@ class ChiTietGioHang {
     String? maCTSP,
     int? soLuong,
     double? donGia,
+    bool? isSelected, // Thêm tham số isSelected vào copyWith
   }) {
     return ChiTietGioHang(
       maGioHang: maGioHang ?? this.maGioHang,
       maCTSP: maCTSP ?? this.maCTSP,
       soLuong: soLuong ?? this.soLuong,
       donGia: donGia ?? this.donGia,
+      isSelected: isSelected ?? this.isSelected, // Cập nhật isSelected
     );
   }
 }
