@@ -24,7 +24,7 @@ class ChiTietDonHangController {
       List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => ChiTietDonHang.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to load product count');
+      throw Exception('Failed  product count');
     }
   }
 
