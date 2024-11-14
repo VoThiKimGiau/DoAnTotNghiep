@@ -291,13 +291,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
               await checkoutController.checkOut(
                 "TT1",
                 widget.customerId,
-                "Hoa toc",
+                "Hỏa tốc",
                 "Thanh toan sau khi nhan hang",
                 0,
                 true,
               );
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => SuccessPage()),
+                MaterialPageRoute(builder: (context) => SuccessPage(maKH: widget.customerId,)),
                 (route) => route.isFirst,
               );
             },
