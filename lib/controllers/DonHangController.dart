@@ -7,6 +7,7 @@ import '../config/IpConfig.dart';
 import '../models/ChiTietDonHang.dart';
 import '../models/ChiTietPhieuNhap.dart';
 import '../models/DonHang.dart';
+import 'NhanVienController.dart';
 
 class DonHangController {
   ChiTietDonHangController chiTietDonHangController=ChiTietDonHangController();
@@ -79,6 +80,16 @@ class DonHangController {
     }
   }
   Future<List<DonHang>> fetchDonHangByDateRange(String startDate, String endDate) async {
+
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+
     final String url =
         '${IpConfig.ipConfig}api/donhang/by-date-range?startDate=$startDate&endDate=$endDate';
 
@@ -86,6 +97,7 @@ class DonHangController {
     final response = await http.get(Uri.parse(url),headers: {
       'Content-Type': 'application/json; charset=UTF-8', // Thêm charset
       'Accept': 'application/json',
+      'Authorization': 'Bearer $token'
     },);
 
     if (response.statusCode == 200) {
