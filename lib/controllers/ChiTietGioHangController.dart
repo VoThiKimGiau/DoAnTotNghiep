@@ -56,7 +56,7 @@ class ChiTietGioHangController {
   // Lấy mã giỏ hàng dựa trên mã khách hàng
   Future<String> fetchMaGioHang(String maKH) async {
     final response = await http.get(
-      Uri.parse('http://${IpConfig.ipConfig}/api/giohang?khachHang/$maKH'), // Đường dẫn API
+      Uri.parse('${IpConfig.ipConfig}/api/giohang?khachHang/$maKH'), // Đường dẫn API
     );
 
     if (response.statusCode == 200) {

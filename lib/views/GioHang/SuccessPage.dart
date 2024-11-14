@@ -1,12 +1,16 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/views/TrangChu/TrangChu.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
 import '../../services/storage/storage_service.dart';
 
 class SuccessPage extends StatelessWidget {
-  final StorageService storageService = StorageService();
+  String? maKH;
 
-  SuccessPage({super.key}); // Khởi tạo đối tượng StorageService
+  SuccessPage({required this.maKH});
+
+  final StorageService storageService = StorageService();
 
   @override
   Widget build(BuildContext context) {
@@ -47,15 +51,6 @@ class SuccessPage extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Chúng tôi sẽ gửi email xác nhận cho bạn.',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
                     const Spacer(),
                     SizedBox(
                       height: 65,
@@ -66,9 +61,11 @@ class SuccessPage extends StatelessWidget {
                           AppColors.primaryColor,
                         )),
                         onPressed: () {
-                          Navigator.of(context).popUntil(
-                            (route) => route.isFirst,
-                          ); // Trở lại trang trước đó
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      MainScreen(maKH: maKH)));
                         },
                         child: const Text(
                           'Tiếp tục mua sắm',
