@@ -28,6 +28,7 @@ class _LoginScreen extends State<LoginScreen> {
   bool isEmployee = false;
   late NhanVienController nhanVienController;
   late NhanVien? nhanVien;
+  String? maNV="";
 
   @override
   void initState() {
@@ -64,7 +65,7 @@ class _LoginScreen extends State<LoginScreen> {
         );
       }
     } else {
-      nhanVien = await nhanVienController.dangNhapNV(
+      maNV = await nhanVienController.dangNhapNV(
           tenTKController.text, matKhauController.text);
       if (nhanVien == null) {
         SnackBar(content: Text('Login failed. Please check your credentials.'));

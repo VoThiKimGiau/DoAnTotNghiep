@@ -4,6 +4,7 @@ import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DoiTra/ReturnListScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/QuanLyDonHang.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../controllers/DonHangController.dart';
 import '../../models/DonHang.dart';
@@ -24,10 +25,18 @@ class _ShopDashboardState extends State<ShopDashboard> {
   int doneOrdersCount=0;
   double totalRevenue=0.0;
   double profit=0.0;
+  String? chucVu;
   @override
   void initState() {
     super.initState();
     _fetchTodayStatistics();
+    _loadChucVu();
+  }
+  Future<void> _loadChucVu() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      chucVu = prefs.getString('chucVu');
+    });
   }
   Future<void> _fetchTodayStatistics() async {
 
@@ -96,6 +105,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 ],
               ),
               SizedBox(height: 10),
+              if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
               GridView.count(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
@@ -110,6 +120,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 ],
               ),
               SizedBox(height: 20),
+              if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -117,6 +128,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 ],
               ),
               SizedBox(height: 10),
+              if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -136,6 +148,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 ],
               ),
               SizedBox(height: 20),
+              if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
               GridView.count(
                 crossAxisCount: 4,
                 crossAxisSpacing: 10,
@@ -143,6 +156,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 children: [
+                  if (chucVu != 'THU_KHO' )
                   _buildActionButton('Đơn hàng', Icons.list_alt,
                   onPressed:() {
                     Navigator.push(
@@ -153,6 +167,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                     );
                   }),
                   _buildActionButton('Sản phẩm', Icons.inventory),
+                  if ( chucVu != 'BAN_HANG')
                   _buildActionButton(
                     'Kho hàng',
                     Icons.store,
@@ -165,6 +180,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                       );
                     },
                   ),
+                  if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
                   _buildActionButton(
                     'Đổi trả',
                     Icons.swap_horiz,
@@ -177,6 +193,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                       );
                     },
                   ),
+                  if (chucVu != 'THU_KHO' && chucVu != 'BAN_HANG')
                   _buildActionButton(
                     'Báo cáo',
                     Icons.insert_chart,

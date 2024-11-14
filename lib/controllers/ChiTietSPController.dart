@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:http/http.dart' as http;
+
+import 'NhanVienController.dart';
 class ChiTietSPController{
   final baseUrl="${IpConfig.ipConfig}";
   Future<ChiTietSP> layCTSPTheoMa(String maCTSP) async
@@ -154,8 +156,18 @@ class ChiTietSPController{
     }
   }
   Future<List<ChiTietSP>> fetchLowQuantity() async {
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
     final url = Uri.parse('${baseUrl}api/chitietsp/low-stock');
-    final response = await http.get(url);
+    final response = await http.get(url, headers: {
+      'Authorization': 'Bearer $token',
+    },);
     if (response.statusCode == 200) {
       // Decode the JSON response into a List of ChiTietSP objects
       List<dynamic> jsonList = json.decode(response.body);

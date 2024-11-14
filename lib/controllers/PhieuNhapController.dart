@@ -1,12 +1,28 @@
 import 'dart:convert';
 
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/NhanVienController.dart';
 import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
 import 'package:http/http.dart' as http;
 class PhieuNhapController{
+
   Future<List<PhieuNhap>> layDanhSachPhieuNhap() async
   {
-    final response= await http.get(Uri.parse('${IpConfig.ipConfig}api/phieunhap'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    // Gửi request với Bearer token trong headers
+    final response = await http.get(
+      Uri.parse('${IpConfig.ipConfig}api/phieunhap'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
     if(response.statusCode==200)
       {
         List<dynamic> jsonResponse=json.decode(response.body);
@@ -26,11 +42,22 @@ class PhieuNhapController{
     return newOrderCode;
   }
   Future<PhieuNhap> taoPhieuNhap(PhieuNhap phieuNhap) async {
+
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    // Gửi request với Bearer token trong headers
     final response = await http.post(
       Uri.parse('${IpConfig.ipConfig}api/phieunhap'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
       body: json.encode({
         'maPhieuNhap': phieuNhap.maPhieuNhap,
@@ -49,13 +76,21 @@ class PhieuNhapController{
     }
   }
   Future<void> updatePhieuNhapDaGiao(String maPN) async {
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
     final String url = '${IpConfig.ipConfig}api/phieunhap/daGiaoHang/$maPN';
 
     try {
+
       final response = await http.put(
         Uri.parse(url),
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -72,7 +107,17 @@ class PhieuNhapController{
     }
   }
   Future<List<PhieuNhap>> getPhieuNhapByTrangThai(String trangThai) async {
-    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/phieunhap/trangthai/$trangThai'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/phieunhap/trangthai/$trangThai'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },);
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
