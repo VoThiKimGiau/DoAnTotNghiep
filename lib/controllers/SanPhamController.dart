@@ -65,4 +65,23 @@ class SanPhamController {
       throw Exception('Failed to load product by category');
     }
   }
+
+  Future<SanPham?> updateProduct(String id, SanPham updatedSanPham) async {
+    final String apiUrl = '${IpConfig.ipConfig}api/sanpham/update/$id';
+
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(updatedSanPham.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return SanPham.fromJson(jsonDecode(response.body));
+    } else {
+      print('Failed to update product: ${response.statusCode}');
+      return null;
+    }
+  }
 }

@@ -1,9 +1,11 @@
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietGioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GioHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/SPYeuThichController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietGioHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/KichCo.dart';
+import 'package:datn_cntt304_bandogiadung/models/SPYeuThich.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/CircleButtonSize.dart';
@@ -47,12 +49,17 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
   String? maGH;
   String? maSanPham;
 
+  SPYeuThichController spYeuThichController = SPYeuThichController();
+  List<SPYeuThich> dsSPYT = [];
+  bool isFavorite = false;
+
   @override
   void initState() {
     super.initState();
     fetchSP(widget.maSP!);
     fetchChiTietSP(widget.maSP!);
     maSanPham = widget.maSP;
+    isFavoriteF(maSanPham!);
   }
 
   Future<void> fetchSP(String maSanPham) async {
@@ -137,6 +144,28 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
     return gioHangController.getMaGHByMaKH(maKH);
   }
 
+  Future<void> fetchSPYeuThich(String? maKH) async {
+    try {
+      List<SPYeuThich> fetchedItems =
+          await spYeuThichController.fetchSPYeuThichByKH(widget.maKH);
+      setState(() {
+        dsSPYT = fetchedItems;
+      });
+    } catch (e) {
+      print('Error: $e'); // Handle error
+      setState(() {
+        dsSPYT = []; // Set list to empty on error
+      });
+    }
+  }
+
+  Future<void> isFavoriteF(String maSP) async {
+    await fetchSPYeuThich(widget.maKH);
+    setState(() {
+      isFavorite = dsSPYT.any((spyt) => spyt.maSanPham == maSP);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,14 +200,35 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                       height: 40,
                       margin: const EdgeInsets.only(right: 36),
                       child: ElevatedButton(
-                        onPressed: () {
-                          print('b');
+                        onPressed: () async {
+                          if (!isFavorite) {
+                            await spYeuThichController.themSPYeuThich(
+                                SPYeuThich(
+                                    maKhachHang: widget.maKH ?? '',
+                                    maSanPham: widget.maSP ?? ''));
+                            setState(() {
+                              isFavorite = true;
+                            });
+                            print('Sản phẩm đã được thêm vào yêu thích.');
+                          } else {
+                            await spYeuThichController.xoaSPYeuThich(
+                                widget.maKH ?? '', widget.maSP ?? '');
+                            setState(() {
+                              isFavorite = false;
+                            });
+                            print(
+                                'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
                           backgroundColor: Colors.white,
                         ),
-                        child: SvgPicture.asset('assets/icons/heart.svg'),
+                        child: SvgPicture.asset(
+                          isFavorite
+                              ? 'assets/icons/heart_red.svg'
+                              : 'assets/icons/heart.svg',
+                        ),
                       ),
                     )
                   ],
@@ -293,6 +343,9 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                           : itemsSP!.length)
                                       : 0,
                                   itemBuilder: (context, index) {
+                                    bool isFavoriteLV = dsSPYT.any((spyt) =>
+                                        spyt.maSanPham == itemsSP![index].maSP);
+
                                     return GestureDetector(
                                       onTap: () async {
                                         await Navigator.push(
@@ -306,13 +359,43 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                           ),
                                         );
                                       },
-                                      child: SanPhamItem(item: itemsSP![index]),
+                                      child: SanPhamItem(
+                                        item: itemsSP![index],
+                                        isFavorite: isFavoriteLV,
+                                        onFavoriteToggle: () async {
+                                          if (!isFavorite) {
+                                            await spYeuThichController
+                                                .themSPYeuThich(SPYeuThich(
+                                              maKhachHang: widget.maKH ?? '',
+                                              maSanPham: itemsSP![index].maSP,
+                                            ));
+                                            print(
+                                                'Sản phẩm đã được thêm vào yêu thích.');
+                                          } else {
+                                            await spYeuThichController
+                                                .xoaSPYeuThich(
+                                                    widget.maKH ?? '',
+                                                    itemsSP![index].maSP);
+                                            print(
+                                                'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                                          }
+
+                                          // Cập nhật lại trạng thái yêu thích
+                                          setState(() {
+                                            // Cập nhật trạng thái yêu thích của sản phẩm
+                                            isFavorite = !isFavorite;
+                                          });
+                                        },
+                                      ),
                                     );
                                   },
                                 )),
-                            const SizedBox(height: 15,),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 24),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 24),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -468,6 +551,7 @@ class CustomBottomSheet {
                               Text(
                                 sharedFunction.formatCurrency(giaMD),
                                 style: const TextStyle(
+                                  fontFamily: 'Gabarito',
                                   color: Colors.red,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
@@ -566,10 +650,11 @@ class CustomBottomSheet {
                                 maHA = chiTietSP!.maHinhAnh;
                                 slKho = chiTietSP!.slKho;
                                 giaMD = chiTietSP!.giaBan;
-                                if (slKho == 0)
+                                if (slKho == 0) {
                                   quantity = 0;
-                                else
+                                } else {
                                   quantity = 1;
+                                }
                               });
                             }
                           }
@@ -774,7 +859,9 @@ class CustomBottomSheet {
                             ),
                             isLoading
                                 ? const Center(
-                                    child: CircularProgressIndicator(),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : Text(
                                     buttonText,
