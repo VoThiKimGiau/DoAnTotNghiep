@@ -1,5 +1,6 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
+import 'package:datn_cntt304_bandogiadung/dto/DangKyKhachHangDTO.dart';
 import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
@@ -50,16 +51,15 @@ class _CompleteInformationState extends State<CompleteInformation> {
   void _createAccount() {
     bool gTinh = _selectedGender == 'Nam' ? false : true;
 
-    khachHangController.insertCustomer(new KhachHang(
-      maKH: widget.maKH,
+    khachHangController.insertCustomer(new DangKyKhachHangDTO(
       tenKH: widget.tenKH,
       sdt: widget.sdt,
       email: widget.email,
       tenTK: widget.tenTK,
       matKhau: widget.matKhau,
-      hoatDong: true,
       gioiTinh: gTinh,
       ngaySinh: _selectedDate,
+      matKhauNhapLai: widget.matKhau
     ));
 
     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
+import 'package:datn_cntt304_bandogiadung/dto/DangKyKhachHangDTO.dart';
 import 'package:http/http.dart' as http;
 import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 
@@ -49,9 +50,9 @@ class KhachHangController {
     }
   }
 
-  Future<KhachHang> insertCustomer(KhachHang kh) async {
+  Future<KhachHang> insertCustomer(DangKyKhachHangDTO kh) async {
     final response = await http.post(
-      Uri.parse('${IpConfig.ipConfig}api/khachhang'),
+      Uri.parse('${IpConfig.ipConfig}api/khachhang/register'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',
