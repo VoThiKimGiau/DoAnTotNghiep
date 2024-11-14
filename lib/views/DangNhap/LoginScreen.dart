@@ -67,12 +67,12 @@ class _LoginScreen extends State<LoginScreen> {
     } else {
       maNV = await nhanVienController.dangNhapNV(
           tenTKController.text, matKhauController.text);
-      if (nhanVien == null) {
+      if (maNV == null) {
         SnackBar(content: Text('Login failed. Please check your credentials.'));
       } else {
-        String maNV = nhanVien?.maNV ?? '';
+
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ShopDashboard(maNV: maNV)));
+            MaterialPageRoute(builder: (context) => ShopDashboard(maNV: maNV?? ' ')));
       }
     }
   }

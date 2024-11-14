@@ -59,7 +59,15 @@ class ChiTietSPController{
     return allChiTietSPs;
   }
   Future<int> getTotalSlKho() async {
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-slkho'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-slkho'),headers: {
+    'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return int.parse(response.body);
     } else {
@@ -69,7 +77,17 @@ class ChiTietSPController{
 
   // Get total inventory value
   Future<double> getTotalInventoryValue() async {
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-ton'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-ton'),headers: {
+    'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -79,7 +97,18 @@ class ChiTietSPController{
 
   // Get total sold inventory value
   Future<double> getTotalSoldValue() async {
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-da-ban'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+
+
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-da-ban'),headers: {
+    'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -89,7 +118,17 @@ class ChiTietSPController{
 
   // Get total number of products below stock threshold
   Future<int> getItemsWithLowInventory(int threshold) async {
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'),headers: {
+      'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;
@@ -100,7 +139,16 @@ class ChiTietSPController{
 
   // Get total number of products available for sale
   Future<int> getAvailableItems() async {
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/con-ton-kho'));
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/con-ton-kho'),headers: {
+    'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;

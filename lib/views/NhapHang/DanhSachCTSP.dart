@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietPhieuNhap.dart';
@@ -30,6 +31,7 @@ class _DanhSachCTSPState extends State<DanhSachCTSP> {
   final SanPhamController _sanPhamController = SanPhamController();
   late MauSPController mauSPController=MauSPController();
   late KichCoController kichCoController=KichCoController();
+  SharedFunction sharedFunction=SharedFunction();
   @override
   void initState() {
     super.initState();
@@ -160,15 +162,28 @@ class _DanhSachCTSPState extends State<DanhSachCTSP> {
                                               tenSPSnapshot.data ?? 'Tên sản phẩm không tìm thấy',
                                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min, // Takes minimum horizontal space needed
+                                          children: [
                                             Container(
                                               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                               decoration: BoxDecoration(
                                                 color: Colors.blue.withOpacity(0.1),
                                                 borderRadius: BorderRadius.circular(20),
                                               ),
-                                              child: Text(
-                                                'SL: ${chiTiet.soLuong}',
-                                                style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    'SL: ',
+                                                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                                  ),
+                                                  Text(
+                                                    '${chiTiet.soLuong}',
+                                                    style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
@@ -176,8 +191,8 @@ class _DanhSachCTSPState extends State<DanhSachCTSP> {
                                         SizedBox(height: 8),
                                         _buildInfoRow('Kích cỡ', tenKichCo),
                                         _buildInfoRow('Màu sắc', tenMau),
-                                        _buildInfoRow('Đơn giá', '${chiTiet.donGia.toStringAsFixed(0)}đ'),
-                                        _buildInfoRow('Thành tiền', '${(chiTiet.donGia * chiTiet.soLuong).toStringAsFixed(0)}đ'),
+                                        _buildInfoRow('Đơn giá', '${sharedFunction.formatCurrency( chiTiet.donGia)}'),
+                                        _buildInfoRow('Thành tiền', '${sharedFunction.formatCurrency(chiTiet.donGia * chiTiet.soLuong)}'),
                                       ],
                                     ),
                                   ),

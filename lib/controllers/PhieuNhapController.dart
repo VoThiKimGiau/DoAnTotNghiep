@@ -131,8 +131,17 @@ class PhieuNhapController{
 
   // Phương thức lọc phiếu nhập giữa hai ngày
   Future<List<PhieuNhap>> filterPhieuNhapBetweenDates(String startDate, String endDate) async {
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
     final url = Uri.parse('${IpConfig.ipConfig}api/phieunhap/between-dates?startDate=$startDate&endDate=$endDate');
-    final response = await http.get(url);
+    final response = await http.get(url,headers: {
+      'Authorization': 'Bearer $token',
+    },);
 
     if (response.statusCode == 200) {
       List<dynamic> jsonData = jsonDecode(response.body);
