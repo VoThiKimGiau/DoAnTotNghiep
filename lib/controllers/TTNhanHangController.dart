@@ -34,4 +34,33 @@ class TTNhanHangController {
           'Failed to load TTNhanHang. Status code: ${response.statusCode}');
     }
   }
+
+  Future<TTNhanHang?> createTTNhanHang(TTNhanHang ttNhanHang) async {
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(ttNhanHang.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      // If the server returns an OK response, parse the JSON
+      return TTNhanHang.fromJson(json.decode(response.body));
+    } else {
+      // If the response was not OK, throw an exception
+      throw Exception('Failed to create TTNhanHang: ${response.reasonPhrase}');
+    }
+  }
+
+  Future<List<TTNhanHang>> getAllTTNhanHang() async {
+    final response = await http.get(Uri.parse(baseUrl));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((item) => TTNhanHang.fromJson(item)).toList();
+    } else {
+      throw Exception('Failed to load TTNhanHang: ${response.reasonPhrase}');
+    }
+  }
 }

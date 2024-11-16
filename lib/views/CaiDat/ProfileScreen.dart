@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/TaiKhoanController.dart';
+import 'package:datn_cntt304_bandogiadung/views/CaiDat/TTNhanHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import '../../models/KhachHang.dart';
 import 'SanPhamYeuThich.dart';
+import 'ThemDiaChi.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? makh;
@@ -94,7 +96,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 24),
               _buildMenuItem('Địa chỉ giao hàng', Icons.location_on, () {
-                // Handle navigation if needed
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TTNhanHangScreen(
+                              maKH: widget.makh,
+                            )));
               }),
               _buildMenuItem('Sản phẩm yêu thích', Icons.favorite, () {
                 Navigator.push(

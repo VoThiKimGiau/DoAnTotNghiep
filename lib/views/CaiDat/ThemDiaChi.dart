@@ -1,124 +1,128 @@
-
+import 'package:datn_cntt304_bandogiadung/controllers/TTNhanHangController.dart';
+import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
+import 'package:datn_cntt304_bandogiadung/views/CaiDat/TTNhanHang.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart'; // Import for TextInputFormatter
 import '../../colors/color.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AddDeliveryAddressScreen(),
-    );
-  }
-}
-
 class AddDeliveryAddressScreen extends StatefulWidget {
+  final String? maKH;
+
+  AddDeliveryAddressScreen({required this.maKH});
+
   @override
-  _AddDeliveryAddressScreenState createState() => _AddDeliveryAddressScreenState();
+  _AddDeliveryAddressScreenState createState() =>
+      _AddDeliveryAddressScreenState();
 }
 
 class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _wardController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _districtController = TextEditingController();
-  final _houseNumberController = TextEditingController();
+  final Map<String, TextEditingController> _controllers = {
+    'name': TextEditingController(),
+    'phone': TextEditingController(),
+    'houseNumber': TextEditingController(),
+    'ward': TextEditingController(),
+    'district': TextEditingController(),
+    'city': TextEditingController(),
+  };
 
-  // Create focus nodes for each text form field
-  final FocusNode _wardFocusNode = FocusNode();
-  final FocusNode _cityFocusNode = FocusNode();
-  final FocusNode _districtFocusNode = FocusNode();
-  final FocusNode _houseNumberFocusNode = FocusNode();
+  final Map<String, FocusNode> _focusNodes = {
+    'name': FocusNode(),
+    'phone': FocusNode(),
+    'houseNumber': FocusNode(),
+    'ward': FocusNode(),
+    'district': FocusNode(),
+    'city': FocusNode(),
+  };
 
-  Color _wardBorderColor = Colors.grey;
-  Color _cityBorderColor = Colors.grey;
-  Color _districtBorderColor = Colors.grey;
-  Color _houseNumberBorderColor = Colors.grey;
+  final Map<String, Color> _borderColors = {
+    'name': Colors.grey,
+    'phone': Colors.grey,
+    'houseNumber': Colors.grey,
+    'ward': Colors.grey,
+    'district': Colors.grey,
+    'city': Colors.grey,
+  };
+
+  bool _isDefaultAddress = false;
 
   @override
   void initState() {
     super.initState();
-
-    // Add listeners to change the border color when focused/unfocused
-    _wardFocusNode.addListener(() {
-      setState(() {
-        _wardBorderColor = _wardFocusNode.hasFocus ? AppColors.primaryColor : Colors.grey;
-      });
-    });
-    _cityFocusNode.addListener(() {
-      setState(() {
-        _cityBorderColor = _cityFocusNode.hasFocus ? AppColors.primaryColor : Colors.grey;
-      });
-    });
-    _districtFocusNode.addListener(() {
-      setState(() {
-        _districtBorderColor = _districtFocusNode.hasFocus ? AppColors.primaryColor : Colors.grey;
-      });
-    });
-    _houseNumberFocusNode.addListener(() {
-      setState(() {
-        _houseNumberBorderColor = _houseNumberFocusNode.hasFocus ? AppColors.primaryColor : Colors.grey;
+    _focusNodes.forEach((key, node) {
+      node.addListener(() {
+        setState(() {
+          _borderColors[key] =
+              node.hasFocus ? AppColors.primaryColor : Colors.grey;
+        });
       });
     });
   }
 
   @override
   void dispose() {
-    _wardController.dispose();
-    _cityController.dispose();
-    _districtController.dispose();
-    _houseNumberController.dispose();
-    _wardFocusNode.dispose();
-    _cityFocusNode.dispose();
-    _districtFocusNode.dispose();
-    _houseNumberFocusNode.dispose();
+    _controllers.values.forEach((controller) => controller.dispose());
+    _focusNodes.values.forEach((node) => node.dispose());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          'Thêm địa chỉ giao hàng',
-          style: TextStyle(color: Colors.black, fontSize: 25),
-        ),
+        title: const Text('Thêm địa chỉ giao hàng',
+            style: TextStyle(color: Colors.black, fontSize: 25)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              _buildTextFormField(_wardController, 'Phường/Xã', _wardFocusNode, _wardBorderColor),
-              SizedBox(height: 16),
-              _buildTextFormField(_cityController, 'Thành phố/Tỉnh', _cityFocusNode, _cityBorderColor),
-              SizedBox(height: 16),
-              _buildTextFormField(_districtController, 'Quận/Huyện', _districtFocusNode, _districtBorderColor),
-              SizedBox(height: 16),
-              _buildTextFormField(_houseNumberController, 'Số nhà', _houseNumberFocusNode, _houseNumberBorderColor),
-              Spacer(),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Lưu', style: TextStyle(fontSize: 18)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  minimumSize: Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+              ..._buildTextFields(),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _isDefaultAddress,
+                    onChanged: (value) {
+                      setState(() {
+                        _isDefaultAddress = value!;
+                      });
+                    },
                   ),
+                  const Text(
+                    'Địa chỉ mặc định',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (widget.maKH != null) {
+                    _submitForm(widget.maKH!);
+                  } else {
+                    // Handle the case where maKH is null, if necessary
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Mã khách hàng không hợp lệ.')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  minimumSize: const Size(double.infinity, 50),
                 ),
+                child: const Text('Lưu',
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
             ],
           ),
@@ -127,37 +131,104 @@ class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String label, FocusNode focusNode, Color borderColor) {
-    return TextFormField(
-      controller: controller,
-      focusNode: focusNode,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: borderColor),
+  List<Widget> _buildTextFields() {
+    final labels = [
+      'Họ tên',
+      'SĐT',
+      'Số nhà',
+      'Phường/Xã',
+      'Quận/Huyện',
+      'Thành phố/Tỉnh'
+    ];
+    return List.generate(labels.length, (index) {
+      String key =
+          ['name', 'phone', 'houseNumber', 'ward', 'district', 'city'][index];
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: TextFormField(
+          controller: _controllers[key],
+          focusNode: _focusNodes[key],
+          decoration: InputDecoration(
+            labelText: labels[index],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: _borderColors[key]!),
+            ),
+            filled: true,
+            fillColor: Colors.grey[200],
+          ),
+          inputFormatters:
+              key == 'phone' ? [FilteringTextInputFormatter.digitsOnly] : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Vui lòng nhập ${labels[index]}';
+            }
+            if (key == 'phone') {
+              // Validate phone number: must be 10 digits and start with 0
+              final regex = RegExp(r'^0\d{9}$');
+              if (!regex.hasMatch(value)) {
+                return 'SĐT phải là 10 số và bắt đầu bằng 0';
+              }
+            }
+            return null;
+          },
         ),
-        filled: true,
-        fillColor: Colors.grey[200],
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Vui lòng nhập $label';
-        }
-        return null;
-      },
-    );
+      );
+    });
   }
 
-  void _submitForm() {
+  Future<void> _submitForm(String maKH) async {
     if (_formKey.currentState!.validate()) {
-      // Process the form data
-      print('Ward: ${_wardController.text}');
-      print('City: ${_cityController.text}');
-      print('District: ${_districtController.text}');
-      print('House Number: ${_houseNumberController.text}');
-      // You can add your logic here to save the address
-      Navigator.of(context).pop();
+      TTNhanHangController ttNhanHangController = TTNhanHangController();
+
+      String address =
+          '${_controllers['houseNumber']!.text}, ${_controllers['ward']!.text}, ${_controllers['district']!.text}, ${_controllers['city']!.text}';
+
+      try {
+        List<TTNhanHang> dsTT = await ttNhanHangController.getAllTTNhanHang();
+
+        int getMaxID(List<TTNhanHang> dsTT) {
+          int maxId = 0;
+          for (TTNhanHang tt in dsTT) {
+            if (tt.maTTNH!.startsWith('TT')) {
+              int id = int.parse(tt.maTTNH!.substring(2));
+              if (id > maxId) {
+                maxId = id;
+              }
+            }
+          }
+          return maxId;
+        }
+
+        String generateTTNhanHangCode() {
+          int currentMaxId = getMaxID(dsTT);
+          currentMaxId++;
+          return 'TT$currentMaxId';
+        }
+
+        await ttNhanHangController.createTTNhanHang(
+          TTNhanHang(
+            maTTNH: generateTTNhanHangCode(),
+            hoTen: _controllers['name']!.text,
+            diaChi: address,
+            sdt: _controllers['phone']!.text,
+            maKH: maKH,
+            macDinh: _isDefaultAddress,
+          ),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Thêm địa chỉ thành công!')),
+        );
+
+        Navigator.pop(context);
+      } catch (error) {
+        print('Error adding delivery address: $error');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Thêm địa chỉ thất bại. Vui lòng thử lại.')),
+        );
+      }
     }
   }
 }

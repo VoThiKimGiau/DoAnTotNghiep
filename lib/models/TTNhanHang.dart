@@ -26,4 +26,15 @@ class TTNhanHang {
       macDinh: json['macDinh'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'maTTNH': maTTNH,
+      'hoTen': hoTen,
+      'diaChi': diaChi,
+      'sdt': sdt,
+      'maKH': maKH,
+      'macDinh': macDinh,
+    };
+  }
 }
