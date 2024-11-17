@@ -5,7 +5,7 @@ class TTNhanHang {
   final String diaChi;
   final String sdt;
   final String maKH;
-  final bool macDinh;
+  late final bool macDinh;
 
   TTNhanHang({
     required this.maTTNH,

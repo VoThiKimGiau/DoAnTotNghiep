@@ -3,6 +3,7 @@ import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/CaiDat/TTNhanHang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Import for TextInputFormatter
+import 'package:flutter_svg/svg.dart';
 import '../../colors/color.dart';
 
 class AddDeliveryAddressScreen extends StatefulWidget {
@@ -70,59 +71,90 @@ class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Thêm địa chỉ giao hàng',
-            style: TextStyle(color: Colors.black, fontSize: 25)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              ..._buildTextFields(),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isDefaultAddress,
-                    onChanged: (value) {
-                      setState(() {
-                        _isDefaultAddress = value!;
-                      });
-                    },
-                  ),
-                  const Text(
-                    'Địa chỉ mặc định',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
+              Container(
+                height: 40,
+                margin: const EdgeInsets.only(left: 20, top: 40),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(12),
+                          backgroundColor: Colors.white,
+                        ),
+                        child: SvgPicture.asset('assets/icons/arrowleft.svg'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: const Text(
+                        'THÊM THÔNG TIN NHẬN HÀNG',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [..._buildTextFields()],
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Đặt làm địa chỉ mặc định',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Switch(
+                      activeColor: Colors.deepOrange,
+                      value: _isDefaultAddress,
+                      onChanged: (value) {
+                        setState(() {
+                          _isDefaultAddress = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (widget.maKH != null) {
-                    _submitForm(widget.maKH!);
-                  } else {
-                    // Handle the case where maKH is null, if necessary
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Mã khách hàng không hợp lệ.')),
-                    );
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryColor,
-                  minimumSize: const Size(double.infinity, 50),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (widget.maKH != null) {
+                      _submitForm(widget.maKH!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Mã khách hàng không hợp lệ.')),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    minimumSize: const Size(double.infinity, 40),
+                  ),
+                  child: const Text('Lưu',
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
-                child: const Text('Lưu',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
             ],
           ),
@@ -221,7 +253,7 @@ class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
           const SnackBar(content: Text('Thêm địa chỉ thành công!')),
         );
 
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } catch (error) {
         print('Error adding delivery address: $error');
         ScaffoldMessenger.of(context).showSnackBar(

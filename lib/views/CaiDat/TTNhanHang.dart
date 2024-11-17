@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/TTNhanHangController.dart';
 import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
+import 'package:datn_cntt304_bandogiadung/views/CaiDat/ChiTietTTNH.dart';
 import 'package:datn_cntt304_bandogiadung/views/CaiDat/ThemDiaChi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,6 +11,7 @@ class TTNhanHangScreen extends StatefulWidget {
 
   TTNhanHangScreen({required this.maKH});
 
+  @override
   _TTNhanHangScreen createState() => _TTNhanHangScreen();
 }
 
@@ -38,6 +40,28 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
         dsTTNH = [];
         isLoading = false;
       });
+    }
+  }
+
+  void navigateToChiTietTTNH(String maTTNH) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChiTietTTNHScreen(maTTNH: maTTNH)),
+    );
+
+    if (result == true) {
+      fetchTTNH();
+    }
+  }
+
+  void navigateToThemDiaChi() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddDeliveryAddressScreen(maKH: widget.maKH)),
+    );
+
+    if (result == true) {
+      fetchTTNH();
     }
   }
 
@@ -71,8 +95,7 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: const Text(
                       'THÔNG TIN NHẬN HÀNG',
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -91,8 +114,7 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
                     const SizedBox(height: 20),
                     const Text(
                       'Bạn chưa có thông tin nhận hàng nào',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -104,12 +126,9 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
                   itemBuilder: (context, index) {
                     final item = dsTTNH![index];
                     return GestureDetector(
-                      onTap: () {
-                        print('Sửa');
-                      },
+                      onTap: () => navigateToChiTietTTNH(item.maTTNH),
                       child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
+                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
@@ -117,8 +136,7 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
@@ -159,11 +177,10 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              if (item.macDinh) // Check if macDinh is true
+                              if (item.macDinh)
                                 Container(
                                   margin: const EdgeInsets.only(top: 8),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.transparent,
                                     border: Border.all(color: Colors.red),
@@ -189,18 +206,10 @@ class _TTNhanHangScreen extends State<TTNhanHangScreen> {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AddDeliveryAddressScreen(maKH: widget.maKH),
-                    ),
-                  );
-                },
+                onPressed: navigateToThemDiaChi,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
-                    minimumSize: const Size(double.infinity, 50)),
+                    minimumSize: const Size(double.infinity, 40)),
                 child: const Text(
                   'Thêm thông tin',
                   style: TextStyle(color: Colors.white, fontSize: 16),

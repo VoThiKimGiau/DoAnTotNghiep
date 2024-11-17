@@ -63,4 +63,52 @@ class TTNhanHangController {
       throw Exception('Failed to load TTNhanHang: ${response.reasonPhrase}');
     }
   }
+
+  Future<bool> updateTTNhanHang(String maTTNH, TTNhanHang ttNhanHang) async {
+    final String apiUrl = '$baseUrl/$maTTNH';
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(ttNhanHang.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      // Cập nhật thành công
+      return true;
+    } else if (response.statusCode == 404) {
+      // Không tìm thấy thông tin nhận hàng
+      print('Không tìm thấy thông tin nhận hàng');
+      return false;
+    } else {
+      // Xử lý lỗi khác
+      print('Lỗi: ${response.statusCode}');
+      return false;
+    }
+  }
+
+  Future<bool> deleteTTNhanHang(String maTTNH) async {
+    final String apiUrl = '$baseUrl/$maTTNH'; // Thay 'your-api-endpoint' bằng URL thực tế của API
+
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      // Xóa thành công
+      return true;
+    } else if (response.statusCode == 404) {
+      // Không tìm thấy thông tin nhận hàng để xóa
+      print('Không tìm thấy thông tin nhận hàng để xóa');
+      return false;
+    } else {
+      // Xử lý lỗi khác
+      print('Lỗi: ${response.statusCode}');
+      return false;
+    }
+  }
 }
