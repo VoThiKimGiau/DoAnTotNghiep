@@ -38,8 +38,6 @@ class ChiTietGioHang {
       'gioHang': maGioHang,
       'sanPham': maCTSP,
       'soLuong': soLuong,
-      'donGia': donGia,
-      'isSelected': isSelected, // Lưu trạng thái isSelected khi cập nhật
     };
   }
 

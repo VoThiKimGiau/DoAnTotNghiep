@@ -56,7 +56,7 @@ class _LoginScreen extends State<LoginScreen> {
           );
         } else {
           String? maKH = khachHang?.maKH;
-          Navigator.push(context,
+          Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => MainScreen(maKH: maKH)));
         }
       } catch (error) {

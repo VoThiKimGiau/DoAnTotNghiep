@@ -21,8 +21,7 @@ class ChiTietGioHangController {
   // Lấy danh sách sản phẩm trong giỏ hàng
   Future<List<ChiTietGioHang>> fetchListProduct(String maGioHang) async {
     final response = await http.get(
-      Uri.parse(
-          '${IpConfig.ipConfig}api/chitietgiohang?maGioHang=$maGioHang'),
+      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang?maGioHang=$maGioHang'),
     );
 
     if (response.statusCode == 200) {
@@ -34,7 +33,8 @@ class ChiTietGioHangController {
   }
 
   // Thêm chi tiết giỏ hàng
-  Future<ChiTietGioHang> themChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
+  Future<ChiTietGioHang> themChiTietGioHang(
+      ChiTietGioHang chiTietGioHang) async {
     print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.post(
       Uri.parse('${IpConfig.ipConfig}api/chitietgiohang'),
@@ -56,7 +56,8 @@ class ChiTietGioHangController {
   // Lấy mã giỏ hàng dựa trên mã khách hàng
   Future<String> fetchMaGioHang(String maKH) async {
     final response = await http.get(
-      Uri.parse('${IpConfig.ipConfig}/api/giohang?khachHang/$maKH'), // Đường dẫn API
+      Uri.parse(
+          '${IpConfig.ipConfig}/api/giohang?khachHang/$maKH'), // Đường dẫn API
     );
 
     if (response.statusCode == 200) {
@@ -68,12 +69,12 @@ class ChiTietGioHangController {
   }
 
   // Update cart
-  Future<ChiTietGioHang> capnhatChiTietGioHang(ChiTietGioHang chiTietGioHang) async {
-    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
+  Future<ChiTietGioHang> capnhatChiTietGioHang(
+      ChiTietGioHang chiTietGioHang) async {
+    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJsonForUpdate())}");
     final response = await http.put(
       Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/update'),
       headers: <String, String>{
-        'accept': '*/*',
         'Content-Type': 'application/json',
       },
       body: json.encode(chiTietGioHang.toJsonForUpdate()),
@@ -90,7 +91,8 @@ class ChiTietGioHangController {
   //Delete item cart
   Future<bool> xoaChiTietGioHang(String maGioHang, String maCTSP) async {
     final response = await http.delete(
-      Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/delete/$maGioHang/$maCTSP'),
+      Uri.parse(
+          '${IpConfig.ipConfig}api/chitietgiohang/delete/$maGioHang/$maCTSP'),
       headers: <String, String>{
         'accept': '*/*',
         'Content-Type': 'application/json',
