@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../config/IpConfig.dart';
 import '../models/TTNhanHang.dart';
@@ -9,7 +10,7 @@ class TTNhanHangController {
   // Lấy thông tin địa chỉ nhận hàng theo mã khách hàng
   Future<List<TTNhanHang>> fetchTTNhanHangByCustomer(String? maKH) async {
     final response =
-    await http.get(Uri.parse('$baseUrl/byCustomer?maKH=$maKH'));
+        await http.get(Uri.parse('$baseUrl/byCustomer?maKH=$maKH'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => TTNhanHang.fromJson(json)).toList();
@@ -21,11 +22,61 @@ class TTNhanHangController {
     }
   }
 
+  Future<TTNhanHang> createTTNhanHangByCustomer(
+      String hoten, diachi, maKH, sdt) async {
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "maTTNH": getRandomString(5),
+        "hoTen": hoten,
+        "diaChi": diachi,
+        "sdt": sdt,
+        "maKH": maKH,
+        "macDinh": false,
+      }),
+    );
+    if (response.statusCode == 201) {
+      final dynamic data = json.decode(utf8.decode(response.bodyBytes));
+      return TTNhanHang.fromJson(data);
+    } else {
+      throw Exception(
+          'Failed to load TTNhanHang. Status code: ${response.statusCode}');
+    }
+  }
+
+  Future<TTNhanHang> updateTTNhanHangByCustomer(
+      String maTTNN, hoten, diachi, maKH, sdt) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/$maTTNN"),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "hoTen": hoten,
+        "diaChi": diachi,
+        "sdt": sdt,
+        "maKH": maKH,
+        "macDinh": false,
+      }),
+    );
+    if (response.statusCode == 200) {
+      final dynamic data = json.decode(utf8.decode(response.bodyBytes));
+      return TTNhanHang.fromJson(data);
+    } else {
+      throw Exception(
+          'Failed to load TTNhanHang. Status code: ${response.statusCode}');
+    }
+  }
+
   // Lấy thông tin địa chỉ nhận hàng theo mã địa chỉ
   Future<TTNhanHang?> fetchTTNhanHang(String maTTNH) async {
     final response = await http.get(Uri.parse('$baseUrl/$maTTNH'));
     if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      final Map<String, dynamic> data =
+          json.decode(utf8.decode(response.bodyBytes));
       return TTNhanHang.fromJson(data);
     } else {
       print('HTTP Error: ${response.statusCode}');
@@ -33,6 +84,20 @@ class TTNhanHangController {
       throw Exception(
           'Failed to load TTNhanHang. Status code: ${response.statusCode}');
     }
+  }
+
+  String getRandomString(int length) {
+    const chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    Random rnd = Random();
+    return String.fromCharCodes(
+      Iterable.generate(
+        length,
+        (_) => chars.codeUnitAt(
+          rnd.nextInt(chars.length),
+        ),
+      ),
+    );
   }
 
   Future<TTNhanHang?> createTTNhanHang(TTNhanHang ttNhanHang) async {
@@ -89,7 +154,8 @@ class TTNhanHangController {
   }
 
   Future<bool> deleteTTNhanHang(String maTTNH) async {
-    final String apiUrl = '$baseUrl/$maTTNH'; // Thay 'your-api-endpoint' bằng URL thực tế của API
+    final String apiUrl =
+        '$baseUrl/$maTTNH'; // Thay 'your-api-endpoint' bằng URL thực tế của API
 
     final response = await http.delete(
       Uri.parse(apiUrl),
