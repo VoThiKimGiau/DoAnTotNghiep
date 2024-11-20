@@ -33,7 +33,6 @@ class _TrangChuScreen extends State<TrangChuScreen> {
   late Future<String> maGioHang;
 
   int selectedCategoryIndex = 0;
-  int? selectedSortIndex;
 
   @override
   void initState() {
@@ -103,23 +102,44 @@ class _TrangChuScreen extends State<TrangChuScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SizedBox(
-                  height: 40,
-                  width: 40,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print('a');
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: 45,
+                  child: GestureDetector(
+                    onTap: () {
+                      showSearch(
+                        context: context,
+                        delegate: CustomSearch(
+                          maKH: widget.maKhachHang,
+                        ),
+                      );
                     },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.zero,
+                    child: AbsorbPointer(
+                      // Prevents the text field from gaining focus
+                      child: TextField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFDDDDDD),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide:
+                                const BorderSide(color: Colors.transparent),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide:
+                                const BorderSide(color: Colors.transparent),
+                          ),
+                          prefixIcon: Image.asset('assets/icons/search.png'),
+                          hintText: 'Tìm kiếm',
+                          hintStyle: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
                     ),
-                    child: Image.asset('assets/icons/account_icon.png'),
                   ),
                 ),
-                const Text('CỬA HÀNG GIA DỤNG HUIT',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primaryColor,
-                        fontSize: 18)),
                 SizedBox(
                   width: 40,
                   height: 40,
@@ -145,55 +165,14 @@ class _TrangChuScreen extends State<TrangChuScreen> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.only(top: 24, left: 24, right: 24),
-            child: GestureDetector(
-              onTap: () {
-                showSearch(
-                  context: context,
-                  delegate: CustomSearch(
-                    maKH: widget.maKhachHang,
-                    onSortSelected: (index) {
-                      setState(() {
-                        selectedSortIndex = index; // Update selected sort index
-                      });
-                    },
-                  ),
-                );
-              },
-              child: AbsorbPointer(
-                // Prevents the text field from gaining focus
-                child: TextField(
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color(0xFFF4F4F4),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.transparent),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(color: Colors.transparent),
-                    ),
-                    prefixIcon: Image.asset('assets/icons/search.png'),
-                    hintText: 'Tìm kiếm',
-                    hintStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 14),
+            margin: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 const Text('Danh mục',
                     style: TextStyle(
                         fontFamily: 'Gabarito',
-                        fontSize: 22,
+                        fontSize: 19,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primaryColor)),
                 TextButton(
@@ -207,84 +186,179 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                     },
                     child: const Text(
                       'Xem tất cả',
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      style: TextStyle(color: Colors.black, fontSize: 15),
                     ))
               ],
             ),
           ),
           Container(
-            height: 120,
-            margin: const EdgeInsets.only(bottom: 25),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: items!.length >= 5 ? 5 : items!.length,
-              itemBuilder: (context, index) {
-                bool isSelected = selectedCategoryIndex == index;
-                return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedCategoryIndex = index;
-                      });
-                    },
-                    child: Container(
-                      width: 140,
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primaryColor
-                            : Colors.transparent,
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primaryColor
-                              : Colors.transparent,
-                          width: isSelected ? 2 : 1,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            child: SizedBox(
+              height: items!.length >= 10 ? 170 : 90,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: List.generate(
+                        8,
+                            (colIndex) {
+                          int itemIndex = colIndex;
+
+                          if (itemIndex >= items!.length) return Container();
+
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedCategoryIndex = itemIndex;
+                              });
+                            },
+                            child: Container(
+                              width: 90,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: selectedCategoryIndex == itemIndex
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                                border: Border.all(
+                                  color: selectedCategoryIndex == itemIndex
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  width: selectedCategoryIndex == itemIndex ? 2 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: selectedCategoryIndex == itemIndex
+                                    ? [
+                                  BoxShadow(
                                     color: Colors.black.withOpacity(0.5),
-                                    blurRadius: 5)
-                              ]
-                            : [],
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: CircleAvatar(
-                                radius: 30,
-                                child: ClipOval(
-                                  child: Image.network(
-                                    items![index].anhDanhMuc,
-                                    fit: BoxFit.cover,
-                                    width: 60,
-                                    height: 60,
+                                    blurRadius: 5,
                                   ),
+                                ]
+                                    : [],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start, // Align items at the top
+                                children: [
+                                  SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: CircleAvatar(
+                                      radius: 15,
+                                      child: ClipOval(
+                                        child: Image.network(
+                                          items![itemIndex].anhDanhMuc,
+                                          fit: BoxFit.cover,
+                                          width: 40,
+                                          height: 40,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    items![itemIndex].tenDanhMuc,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10,
+                                      color: selectedCategoryIndex == itemIndex
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (items!.length >= 10)
+                      SizedBox(height: 5,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: List.generate(
+                          6,
+                              (colIndex) {
+                            int itemIndex = 6 + colIndex;
+
+                            if (itemIndex >= items!.length) return Container();
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedCategoryIndex = itemIndex;
+                                });
+                              },
+                              child: Container(
+                                width: 90,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: selectedCategoryIndex == itemIndex
+                                      ? AppColors.primaryColor
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                    color: selectedCategoryIndex == itemIndex
+                                        ? AppColors.primaryColor
+                                        : Colors.transparent,
+                                    width: selectedCategoryIndex == itemIndex ? 2 : 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: selectedCategoryIndex == itemIndex
+                                      ? [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.5),
+                                      blurRadius: 5,
+                                    ),
+                                  ]
+                                      : [],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start, // Align items at the top
+                                  children: [
+                                    SizedBox(
+                                      width: 40,
+                                      height: 40,
+                                      child: CircleAvatar(
+                                        radius: 15,
+                                        child: ClipOval(
+                                          child: Image.network(
+                                            items![itemIndex].anhDanhMuc,
+                                            fit: BoxFit.cover,
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      items![itemIndex].tenDanhMuc,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                        color: selectedCategoryIndex == itemIndex
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              items![index].tenDanhMuc,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: isSelected ? Colors.white : Colors.black,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
-                    ));
-              },
+                  ],
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -301,9 +375,13 @@ class _TrangChuScreen extends State<TrangChuScreen> {
                   return const Center(child: Text('No products available.'));
                 }
 
-                return GridViewSanPham(
-                  itemsSP: snapshot.data!,
-                  maKH: widget.maKhachHang,
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  color: const Color(0xFFf8f8ff),
+                  child: GridViewSanPham(
+                    itemsSP: snapshot.data!,
+                    maKH: widget.maKhachHang,
+                  ),
                 );
               },
             ),
@@ -319,11 +397,10 @@ class CustomSearch extends SearchDelegate {
   final String? maKH;
 
   int? selectedSortIndex;
-  final Function(int) onSortSelected;
 
   List<SanPham> searchResults = [];
 
-  CustomSearch({this.maKH, required this.onSortSelected});
+  CustomSearch({this.maKH});
 
   Future<List<SanPham>> fetchSP() async {
     try {
@@ -395,6 +472,10 @@ class CustomSearch extends SearchDelegate {
                 item.tenSP.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
+        if (searchResults.isEmpty) {
+          return _buildNoResults(context);
+        }
+
         if (selectedSortIndex != null) {
           if (selectedSortIndex == 2) {
             searchResults.sort((a, b) => a.giaMacDinh.compareTo(b.giaMacDinh));
@@ -403,8 +484,15 @@ class CustomSearch extends SearchDelegate {
           }
         }
 
-        if (searchResults.isEmpty) {
-          return _buildNoResults(context);
+        Future<void> navigateToSort() async {
+          final result = await CustomBottomSheet.show(context,
+              onSortSelected: (index) {
+                selectedSortIndex = index;
+              });
+
+          if (result == true) {
+            _buildSearchResults(context);
+          }
         }
 
         return SafeArea(
@@ -423,11 +511,7 @@ class CustomSearch extends SearchDelegate {
                     height: 45,
                     child: ElevatedButton(
                       onPressed: () {
-                        CustomBottomSheet.show(context,
-                            onSortSelected: (index) {
-                          selectedSortIndex = index;
-                          showResults(context);
-                        });
+                        navigateToSort();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
@@ -565,12 +649,12 @@ class CustomSearch extends SearchDelegate {
 }
 
 class CustomBottomSheet {
-  static void show(BuildContext context,
+  static Future<bool?> show(BuildContext context,
       {required Function(int) onSortSelected}) {
     List<String> data = ['Gợi ý', 'Mới nhất', 'Giá tăng dần', 'Giá giảm dần'];
-    int selectedIndex = -1; // Initialize selected index
+    int selectedIndex = -1;
 
-    showModalBottomSheet(
+    return showModalBottomSheet<bool>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
@@ -590,9 +674,7 @@ class CustomBottomSheet {
               width: double.infinity,
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -601,6 +683,7 @@ class CustomBottomSheet {
                           setState(() {
                             selectedIndex = -1;
                           });
+                          Navigator.pop(context, true);
                         },
                         child: const Text(
                           'Clear',
@@ -617,7 +700,7 @@ class CustomBottomSheet {
                       ),
                       ElevatedButton.icon(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                         style: ElevatedButton.styleFrom(
                           shadowColor: Colors.transparent,
@@ -630,9 +713,7 @@ class CustomBottomSheet {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
                   Expanded(
                     child: ListView.builder(
                       itemCount: data.length,
@@ -642,13 +723,12 @@ class CustomBottomSheet {
                             setState(() {
                               selectedIndex = index;
                               onSortSelected(index);
-                              Navigator.pop(context);
+                              Navigator.pop(context, true);
                             });
                           },
                           child: Container(
                             height: 50,
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 24),
+                            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             decoration: BoxDecoration(
                               color: selectedIndex == index
@@ -674,8 +754,7 @@ class CustomBottomSheet {
                                   ),
                                 ),
                                 if (selectedIndex == index)
-                                  const Icon(Icons.check,
-                                      color: Colors.white, size: 20),
+                                  const Icon(Icons.check, color: Colors.white, size: 20),
                               ],
                             ),
                           ),
@@ -689,6 +768,6 @@ class CustomBottomSheet {
           },
         );
       },
-    );
+    ).then((value) => value ?? false);
   }
 }

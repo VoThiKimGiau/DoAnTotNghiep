@@ -19,8 +19,8 @@ class SanPhamItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(right: 12),
-      height: 250,
-      width: 160,
+      height: 150,
+      width: 170,
       child: Stack(
         children: [
           Card(
@@ -32,32 +32,34 @@ class SanPhamItem extends StatelessWidget {
                       service.getImageUrl(item.hinhAnhMacDinh),
                       fit: BoxFit.cover,
                       width: 160,
-                      height: 190,
+                      height: 170,
                     ),
                   ),
                   Container(
-                      margin: const EdgeInsets.only(left: 10),
-                      height: 45,
+                      margin: const EdgeInsets.only(left: 10, top: 5),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           item.tenSP,
                           textAlign: TextAlign.left,
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black, fontSize: 15),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )),
                   Container(
                     margin: const EdgeInsets.only(left: 10, bottom: 12),
-                    height: 15,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         sharedFunction.formatCurrency(item.giaMacDinh),
                         textAlign: TextAlign.left,
                         style: const TextStyle(
-                            color: Colors.black,
+                            color: Colors.red,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Gabarito'),
+                            fontFamily: 'Gabarito',
+                          fontSize: 15
+                        ),
                       ),
                     ),
                   ),

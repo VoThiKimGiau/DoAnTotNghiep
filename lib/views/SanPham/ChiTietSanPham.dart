@@ -176,7 +176,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
             children: [
               Container(
                 height: 50,
-                margin: const EdgeInsets.only(top: 63),
+                margin: const EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -253,10 +253,10 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                       itemBuilder: (context, index) {
                                         return Container(
                                           margin: const EdgeInsets.only(
-                                              top: 24,
-                                              bottom: 24,
-                                              left: 24,
-                                              right: 10),
+                                              top: 5,
+                                              bottom: 10,
+                                              left: 15,
+                                              right: 5),
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(8.0),
@@ -264,8 +264,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                               storageService
                                                   .getImageUrl(dsHinhSP[index]),
                                               fit: BoxFit.cover,
-                                              width: 160,
-                                              height: 250,
+                                              width: 200,
+                                              height: 200,
                                             ),
                                           ),
                                         );
@@ -327,21 +327,22 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                   child: Text(
                                     'Sản phẩm tương tự ',
                                     style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         fontFamily: 'Gabarito'),
                                   ),
                                 )),
                             Container(
-                                height: 280,
+                                height: 440,
                                 margin: const EdgeInsets.only(left: 24),
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: itemsSP != null
-                                      ? (itemsSP!.length >= 5
-                                          ? 5
-                                          : itemsSP!.length)
-                                      : 0,
+                                child: GridView.builder(
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2, // Number of columns
+                                    crossAxisSpacing: 5, // Spacing between columns
+                                    mainAxisSpacing: 5, // Spacing between rows
+                                    childAspectRatio: 0.8, // Aspect ratio of each cell
+                                  ),
+                                  itemCount: itemsSP!.length,
                                   itemBuilder: (context, index) {
                                     bool isFavoriteLV = dsSPYT.any((spyt) =>
                                         spyt.maSanPham == itemsSP![index].maSP);
@@ -380,9 +381,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                                 'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
                                           }
 
-                                          // Cập nhật lại trạng thái yêu thích
                                           setState(() {
-                                            // Cập nhật trạng thái yêu thích của sản phẩm
                                             isFavorite = !isFavorite;
                                           });
                                         },
@@ -390,77 +389,76 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                     );
                                   },
                                 )),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    CustomBottomSheet.show(
-                                      context,
-                                      "Đặt hàng",
-                                      dsCTSP,
-                                      dsMauSP,
-                                      dsKichCo,
-                                      _quantity,
-                                      maSanPham ?? '',
-                                      maGH ?? '',
-                                      item!.hinhAnhMacDinh ?? '',
-                                      item!.giaMacDinh ?? 0,
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                  ),
-                                  child: const Text(
-                                    'Đặt hàng',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 16),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 15),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    CustomBottomSheet.show(
-                                      context,
-                                      "Thêm vào giỏ hàng",
-                                      dsCTSP,
-                                      dsMauSP,
-                                      dsKichCo,
-                                      _quantity,
-                                      maSanPham ?? '',
-                                      maGH ?? '',
-                                      item!.hinhAnhMacDinh ?? '',
-                                      item!.giaMacDinh ?? 0,
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primaryColor,
-                                  ),
-                                  child: const Text(
-                                    'Thêm vào giỏ hàng',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
                         ),
             ],
           ),
+        ),
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 40,
+        child: Row(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                CustomBottomSheet.show(
+                  context,
+                  "Thêm vào giỏ hàng",
+                  dsCTSP,
+                  dsMauSP,
+                  dsKichCo,
+                  _quantity,
+                  maSanPham ?? '',
+                  maGH ?? '',
+                  item!.hinhAnhMacDinh ?? '',
+                  item!.giaMacDinh ?? 0,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+                padding: EdgeInsets.zero,
+              ),
+              child: Image.asset(
+                'assets/icons/cart_plus_icon.png',
+                height: 40,
+                width: 40,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  CustomBottomSheet.show(
+                    context,
+                    "Mua ngay",
+                    dsCTSP,
+                    dsMauSP,
+                    dsKichCo,
+                    _quantity,
+                    maSanPham ?? '',
+                    maGH ?? '',
+                    item!.hinhAnhMacDinh ?? '',
+                    item!.giaMacDinh ?? 0,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(double.infinity, 40),
+                ),
+                child: const Text(
+                  'Mua ngay',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -43,14 +43,12 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
 
   Future<void> fetchSP() async {
     try {
-      SanPham fetchedItems =
-      await sanPhamController.getProductByMaSP(widget.maSP);
+      SanPham fetchedItems = await sanPhamController.getProductByMaSP(widget.maSP);
       setState(() {
         itemSP = fetchedItems;
         isLoading = false;
         tenSPController.text = itemSP!.tenSP;
-        hinhAnhController.text =
-            storageService.getImageUrl(itemSP!.hinhAnhMacDinh);
+        hinhAnhController.text = storageService.getImageUrl(itemSP!.hinhAnhMacDinh);
         moTaController.text = itemSP!.moTa;
         selectedCategory = itemSP!.danhMuc;
         giaMacDinhController.text = itemSP!.giaMacDinh.toString();
@@ -73,6 +71,10 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
           dsDanhMuc = fetchedItems;
           dsTenDM = dsDanhMuc!.map((dm) => dm.tenDanhMuc).toSet().toList();
           isLoading = false;
+
+          if (!dsTenDM.contains(selectedCategory)) {
+            selectedCategory = dsTenDM.isNotEmpty ? dsTenDM.first : null;
+          }
         });
       }
     } catch (e) {
@@ -102,7 +104,6 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
         giaMacDinh: double.tryParse(giaMacDinhController.text) ?? 0.0,
       );
       await sanPhamController.updateProduct(itemSP!.maSP, updatedSP);
-      Navigator.pop(context); // Optionally navigate back
     } catch (e) {
       print('Error saving changes: $e');
     }
@@ -117,8 +118,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
           child: Column(
             children: [
               Container(
-                margin:
-                const EdgeInsets.symmetric(horizontal: 17, vertical: 25),
+                margin: const EdgeInsets.symmetric(horizontal: 17, vertical: 25),
                 child: Row(
                   children: [
                     SizedBox(
@@ -138,16 +138,14 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                     const SizedBox(width: 50),
                     const Text(
                       'SỬA SẢN PHẨM',
-                      style:
-                      TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               ),
               Container(
-                margin:
-                const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
+                margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
                 child: isLoading
                     ? const Center(
                   child: CircularProgressIndicator(),
@@ -156,8 +154,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                   children: [
                     Center(
                       child: Image.network(
-                        storageService
-                            .getImageUrl(itemSP!.hinhAnhMacDinh),
+                        storageService.getImageUrl(itemSP!.hinhAnhMacDinh),
                       ),
                     ),
                     TextField(
