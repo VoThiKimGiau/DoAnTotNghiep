@@ -8,6 +8,7 @@ import 'package:datn_cntt304_bandogiadung/main.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/TrangChuQuanLy.dart';
+import 'package:flutter/services.dart';
 import '../../models/KhachHang.dart';
 import '../../models/NhanVien.dart';
 
@@ -29,6 +30,7 @@ class _LoginScreen extends State<LoginScreen> {
   late NhanVienController nhanVienController;
   late NhanVien? nhanVien;
   String? maNV="";
+  final filterSpace = FilteringTextInputFormatter.deny(RegExp(r'\s'));
 
   @override
   void initState() {
@@ -107,22 +109,58 @@ class _LoginScreen extends State<LoginScreen> {
                     const EdgeInsets.only(left: 24.0, top: 39.0, right: 24.0),
                 child: Column(
                   children: [
-                    TextField(
-                      controller: tenTKController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Tài khoản',
-                      ),
-                    ),
                     Container(
-                      margin: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: TextField(
-                        controller: matKhauController,
-                        obscureText: true, // Hide password text
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Mật khẩu',
-                        ),
+                      margin: const EdgeInsets.only(left: 2.0, top: 39.0, right: 2.0),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: tenTKController,
+                            // Thêm các formatters để ngăn space
+                            inputFormatters: [filterSpace],
+                            // Thêm onChanged để xử lý khi text thay đổi
+                            onChanged: (value) {
+                              // Loại bỏ khoảng trắng và cập nhật giá trị
+                              final noSpaceText = value.replaceAll(' ', '');
+                              if (noSpaceText != value) {
+                                tenTKController.text = noSpaceText;
+                                // Di chuyển con trỏ về cuối text
+                                tenTKController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: noSpaceText.length),
+                                );
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Tài khoản',
+                              // Thêm helperText để hướng dẫn người dùng
+                              helperStyle: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: TextField(
+                              controller: matKhauController,
+                              obscureText: true,
+                              // Thêm các formatters để ngăn space cho password
+                              inputFormatters: [filterSpace],
+                              // Thêm onChanged để xử lý khi text thay đổi
+                              onChanged: (value) {
+                                final noSpaceText = value.replaceAll(' ', '');
+                                if (noSpaceText != value) {
+                                  matKhauController.text = noSpaceText;
+                                  matKhauController.selection = TextSelection.fromPosition(
+                                    TextPosition(offset: noSpaceText.length),
+                                  );
+                                }
+                              },
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: 'Mật khẩu',
+                                helperStyle: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

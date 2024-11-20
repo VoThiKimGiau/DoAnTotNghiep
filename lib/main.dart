@@ -1,5 +1,7 @@
+import 'package:datn_cntt304_bandogiadung/services/storage/notification_service.dart';
 import 'package:datn_cntt304_bandogiadung/views/TrangChu/TrangChu.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +19,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  await Firebase.initializeApp();
+  await NotificationService.instance.initialize();
   runApp(MyApp());
 }
 
