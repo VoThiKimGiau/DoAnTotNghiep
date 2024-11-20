@@ -5,20 +5,22 @@ import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:http/http.dart' as http;
 
 import 'NhanVienController.dart';
-class ChiTietSPController{
-  final baseUrl="${IpConfig.ipConfig}";
-  Future<ChiTietSP> layCTSPTheoMa(String maCTSP) async
-  {
-   final response=await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp/detail/mactsp?maCTSP=$maCTSP'));
-   if(response.statusCode==200)
-     {
-       return ChiTietSP.fromJson(json.decode(response.body));
-     }
-   else
-     throw Exception("Lỗi khi lay san pham");
+
+class ChiTietSPController {
+  final baseUrl = "${IpConfig.ipConfig}";
+
+  Future<ChiTietSP> layCTSPTheoMa(String maCTSP) async {
+    final response = await http.get(Uri.parse(
+        '${IpConfig.ipConfig}api/chitietsp/detail/mactsp?maCTSP=$maCTSP'));
+    if (response.statusCode == 200) {
+      return ChiTietSP.fromJson(json.decode(response.body));
+    } else
+      throw Exception("Lỗi khi lay san pham");
   }
+
   Future<List<ChiTietSP>> layDanhSachCTSPTheoMaSP(String maSP) async {
-    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp/detail?maSanPham=$maSP'));
+    final response = await http.get(
+        Uri.parse('${IpConfig.ipConfig}api/chitietsp/detail?maSanPham=$maSP'));
 
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
@@ -29,6 +31,7 @@ class ChiTietSPController{
       throw Exception("Lỗi khi lấy sản phẩm");
     }
   }
+
   Future<List<ChiTietSP>> fetchAllChiTietSPByMaNCC(String maNCC) async {
     List<ChiTietSP> allChiTietSPs = [];
     int page = 0;
@@ -36,14 +39,16 @@ class ChiTietSPController{
     bool hasNextPage = true;
 
     while (hasNextPage) {
-      final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/chitietsp?page=$page&size=$pageSize&maNCC=$maNCC'));
+      final response = await http.get(Uri.parse(
+          '${IpConfig.ipConfig}api/chitietsp?page=$page&size=$pageSize&maNCC=$maNCC'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = json.decode(response.body)['data'];
 
         // Parse danh sách sản phẩm từ API
         List<dynamic> jsonList = jsonResponse['items'];
-        List<ChiTietSP> chiTietSPPage = jsonList.map((json) => ChiTietSP.fromJson(json)).toList();
+        List<ChiTietSP> chiTietSPPage =
+            jsonList.map((json) => ChiTietSP.fromJson(json)).toList();
 
         // Thêm dữ liệu trang vào danh sách tổng
         allChiTietSPs.addAll(chiTietSPPage);
@@ -58,16 +63,18 @@ class ChiTietSPController{
 
     return allChiTietSPs;
   }
+
   Future<int> getTotalSlKho() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
     if (token == null) {
       throw Exception("Token không tồn tại");
     }
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-slkho'),headers: {
-    'Authorization': 'Bearer $token'});
+    final response = await http.get(
+        Uri.parse('${baseUrl}api/chitietsp/tong-slkho'),
+        headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return int.parse(response.body);
     } else {
@@ -77,7 +84,7 @@ class ChiTietSPController{
 
   // Get total inventory value
   Future<double> getTotalInventoryValue() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -85,9 +92,9 @@ class ChiTietSPController{
       throw Exception("Token không tồn tại");
     }
 
-
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-ton'),headers: {
-    'Authorization': 'Bearer $token'});
+    final response = await http.get(
+        Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-ton'),
+        headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -97,7 +104,7 @@ class ChiTietSPController{
 
   // Get total sold inventory value
   Future<double> getTotalSoldValue() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -105,10 +112,9 @@ class ChiTietSPController{
       throw Exception("Token không tồn tại");
     }
 
-
-
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-da-ban'),headers: {
-    'Authorization': 'Bearer $token'});
+    final response = await http.get(
+        Uri.parse('${baseUrl}api/chitietsp/tong-gia-tri-da-ban'),
+        headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       return double.parse(response.body);
     } else {
@@ -118,7 +124,7 @@ class ChiTietSPController{
 
   // Get total number of products below stock threshold
   Future<int> getItemsWithLowInventory(int threshold) async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -126,9 +132,10 @@ class ChiTietSPController{
       throw Exception("Token không tồn tại");
     }
 
-
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'),headers: {
-      'Authorization': 'Bearer $token'});
+    final response = await http.get(
+        Uri.parse(
+            '${baseUrl}api/chitietsp/duoi-nguong-ton-kho?threshold=$threshold'),
+        headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;
@@ -139,7 +146,7 @@ class ChiTietSPController{
 
   // Get total number of products available for sale
   Future<int> getAvailableItems() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -147,8 +154,9 @@ class ChiTietSPController{
       throw Exception("Token không tồn tại");
     }
 
-    final response = await http.get(Uri.parse('${baseUrl}api/chitietsp/con-ton-kho'),headers: {
-    'Authorization': 'Bearer $token'});
+    final response = await http.get(
+        Uri.parse('${baseUrl}api/chitietsp/con-ton-kho'),
+        headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       List<dynamic> items = jsonDecode(response.body);
       return items.length;
@@ -156,8 +164,10 @@ class ChiTietSPController{
       throw Exception('Failed to load available items');
     }
   }
+
   Future<List<dynamic>> fetchChiTietSPByCategory(String maDanhMuc) async {
-    final url = Uri.parse("${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc");
+    final url =
+        Uri.parse("${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc");
 
     try {
       final response = await http.get(url);
@@ -192,6 +202,7 @@ class ChiTietSPController{
       return [];
     }
   }
+
   Future<List<ChiTietSP>> fetchChiTietSP(String maDM, String maNCC) async {
     final url = Uri.parse('${baseUrl}api/chitietsp/madm/$maDM/mancc/$maNCC');
     final response = await http.get(url);
@@ -203,8 +214,9 @@ class ChiTietSPController{
       throw Exception('Failed to load ChiTietSP');
     }
   }
+
   Future<List<ChiTietSP>> fetchLowQuantity() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -213,9 +225,12 @@ class ChiTietSPController{
     }
 
     final url = Uri.parse('${baseUrl}api/chitietsp/low-stock');
-    final response = await http.get(url, headers: {
-      'Authorization': 'Bearer $token',
-    },);
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       // Decode the JSON response into a List of ChiTietSP objects
       List<dynamic> jsonList = json.decode(response.body);
@@ -224,12 +239,13 @@ class ChiTietSPController{
       throw Exception('Failed to load ChiTietSP');
     }
   }
-  Future<List<ChiTietSP>> locChiTietSPTheoDanhMuc(List<ChiTietSP> danhSachChiTietSP, String maDanhMuc) async {
+
+  Future<List<ChiTietSP>> locChiTietSPTheoDanhMuc(
+      List<ChiTietSP> danhSachChiTietSP, String maDanhMuc) async {
     try {
       // Gọi API để lấy danh sách chi tiết sản phẩm theo danh mục
-      final response = await http.get(
-          Uri.parse('${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc')
-      );
+      final response = await http.get(Uri.parse(
+          '${baseUrl}api/chitietsp/by-category?maDanhMuc=$maDanhMuc'));
 
       if (response.statusCode == 200) {
         // Parse response thành List các mã sản phẩm thuộc danh mục
@@ -250,27 +266,26 @@ class ChiTietSPController{
       return [];
     }
   }
-  // Thêm vào ChiTietSPController
-  Future<List<ChiTietSP>> filterLowQuantityProducts(
-      List<ChiTietSP> products,
-      {String? maDanhMuc, String? maNCC}) async {
 
+  // Thêm vào ChiTietSPController
+  Future<List<ChiTietSP>> filterLowQuantityProducts(List<ChiTietSP> products,
+      {String? maDanhMuc, String? maNCC}) async {
     List<ChiTietSP> results = products;
 
     if (maDanhMuc != null) {
       // Lấy danh sách mã sản phẩm thuộc danh mục
-      List<dynamic> categoryProducts = await fetchChiTietSPByCategory(maDanhMuc);
-      Set<String> categoryProductIds = categoryProducts
-          .map((item) => item['maSanPham'].toString())
-          .toSet();
+      List<dynamic> categoryProducts =
+          await fetchChiTietSPByCategory(maDanhMuc);
+      Set<String> categoryProductIds =
+          categoryProducts.map((item) => item['maSanPham'].toString()).toSet();
 
-      results = results.where((product) =>
-          categoryProductIds.contains(product.maSP)).toList();
+      results = results
+          .where((product) => categoryProductIds.contains(product.maSP))
+          .toList();
     }
 
     if (maNCC != null) {
-      results = results.where((product) =>
-      product.maNCC == maNCC).toList();
+      results = results.where((product) => product.maNCC == maNCC).toList();
     }
 
     return results;

@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -25,11 +26,13 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
   final TTNhanHangController controller =
       TTNhanHangController(); // Khởi tạo controller
   List<TTNhanHang> shippingAddresses = []; // Danh sách địa chỉ nhận hàng
+  List<TTNhanHang> dsTT = [];
 
   @override
   void initState() {
     super.initState();
     _loadShippingAddresses();
+    getAllTTNH();
   }
 
   Future<void> _loadShippingAddresses() async {
@@ -38,11 +41,14 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
           await controller.fetchTTNhanHangByCustomer(widget.maKH);
 
       setState(() {
-        shippingAddresses =
-            addresses; // Cập nhật danh sách địa chỉ nhận hàng và cập nhật giao diện
+        shippingAddresses = addresses;
+
         currentSelectedAddress = addresses.isNotEmpty
-            ? addresses.first
-            : widget.selectedAddress; // Đặt địa chỉ mặc định nếu có
+            ? addresses.firstWhere(
+              (address) => address.macDinh == true,
+          orElse: () => addresses.first,
+        )
+            : widget.selectedAddress;
       });
     } catch (e) {
       print('Error loading shipping addresses: $e');
@@ -50,73 +56,139 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
     }
   }
 
+  Future<void> getAllTTNH() async {
+    try {
+      List<TTNhanHang> fetchItems = await controller.getAllTTNhanHang();
+      setState(() {
+        dsTT = fetchItems;
+
+      });
+    } catch (error) {
+      print('Error adding delivery address: $error');
+    }
+  }
+
+  int getMaxID(List<TTNhanHang> dsTTNH) {
+    int maxId = 0;
+    for (TTNhanHang tt in dsTTNH) {
+      if (tt.maTTNH!.startsWith('TT')) {
+        int id = int.parse(tt.maTTNH!.substring(2));
+        if (id > maxId) {
+          maxId = id;
+        }
+      }
+    }
+    return maxId;
+  }
+
+  String generateTTNhanHangCode(List<TTNhanHang> dsTTNH) {
+    int currentMaxId = getMaxID(dsTTNH);
+    currentMaxId++;
+    return 'TT$currentMaxId';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chọn địa chỉ nhận hàng'),
+        title: const Text('Chọn địa chỉ nhận hàng'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context, currentSelectedAddress),
         ),
       ),
       body: shippingAddresses.isEmpty
-          ? Center(child: Text('No shipping addresses available.'))
+          ? const Center(child: Text('No shipping addresses available.'))
           : ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: shippingAddresses.length + 1,
+        itemBuilder: (context, index) {
+          if (index == shippingAddresses.length) {
+            return ElevatedButton.icon(
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              label: const Text(
+                'Thêm địa chỉ mới',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () => _showAddressForm(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+            );
+          }
+
+          final address = shippingAddresses[index];
+          final isSelected = address == currentSelectedAddress;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                currentSelectedAddress = address;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
-              itemCount: shippingAddresses.length + 1,
-              itemBuilder: (context, index) {
-                if (index == shippingAddresses.length) {
-                  return ElevatedButton.icon(
-                    icon: Icon(Icons.add),
-                    label: Text('Thêm địa chỉ mới'),
-                    onPressed: () => _showAddressForm(context),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50),
-                    ),
-                  );
-                }
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue[50] : Colors.grey[200],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: isSelected ? Colors.blue : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${address.hoTen} | ${address.sdt}',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Gabarito',
+                        fontSize: 15),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(address.diaChi),
+                  const SizedBox(height: 8),
 
-                final address = shippingAddresses[index];
-                final isSelected = address == currentSelectedAddress;
-
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      currentSelectedAddress = address;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isSelected ? Colors.blue[50] : Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isSelected ? Colors.blue : Colors.transparent,
-                        width: 2,
+                  if (address.macDinh == true)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(color: Colors.red),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'Mặc định',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${address.hoTen} | ${address.sdt}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(address.diaChi),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => _showAddressForm(context, address),
-                          child: Text('Chỉnh sửa'),
-                        ),
-                      ],
+
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () => _showAddressForm(context, address),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                    ),
+                    child: const Text(
+                      'Chỉnh sửa',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
+          );
+        },
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
@@ -125,8 +197,9 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 50),
+            backgroundColor: AppColors.primaryColor,
           ),
-          child: const Text('Xác nhận'),
+          child: const Text('Xác nhận', style: TextStyle(color: Colors.white),),
         ),
       ),
     );
@@ -162,18 +235,18 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: 'Tên'),
+                decoration: const InputDecoration(labelText: 'Tên'),
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: phoneController,
-                decoration: InputDecoration(labelText: 'Số điện thoại'),
+                decoration: const InputDecoration(labelText: 'Số điện thoại'),
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 10),
               TextField(
                 controller: addressController,
-                decoration: InputDecoration(labelText: 'Địa chỉ'),
+                decoration: const InputDecoration(labelText: 'Địa chỉ'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -187,6 +260,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                           phoneController.text,
                         )
                       : await controller.createTTNhanHangByCustomer(
+                          generateTTNhanHangCode(dsTT),
                           nameController.text,
                           addressController.text,
                           widget.maKH,
@@ -197,7 +271,10 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
 
                   Navigator.pop(context);
                 },
-                child: Text(isEditing ? 'Cập nhật' : 'Thêm mới'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                ),
+                child: Text(isEditing ? 'Cập nhật' : 'Thêm mới', style: TextStyle(color: Colors.white),),
               ),
             ],
           ),

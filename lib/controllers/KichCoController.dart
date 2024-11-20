@@ -10,7 +10,8 @@ class KichCoController
     final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/kich-cos/$maKichCo'));
     if(response.statusCode==200)
       {
-        final Map<String,dynamic> jsonRequeue=json.decode(response.body);
+        final String responseBody = utf8.decode(response.bodyBytes);
+        final Map<String, dynamic> jsonRequeue = json.decode(responseBody);
         return jsonRequeue['tenKichCo'];
       }
     else

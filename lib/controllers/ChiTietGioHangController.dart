@@ -71,13 +71,13 @@ class ChiTietGioHangController {
   // Update cart
   Future<ChiTietGioHang> capnhatChiTietGioHang(
       ChiTietGioHang chiTietGioHang) async {
-    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJsonForUpdate())}");
+    print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.put(
       Uri.parse('${IpConfig.ipConfig}api/chitietgiohang/update'),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
-      body: json.encode(chiTietGioHang.toJsonForUpdate()),
+      body: json.encode(chiTietGioHang.toJson()),
     );
 
     if (response.statusCode == 200) {

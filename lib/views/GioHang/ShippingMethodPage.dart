@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:flutter/material.dart';
 
 class ShippingMethodPage extends StatefulWidget {
@@ -21,7 +22,9 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('Chọn phương thức vận chuyển'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -58,10 +61,11 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
           onPressed: () {
             Navigator.pop(context, selectedShipping);
           },
-          child: Text('Tiếp tục'),
           style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
             minimumSize: Size(double.infinity, 50),
           ),
+          child: const Text('Tiếp tục', style: TextStyle(color: Colors.white, fontSize: 16),),
         ),
       ),
     );

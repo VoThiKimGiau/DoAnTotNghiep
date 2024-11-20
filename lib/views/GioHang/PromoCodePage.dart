@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:datn_cntt304_bandogiadung/views/GioHang/Widgets/promotion_item.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,9 @@ class _PromoCodePageState extends State<PromoCodePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text('Chọn mã khuyến mãi'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -63,10 +66,11 @@ class _PromoCodePageState extends State<PromoCodePage> {
           onPressed: () {
             Navigator.pop(context, selectedCode); // Trả về mã đã chọn
           },
-          child: Text('Tiếp tục'),
           style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
             minimumSize: Size(double.infinity, 50),
           ),
+          child: const Text('Tiếp tục', style: TextStyle(color: Colors.white, fontSize: 16),),
         ),
       ),
     );

@@ -1,9 +1,16 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietDonHang.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/KMKH.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
+import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:flutter/material.dart';
+import '../../controllers/KichCoController.dart';
+import '../../controllers/MauSPController.dart';
+import '../../services/shared_function.dart';
 import 'PaymentMethodPage.dart';
 import 'PromoCodePage.dart';
 import 'SelectAddressPage.dart';
@@ -13,13 +20,15 @@ import '../../controllers/TTNhanHangController.dart';
 import '../../models/TTNhanHang.dart';
 
 class CheckoutPage extends StatefulWidget {
-  final double totalAmount;
-  final String? customerId; // Thêm tham số cho mã khách hàng
+  final List<ChiTietSP> dsSP;
+  final String? customerId;
+  final List<int> slMua;
 
   const CheckoutPage({
     super.key,
-    required this.totalAmount,
+    required this.dsSP,
     required this.customerId,
+    required this.slMua,
   }); // Cập nhật constructor
 
   @override
@@ -42,8 +51,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   List<TTNhanHang> shippingAddresses = [];
   TTNhanHang? selectedAddress;
-  final TTNhanHangController controller =
-      TTNhanHangController(); // Khởi tạo controller
+  final TTNhanHangController controller = TTNhanHangController();
 
   GiaoHangController giaoHangController = GiaoHangController();
   double? soKM = 0;
@@ -51,12 +59,38 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String? destination;
   static const String APIKEY = '8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY';
 
+  SanPhamController sanPhamController = SanPhamController();
+  String? tenSP;
+
+  MauSPController mauSPController = MauSPController();
+  KichCoController kichCoController = KichCoController();
+
   @override
   void initState() {
     super.initState();
     _loadShippingAddresses(); // Tải địa chỉ giao hàng
     _loadPromotion();
     loadKMShip();
+  }
+
+  Future<String?> layTenMau(String maMau) async {
+    try {
+      return await mauSPController.layTenMauByMaMau(maMau);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  Future<String?> layTenKichCo(String maKichCo) async {
+    try {
+      return await kichCoController.layTenKichCo(maKichCo);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  Future<String?> getTenSP(String maSP) {
+    return sanPhamController.getProductNameByMaSP(maSP);
   }
 
   _loadPromotion() async {
@@ -100,29 +134,38 @@ class _CheckoutPageState extends State<CheckoutPage> {
               widget.customerId); // Sử dụng mã khách hàng
       setState(() {
         shippingAddresses = addresses;
-        if (shippingAddresses.isNotEmpty) {
-          selectedAddress =
-              shippingAddresses.first; // Chọn địa chỉ đầu tiên làm mặc định
-        }
+
+        selectedAddress = addresses.isNotEmpty
+            ? addresses.firstWhere(
+                (address) => address.macDinh == true,
+                orElse: () => addresses.first,
+              )
+            : null;
       });
     } catch (e) {
       print('Lỗi khi tải địa chỉ giao hàng: $e');
     }
   }
 
+  double _tinhTongTien(double giaTien, int soLuong){
+    return giaTien * soLuong;
+  }
   @override
   Widget build(BuildContext context) {
     return isLoading
         ? const Scaffold(
+            backgroundColor: Colors.white,
             body: Center(
               child: CircularProgressIndicator(),
             ),
           )
         : Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              title: Text('Thanh toán'),
+              backgroundColor: Colors.white,
+              title: const Text('Thanh toán'),
               leading: IconButton(
-                icon: Icon(Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
@@ -138,17 +181,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           title: 'Thông tin nhận hàng',
                           content: selectedAddress != null
                               ? _buildAddressContent()
-                              : Text('Chưa có thông tin nhận hàng'),
+                              : const Text('Chưa có thông tin nhận hàng'),
                           onTap: () => _showShippingAddresses(context),
                         ),
-                        _buildSectionCard(
-                          title: 'Phương thức thanh toán',
-                          content: Text(selectedPaymentMethod),
-                          onTap: _showPaymentMethodOptions,
+                        const SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            'Sản phẩm',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryColor),
+                            textAlign: TextAlign.start,
+                          ),
                         ),
+                        _buildProductList(widget.dsSP, widget.slMua),
                         _buildSectionCard(
                           title: 'Phương thức vận chuyển',
-                          content: Text(selectedShippingMethod),
+                          content: Text(
+                            selectedShippingMethod,
+                          ),
                           onTap: _showShippingMethodOptions,
                         ),
                         _buildSectionCard(
@@ -158,6 +210,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               : 'Không có mã giảm giá'),
                           onTap: _showPromoCodeOptions,
                         ),
+                        _buildSectionCard(
+                          title: 'Phương thức thanh toán',
+                          content: Text(selectedPaymentMethod),
+                          onTap: _showPaymentMethodOptions,
+                        ),
                       ],
                     ),
                   ),
@@ -166,6 +223,81 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ],
             ),
           );
+  }
+
+  Widget _buildProductList(List<ChiTietSP> dsSP, List<int> slMua) {
+    SharedFunction sharedFunction = SharedFunction();
+    StorageService storageService = StorageService();
+
+    final List<ChiTietSP> products = dsSP;
+    final List<int> sl = slMua;
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+
+        return FutureBuilder<List<String?>>(
+          future: Future.wait([
+            getTenSP(product.maSP),
+            layTenMau(product.maMau),
+            layTenKichCo(product.maKichCo),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return const Text('Lỗi khi tải thông tin sản phẩm');
+            } else {
+              final productName = snapshot.data![0] ?? 'Tên sản phẩm không có';
+              final tenMau = snapshot.data![1]; // Tên màu
+              final tenKC = snapshot.data![2]; // Tên kích cỡ
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    Image.network(
+                      storageService.getImageUrl(product.maHinhAnh),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(productName,
+                              style: const TextStyle(fontSize: 16)),
+                          if (tenMau != null) Text(tenMau),
+                          if (tenKC != null) Text(tenKC),
+
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      children: [
+                        Text(sharedFunction.formatCurrency(product.giaBan),
+                            style:
+                                const TextStyle(fontSize: 16, color: Colors.red)),
+                        Text('x${sl[index]}')
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+        );
+      },
+    );
   }
 
   Widget _buildSectionCard({
@@ -179,7 +311,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: const Color(0xFFf8f8ff),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -194,6 +326,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Gabarito',
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -276,6 +409,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildSummarySection() {
+    double subtotal = 0;
+    for (int i = 0; i < widget.dsSP.length; i++) {
+      subtotal += _tinhTongTien(widget.dsSP[i].giaBan, widget.slMua[i]);
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
@@ -290,23 +428,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
       child: Column(
         children: [
-          _buildSummaryRow('Tạm tính', widget.totalAmount),
-          _buildSummaryRow('Phí giao hàng', soKM!),
-          _buildSummaryRow('Tổng cộng', widget.totalAmount, isTotal: true),
+          _buildSummaryRow('Tạm tính', subtotal),
+          _buildSummaryRow('Phí giao hàng', soKM! * 1000),
+          _buildSummaryRow('Tổng cộng', subtotal + soKM! * 1000, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
               setState(() {
                 isLoading = true;
               });
-              await checkoutController.checkOut(
+
+              String maDH;
+              maDH = await checkoutController.checkOut(
                 selectedAddress?.maTTNH ?? shippingAddresses.first.maTTNH,
                 widget.customerId,
                 selectedShippingMethod,
-                selectedPromoCode,
-                widget.totalAmount,
-                true,
+                selectedPaymentMethod,
+                subtotal + soKM! * 1000,
+                false,
               );
+
+              for (ChiTietSP ctsp in widget.dsSP) {
+                await checkoutController.addChiTietDonHang(new ChiTietDonHang(
+                    donHang: maDH,
+                    sanPham: ctsp.maCTSP,
+                    soLuong: 1,
+                    donGia: ctsp.giaBan));
+              }
+
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (context) => SuccessPage(
@@ -323,6 +472,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               'Đặt hàng',
               style: TextStyle(
                 color: Colors.white,
+                fontSize: 16,
               ),
             ),
           ),
@@ -332,14 +482,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildSummaryRow(String label, double amount, {bool isTotal = false}) {
+    SharedFunction sharedFunction = SharedFunction();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 16)),
+          Text(label, style: const TextStyle(fontSize: 16)),
           Text(
-            '\$${amount.toStringAsFixed(2)}',
+            sharedFunction.formatCurrency(amount),
             style: TextStyle(
               fontSize: 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,

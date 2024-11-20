@@ -17,11 +17,19 @@ class ChiTietDonHang {
 
   factory ChiTietDonHang.fromJson(Map<String, dynamic> json) {
     return ChiTietDonHang(
-      donHang: json['donHang'] ?? '',
+      donHang: json['madh'] ?? '',
       sanPham: json['mactsp'] ?? '',
-      soLuong: json['soLuong'] ?? 0,
-      donGia: (json['donGia'] is num) ? json['donGia'].toDouble() : 0.0,
+      soLuong: json['soluong'] ?? 0,
+      donGia: (json['dongia'] is num) ? json['dongia'].toDouble() : 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'madh': donHang,
+      'mactsp': sanPham,
+      'soluong': soLuong,
+    };
   }
 
 }

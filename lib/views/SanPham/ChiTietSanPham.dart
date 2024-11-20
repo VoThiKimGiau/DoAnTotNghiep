@@ -8,6 +8,7 @@ import 'package:datn_cntt304_bandogiadung/models/KichCo.dart';
 import 'package:datn_cntt304_bandogiadung/models/SPYeuThich.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
+import 'package:datn_cntt304_bandogiadung/views/GioHang/CheckoutPage.dart';
 import 'package:datn_cntt304_bandogiadung/views/SanPham/CircleButtonSize.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -838,6 +839,9 @@ class CustomBottomSheet {
                               }
                             }
                           }
+                          // else if(buttonText == "Mua ngay" && isLoading == false){
+                          //   Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(dsSP: chiTietSP, customerId: widget, slMua: slMua)))
+                          // }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,

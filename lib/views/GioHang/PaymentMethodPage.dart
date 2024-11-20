@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../colors/color.dart';
+
 class PaymentMethodPage extends StatefulWidget {
   final String selectedMethod;
 
@@ -21,7 +23,9 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('Chọn phương thức thanh toán'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -31,8 +35,8 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
       body: Column(
         children: [
           RadioListTile<String>(
-            title: Text('Thanh toán sau khi nhận hàng'),
-            value: 'Thanh toán sau khi nhận hàng',
+            title: Text('Thanh toán khi nhận hàng'),
+            value: 'Thanh toán khi nhận hàng',
             groupValue: selectedPayment,
             onChanged: (value) {
               setState(() {
@@ -59,10 +63,11 @@ class _PaymentMethodPageState extends State<PaymentMethodPage> {
             // Trả về phương thức thanh toán đã chọn cho CheckoutPage
             Navigator.pop(context, selectedPayment);
           },
-          child: Text('Tiếp tục'),
           style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
             minimumSize: Size(double.infinity, 50),
           ),
+          child: const Text('Tiếp tục', style: TextStyle(color: Colors.white, fontSize: 16),),
         ),
       ),
     );

@@ -23,14 +23,14 @@ class TTNhanHangController {
   }
 
   Future<TTNhanHang> createTTNhanHangByCustomer(
-      String hoten, diachi, maKH, sdt) async {
+      String maTTNH, hoten, diachi, maKH, sdt) async {
     final response = await http.post(
       Uri.parse(baseUrl),
       headers: {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "maTTNH": getRandomString(5),
+        "maTTNH": maTTNH,
         "hoTen": hoten,
         "diaChi": diachi,
         "sdt": sdt,

@@ -8,6 +8,7 @@ class DonHang {
   bool? daThanhToan;
   String trangThaiDH;
   String phuongThucThanhToan;
+  String hinhthucgiaohang;
 
   DonHang({
     required this.maDH,
@@ -19,6 +20,7 @@ class DonHang {
     this.daThanhToan,
     required this.trangThaiDH,
     required this.phuongThucThanhToan,
+    required this.hinhthucgiaohang,
   });
 
   factory DonHang.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,20 @@ class DonHang {
       daThanhToan: json['daThanhToan'],
       trangThaiDH: json['trangThaiDH'],
       phuongThucThanhToan: json['phuongThucThanhToan'],
+      hinhthucgiaohang: json['hinhthucgiaohang'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'khachHang': khachHang,
+      'thongTinNhanHang': thongTinNhanHang,
+      'thanhTien':thanhTien,
+      'ngayDat':ngayDat,
+      'daThanhToan':daThanhToan,
+      'trangThaiDH':trangThaiDH,
+      'phuongThucThanhToan':phuongThucThanhToan,
+      'hinhthucgiaohang':hinhthucgiaohang,
+    };
   }
 }
