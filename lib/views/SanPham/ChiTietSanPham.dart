@@ -203,21 +203,24 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                         onPressed: () async {
                           if (!isFavorite) {
                             await spYeuThichController.themSPYeuThich(
-                                SPYeuThich(
-                                    maKhachHang: widget.maKH ?? '',
-                                    maSanPham: widget.maSP ?? ''));
+                              SPYeuThich(
+                                maKhachHang: widget.maKH ?? '',
+                                maSanPham: widget.maSP ?? '',
+                              ),
+                            );
                             setState(() {
                               isFavorite = true;
                             });
                             print('Sản phẩm đã được thêm vào yêu thích.');
                           } else {
                             await spYeuThichController.xoaSPYeuThich(
-                                widget.maKH ?? '', widget.maSP ?? '');
+                              widget.maKH ?? '',
+                              widget.maSP ?? '',
+                            );
                             setState(() {
                               isFavorite = false;
                             });
-                            print(
-                                'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                            print('Sản phẩm đã được xóa khỏi danh sách yêu thích.');
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -235,162 +238,159 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                 ),
               ),
               isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Display loader while loading
+                  ? const Center(child: CircularProgressIndicator())
                   : item == null
-                      ? const Center(child: Text('Không tìm thấy sản phẩm.'))
-                      : Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: SizedBox(
-                                    height: 250,
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: dsHinhSP.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 5,
-                                              bottom: 10,
-                                              left: 15,
-                                              right: 5),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.network(
-                                              storageService
-                                                  .getImageUrl(dsHinhSP[index]),
-                                              fit: BoxFit.cover,
-                                              width: 200,
-                                              height: 200,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
+                  ? const Center(child: Text('Không tìm thấy sản phẩm.'))
+                  : Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 250,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: dsHinhSP.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.only(
+                                  top: 5,
+                                  bottom: 10,
+                                  left: 15,
+                                  right: 5,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    storageService.getImageUrl(dsHinhSP[index]),
+                                    fit: BoxFit.cover,
+                                    width: 200,
+                                    height: 200,
                                   ),
                                 ),
-                              ],
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(left: 24),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      item!.tenSP,
-                                      style: const TextStyle(
-                                          fontSize: 25,
-                                          color: Colors.black,
-                                          fontFamily: 'Gabarito',
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                    Text(
-                                      sharedFunction
-                                          .formatCurrency(item!.giaMacDinh),
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.red,
-                                        fontFamily: 'Gabarito',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(
-                                  left: 23, top: 24, right: 25),
-                              height: 150,
-                              child: SingleChildScrollView(
-                                child: Text(
-                                  item!.moTa,
-                                  style: const TextStyle(fontSize: 16),
-                                  textAlign: TextAlign.justify,
-                                ),
-                              ),
-                            ),
-                            Container(
-                                margin:
-                                    const EdgeInsets.only(left: 23, top: 24),
-                                child: const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    'Sản phẩm tương tự ',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Gabarito'),
-                                  ),
-                                )),
-                            Container(
-                                height: 440,
-                                margin: const EdgeInsets.only(left: 24),
-                                child: GridView.builder(
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2, // Number of columns
-                                    crossAxisSpacing: 5, // Spacing between columns
-                                    mainAxisSpacing: 5, // Spacing between rows
-                                    childAspectRatio: 0.8, // Aspect ratio of each cell
-                                  ),
-                                  itemCount: itemsSP!.length,
-                                  itemBuilder: (context, index) {
-                                    bool isFavoriteLV = dsSPYT.any((spyt) =>
-                                        spyt.maSanPham == itemsSP![index].maSP);
-
-                                    return GestureDetector(
-                                      onTap: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ChiTietSanPhamScreen(
-                                              maSP: itemsSP![index].maSP,
-                                              maKH: widget.maKH,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: SanPhamItem(
-                                        item: itemsSP![index],
-                                        isFavorite: isFavoriteLV,
-                                        onFavoriteToggle: () async {
-                                          if (!isFavorite) {
-                                            await spYeuThichController
-                                                .themSPYeuThich(SPYeuThich(
-                                              maKhachHang: widget.maKH ?? '',
-                                              maSanPham: itemsSP![index].maSP,
-                                            ));
-                                            print(
-                                                'Sản phẩm đã được thêm vào yêu thích.');
-                                          } else {
-                                            await spYeuThichController
-                                                .xoaSPYeuThich(
-                                                    widget.maKH ?? '',
-                                                    itemsSP![index].maSP);
-                                            print(
-                                                'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
-                                          }
-
-                                          setState(() {
-                                            isFavorite = !isFavorite;
-                                          });
-                                        },
-                                      ),
-                                    );
-                                  },
-                                )),
-                          ],
+                              );
+                            },
+                          ),
                         ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 24),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            item!.tenSP,
+                            style: const TextStyle(
+                              fontSize: 25,
+                              color: Colors.black,
+                              fontFamily: 'Gabarito',
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            sharedFunction.formatCurrency(item!.giaMacDinh),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.red,
+                              fontFamily: 'Gabarito',
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 23, top: 24, right: 25),
+                    height: 150,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        item!.moTa,
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 23, top: 24),
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Sản phẩm tương tự ',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Gabarito',
+                        ),
+                      ),
+                    ),
+                  ),
+                  itemsSP == null || itemsSP!.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : Container(
+                    height: 440,
+                    margin: const EdgeInsets.only(left: 24),
+                    child: GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: itemsSP!.length,
+                      itemBuilder: (context, index) {
+                        bool isFavoriteLV = dsSPYT.any((spyt) =>
+                        spyt.maSanPham == itemsSP![index].maSP);
+
+                        return GestureDetector(
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChiTietSanPhamScreen(
+                                  maSP: itemsSP![index].maSP,
+                                  maKH: widget.maKH,
+                                ),
+                              ),
+                            );
+                          },
+                          child: SanPhamItem(
+                            item: itemsSP![index],
+                            isFavorite: isFavoriteLV,
+                            onFavoriteToggle: () async {
+                              if (!isFavoriteLV) {
+                                await spYeuThichController.themSPYeuThich(
+                                  SPYeuThich(
+                                    maKhachHang: widget.maKH ?? '',
+                                    maSanPham: itemsSP![index].maSP,
+                                  ),
+                                );
+                                print('Sản phẩm đã được thêm vào yêu thích.');
+                              } else {
+                                await spYeuThichController.xoaSPYeuThich(
+                                  widget.maKH ?? '',
+                                  itemsSP![index].maSP,
+                                );
+                                print('Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                              }
+                              setState(() {
+                                isFavorite = !isFavoriteLV;
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -410,8 +410,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                   _quantity,
                   maSanPham ?? '',
                   maGH ?? '',
-                  item!.hinhAnhMacDinh ?? '',
-                  item!.giaMacDinh ?? 0,
+                  item?.hinhAnhMacDinh ?? '',
+                  item?.giaMacDinh ?? 0,
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -440,8 +440,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                     _quantity,
                     maSanPham ?? '',
                     maGH ?? '',
-                    item!.hinhAnhMacDinh ?? '',
-                    item!.giaMacDinh ?? 0,
+                    item?.hinhAnhMacDinh ?? '',
+                    item?.giaMacDinh ?? 0,
                   );
                 },
                 style: ElevatedButton.styleFrom(
