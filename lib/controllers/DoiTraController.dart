@@ -5,6 +5,8 @@ import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
 import '../models/ChiTietDoiTra.dart';
 import '../models/DoiTra.dart';
 import 'package:http/http.dart' as http;
+
+import 'NhanVienController.dart';
 class DoiTraController{
   final String baseUrl='${IpConfig.ipConfig}';
   Future<DoiTra> createDoiTra(DoiTra doiTra) async {
@@ -79,6 +81,44 @@ class DoiTraController{
       }
     } else {
       throw Exception('Failed to load ChiTietDoiTra list');
+    }
+  }
+  Future<DoiTra> updateDoiTra(String maDoiTra, DoiTra updatedDoiTra) async {
+    try {
+      NhanVienController nhanVienController=NhanVienController();
+      String? token = await nhanVienController.getToken();
+
+      // Nếu không có token, throw một exception
+      if (token == null) {
+        throw Exception("Token không tồn tại");
+      }
+      // Encode đối tượng DoiTra thành JSON
+      String jsonString = jsonEncode(updatedDoiTra.toJson());
+      print("Request Body: $jsonString");
+
+      // Gửi yêu cầu PUT tới API
+      final response = await http.put(
+        Uri.parse('${baseUrl}api/doitra/$maDoiTra'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonString,
+      );
+
+      // Kiểm tra phản hồi từ API
+      if (response.statusCode == 200) {
+        // Nếu thành công, trả về đối tượng DoiTra đã được cập nhật
+        return DoiTra.fromJson(jsonDecode(response.body));
+      } else {
+        // Nếu thất bại, ném ra một ngoại lệ với thông tin chi tiết
+        throw Exception(
+            'Failed to update DoiTra. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Xử lý lỗi trong trường hợp gặp sự cố mạng hoặc lỗi khác
+      print('Error updating DoiTra: $e');
+      throw Exception('Error updating DoiTra');
     }
   }
 }

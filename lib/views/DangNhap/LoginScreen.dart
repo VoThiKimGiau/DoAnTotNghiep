@@ -52,7 +52,7 @@ class _LoginScreen extends State<LoginScreen> {
         if (khachHang == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text('Login failed. Please check your credentials.')),
+                content: Text('Xin lỗi, bạn không có quyền thực hiện hành động này. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị')),
           );
         } else {
           String? maKH = khachHang?.maKH;
@@ -68,7 +68,7 @@ class _LoginScreen extends State<LoginScreen> {
       maNV = await nhanVienController.dangNhapNV(
           tenTKController.text, matKhauController.text);
       if (maNV == null) {
-        SnackBar(content: Text('Login failed. Please check your credentials.'));
+        SnackBar(content: Text('Xin lỗi, bạn không có quyền thực hiện hành động này. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị'));
       } else {
 
         Navigator.push(context,

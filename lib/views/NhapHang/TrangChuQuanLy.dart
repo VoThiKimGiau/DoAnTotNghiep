@@ -31,11 +31,11 @@ class _ShopDashboardState extends State<ShopDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadChucVu();
-    if(chucVu=='QUAN_LY')
-      {
+    _loadChucVu().then((_) {
+      if (chucVu == 'QUAN_LY') {
         _fetchTodayStatistics();
       }
+    });
 
 
   }

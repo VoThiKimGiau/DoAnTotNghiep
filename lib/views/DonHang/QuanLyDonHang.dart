@@ -21,9 +21,11 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
   String tempSelectedStatus = "Tất cả";
   String tempSelectedPeriod = "Hôm nay";
   List<String> orderStatuses = ["Tất cả", "Đang xử lý", "Đã xác nhận", "Đã giao", "Đã hủy"];
-  List<String> timePeriods = ["Tất cả thời gian", "Hôm nay", "Hôm qua", "Tuần này", "Tuần trước", "Tháng này", "Tháng trước", "30 ngày", "60 ngày", "2 tháng gần đây"];
+  List<String> timePeriods = ["Tất cả thời gian", "Hôm nay", "Hôm qua", "Tuần này", "Tuần trước", "Tháng này", "Tháng trước", "30 ngày", "60 ngày", "2 tháng gần đây","Tùy chọn"];
   String selectedPeriod = "Hôm nay";
   Map<String, String> _customerNames = {};
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void initState() {
@@ -53,6 +55,23 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
     KhachHangController khachHangController = KhachHangController();
     KhachHang? customer = await khachHangController.getKhachHang(makh);
     return customer;
+  }
+  Future<void> _showDateRangePicker(BuildContext context, StateSetter setSheetState) async {
+    DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _startDate != null && _endDate != null
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : null,
+    );
+
+    if (picked != null) {
+      setSheetState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+      });
+    }
   }
 
   void _updateOrderStatus(String madh, String trangThai) async {
@@ -178,11 +197,22 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
                         onSelected: (bool selected) {
                           setSheetState(() {
                             tempSelectedPeriod = period;
+                            if (period == "Tùy chọn") {
+                              _showDateRangePicker(context, setSheetState);
+                            }
                           });
                         },
                       );
                     }).toList(),
                   ),
+                  if (tempSelectedPeriod == "Tùy chọn" && _startDate != null && _endDate != null)
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Từ: ${DateFormat('dd/MM/yyyy').format(_startDate!)} đến: ${DateFormat('dd/MM/yyyy').format(_endDate!)}',
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
+                      ),
+                    ),
                   SizedBox(height: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -210,6 +240,19 @@ class _TodaysOrdersScreenState extends State<TodaysOrdersScreen> {
     DateTime start;
     DateTime end = DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
 
+    if (tempSelectedPeriod == "Tùy chọn" && _startDate != null && _endDate != null) {
+      // If start and end dates are the same, set time range for the entire day
+      if (_startDate!.year == _endDate!.year &&
+          _startDate!.month == _endDate!.month &&
+          _startDate!.day == _endDate!.day) {
+        start = DateTime(_startDate!.year, _startDate!.month, _startDate!.day, 0, 0, 0);
+        end = DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59, 999);
+      } else {
+        start = _startDate!;
+        end = DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59, 999);
+      }
+      return DateTimeRange(start: start, end: end);
+    }
     switch (tempSelectedPeriod) {
       case "Tất cả thời gian":
         start = DateTime(now.year - 99, now.month, now.day);
