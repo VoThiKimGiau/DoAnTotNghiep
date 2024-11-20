@@ -79,7 +79,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         destination = dcDich;
         origin = dcDau;
         double? fetchedDistance =
-        await giaoHangController.getDistance(origin!, destination!, APIKEY);
+            await giaoHangController.getDistance(origin!, destination!, APIKEY);
 
         setState(() {
           soKM = fetchedDistance;
@@ -300,7 +300,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 isLoading = true;
               });
               await checkoutController.checkOut(
-                shippingAddresses.first.maTTNH,
+                selectedAddress?.maTTNH ?? shippingAddresses.first.maTTNH,
                 widget.customerId,
                 selectedShippingMethod,
                 selectedPromoCode,
@@ -308,7 +308,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 true,
               );
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => SuccessPage(maKH: widget.customerId,)),
+                MaterialPageRoute(
+                    builder: (context) => SuccessPage(
+                          maKH: widget.customerId,
+                        )),
                 (route) => route.isFirst,
               );
             },
