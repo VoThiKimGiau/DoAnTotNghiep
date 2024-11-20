@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/TaiKhoanController.dart';
 import 'package:datn_cntt304_bandogiadung/views/CaiDat/TTNhanHang.dart';
+import 'package:datn_cntt304_bandogiadung/views/CaiDat/ThongKeTheoKhachHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import '../../models/KhachHang.dart';
@@ -102,6 +103,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (context) => TTNhanHangScreen(
                               maKH: widget.makh,
                             )));
+              }),
+              _buildMenuItem('Thống kê chi tiêu', Icons.attach_money_outlined, () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Thongketheokhachhang(
+                          maKH: widget.makh
+                        )));
               }),
               _buildMenuItem('Sản phẩm yêu thích', Icons.favorite, () {
                 Navigator.push(

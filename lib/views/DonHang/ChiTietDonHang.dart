@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:datn_cntt304_bandogiadung/views/DoiTra/DanhSachSanPhamDoiTra.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/HuyDH.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/TBTraHang.dart';
@@ -30,6 +31,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     fetchTTNhanHang();
   }
 
+  Future<void> updateStatus(String orderId,String newStatus) async{
+    DonHangController donHangController=DonHangController();
+    try{
+      donHangController.updateOrderStatus(orderId, newStatus);
+    }catch(error)
+    {
+      print("Error: +$error");
+    }
+  }
   Future<void> fetchTTNhanHang() async {
     TTNhanHangController controller = TTNhanHangController();
     try {
@@ -93,6 +103,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           horizontal: 32, vertical: 12), // Padding cho nút
                     ),
                     onPressed: () {
+                      updateStatus(widget.donHang.maDH, "Đã huỷ");
                       Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -106,7 +117,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             fontSize: 18)), // Nội dung của nút
                   ),
                 ),
-              if (_isButtonsVisible())
+              if (_isConfirmButtonsVisible())
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +131,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 horizontal: 32, vertical: 12),
                           ),
                           onPressed: () {
-                            // Hành động cho nút "Đã nhận hàng"
+                            updateStatus(widget.donHang.maDH, "Đã giao hàng");
                           },
                           child: const Text(
                             'Đã nhận hàng',
@@ -130,6 +141,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ),
                         ),
                       ),
+
+                    ],
+                  ),
+                ),
+              if (_isButtonsVisible())
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       const SizedBox(height: 16),
                       SizedBox(
                         width: 400,
@@ -157,7 +177,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ],
                   ),
-                )
+                ),
+
             ],
           ),
         ),
@@ -312,6 +333,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return decodedStatus == 'Đang xử lý' || decodedStatus == 'Đã xác nhận';
   }
 
+  bool _isConfirmButtonsVisible() {
+    String decodedStatus =utf8.decode(widget.donHang.trangThaiDH.runes.toList());
+    return decodedStatus == 'Đang giao hàng';
+  }
   bool _isButtonsVisible() {
     String decodedStatus =utf8.decode(widget.donHang.trangThaiDH.runes.toList());
     return decodedStatus == 'Đã giao hàng';

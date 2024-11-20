@@ -39,7 +39,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _chiTietDoiTraList = _doiTraController.getChiTietDoiTra(widget.doiTra.maDoiTra);
+    _chiTietDoiTraList = _doiTraController.getChiTietDoiTra(widget.doiTra.maDoiTra.trim());
     _vatChungDoiTraList = _vatChungDoiTraController.getAllVatChungDoiTra(maDoiTra: widget.doiTra.maDoiTra);
   }
 
@@ -47,7 +47,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết đổi trả', style: TextStyle(fontSize: 25)),
+        title: Text('Chi tiết phiếu trả hàng hoàn tiền', style: TextStyle(fontSize: 25)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -83,7 +83,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
             Text('Đơn hàng: ${widget.doiTra.donHang}', style: TextStyle(fontSize: 18)),
             Text('Trạng thái: ${utf8.decode( widget.doiTra.trangThai.runes.toList())}', style: TextStyle(fontSize: 18)),
             Text('Ngày đổi trả: ${DateFormat('dd/MM/yyyy').format(widget.doiTra.ngayDoiTra ?? DateTime.now())}', style: TextStyle(fontSize: 18)),
-            Text('Lý do: ${widget.doiTra.lyDo}', style: TextStyle(fontSize: 18)),
+            Text('Lý do: ${utf8.decode(widget.doiTra.lyDo.runes.toList()) }', style: TextStyle(fontSize: 18)),
             Text('Tiền hoàn trả: ${NumberFormat.currency(locale: 'vi').format(widget.doiTra.tienHoanTra)}', style: TextStyle(fontSize: 18)),
           ],
         ),

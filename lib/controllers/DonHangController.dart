@@ -207,6 +207,81 @@ class DonHangController {
     }
     return null;
   }
+  Future<Map<String, double>> calculateCustomerMonthlySpending(String maKH, DateTime date) async {
+    DateTime firstDayOfMonth = DateTime(date.year, date.month, 1);
+    DateTime lastDayOfMonth = DateTime(date.year, date.month + 1, 0, 23, 59, 59);
 
+    String startDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(firstDayOfMonth);
+    String endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(lastDayOfMonth);
+
+    List<DonHang> customerOrders = await fetchDonHang(maKH);
+
+    List<DonHang> monthlyOrders = customerOrders.where((order) {
+      return order.ngayDat.isAfter(firstDayOfMonth) &&
+          order.ngayDat.isBefore(lastDayOfMonth);
+    }).toList();
+
+    double totalSpending = monthlyOrders
+        .where((order) => utf8.decode(order.trangThaiDH.runes.toList()) != 'Đã huỷ')
+        .fold(0.0, (sum, order) => sum + (order.thanhTien ?? 0.0));
+
+    int successfulOrders = monthlyOrders
+        .where((order) => utf8.decode(order.trangThaiDH.runes.toList()) == 'Đã giao hàng')
+        .length;
+
+
+    int canceledOrders = monthlyOrders
+        .where((order) => utf8.decode(order.trangThaiDH.runes.toList()) == 'Đã huỷ')
+        .length;
+
+    double averageSpendingPerOrder = successfulOrders > 0
+        ? totalSpending / successfulOrders
+        : 0.0;
+
+    return {
+      'totalSpending': totalSpending,
+      'averageSpendingPerOrder': averageSpendingPerOrder,
+      'successfulOrders': successfulOrders.toDouble(),
+      'canceledOrders': canceledOrders.toDouble(),
+    };
+  }
+  Future<List<DonHang>> fetchRecentOrders(String maKH, {int limit = 3}) async {
+
+    List<DonHang> allOrders = await fetchDonHang(maKH);
+
+    allOrders.sort((a, b) => b.ngayDat.compareTo(a.ngayDat));
+
+    return allOrders.take(limit).toList();
+  }
+  Future<double> calculateSpendingGrowthPercentage(String maKH, DateTime currentDate) async {
+
+    Map<String, double> currentMonthStats = await calculateCustomerMonthlySpending(
+        maKH,
+        currentDate
+    );
+
+
+    DateTime previousMonth = DateTime(
+      currentDate.month == 1 ? currentDate.year - 1 : currentDate.year,
+      currentDate.month == 1 ? 12 : currentDate.month - 1,
+    );
+
+
+    Map<String, double> previousMonthStats = await calculateCustomerMonthlySpending(
+        maKH,
+        previousMonth
+    );
+
+
+    double currentMonthSpending = currentMonthStats['totalSpending'] ?? 0.0;
+    double previousMonthSpending = previousMonthStats['totalSpending'] ?? 0.0;
+
+
+    if (previousMonthSpending > 0) {
+      return ((currentMonthSpending - previousMonthSpending) / previousMonthSpending) * 100;
+    }
+
+    return 0.0;
+  }
 
 }
