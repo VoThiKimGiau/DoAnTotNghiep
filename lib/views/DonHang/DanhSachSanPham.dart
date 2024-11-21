@@ -75,8 +75,8 @@ class _OrderSummaryState extends State<OrderSummary> {
     String tenKC='';
     try {
       tenKC = await kichCoController.layTenKichCo(maKichCo);
-      String kc=utf8.decode(tenKC.runes.toList());
-      return kc;
+
+      return tenKC;
     } catch (error) {
       return 'Lỗi hiển thị kích cỡ';
     }
