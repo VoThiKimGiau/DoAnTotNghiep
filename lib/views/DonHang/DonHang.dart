@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
@@ -20,6 +21,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   late Future<List<DonHang>> futureDonHangs;
   String? selectedStatus;
   DateTime? selectedDate;
+  SharedFunction sharedFunction=SharedFunction();
 
   final ColorScheme colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.blue,
@@ -60,7 +62,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
             fontSize: 25,
             color: colorScheme.onPrimary,
             fontFamily: 'Comfortaa',
-            
+
           ),
         ),
         backgroundColor: colorScheme.primary,
@@ -232,6 +234,14 @@ class _OrderListScreenState extends State<OrderListScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Thành tiền: ${sharedFunction.formatCurrency(donHang.thanhTien) }',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: colorScheme.error,
                 ),
               ),
             ],
