@@ -34,7 +34,7 @@ class DonHang {
       daThanhToan: json['daThanhToan'],
       trangThaiDH: json['trangThaiDH'],
       phuongThucThanhToan: json['phuongThucThanhToan'],
-      hinhthucgiaohang: json['hinhthucgiaohang'],
+      hinhthucgiaohang: json['hinhThucGiaoHang'],
     );
   }
 
