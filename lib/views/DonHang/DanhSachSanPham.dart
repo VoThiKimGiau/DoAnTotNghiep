@@ -10,11 +10,13 @@ import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/GiaoHang.dart';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
+import '../../dto/ChiTietDonHangDTO.dart';
 import '../../models/ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietDonHangController.dart';
 
@@ -29,7 +31,7 @@ class OrderSummary extends StatefulWidget {
 }
 
 class _OrderSummaryState extends State<OrderSummary> {
-  late Future<List<ChiTietDonHang>> _orderDetails;
+  late Future<List<ChiTietDonHangDTO>> _orderDetails;
   late Future<List<KMDH>> _khuyenmai;
   final SanPhamController _sanPhamController = SanPhamController();
   late MauSPController mauSPController=MauSPController();
@@ -38,6 +40,7 @@ class _OrderSummaryState extends State<OrderSummary> {
   late DonHangController donHangController=DonHangController();
   late HinhAnhController hinhAnhController=HinhAnhController();
   late StorageService service=StorageService();
+  final SharedFunction sharedFunction=SharedFunction();
 
   @override
   void initState() {
@@ -118,7 +121,7 @@ class _OrderSummaryState extends State<OrderSummary> {
         child: Column(
           children: [
             Expanded(
-              child: FutureBuilder<List<ChiTietDonHang>>(
+              child: FutureBuilder<List<ChiTietDonHangDTO>>(
                 future: _orderDetails,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -131,9 +134,9 @@ class _OrderSummaryState extends State<OrderSummary> {
                     return ListView(
                       children: snapshot.data!.map((item) {
                         Widget productItem = _buildProductItem(
-                            item.sanPham,
+                            item.mactsp,
                             'SL ${item.soLuong}',
-                            '\$${item.donGia}'
+                            '${sharedFunction.formatCurrency( item.donGia)}'
                         );
                         return Column(
                           children: [

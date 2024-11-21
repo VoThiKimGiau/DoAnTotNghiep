@@ -4,6 +4,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../config/IpConfig.dart';
+import '../dto/ChiTietDonHangDTO.dart';
 import '../models/ChiTietDonHang.dart';
 import '../models/ChiTietPhieuNhap.dart';
 import '../models/DonHang.dart';
@@ -175,10 +176,10 @@ class DonHangController {
 
     // Bước 2: Lặp qua từng đơn hàng hôm nay để tính tổng giá trị vốn
     for (DonHang donHang in donHangListToday) {
-      List<ChiTietDonHang> listChiTietDonHang= await chiTietDonHangController.fetchListProduct(donHang.maDH);
-      for (ChiTietDonHang chiTiet in listChiTietDonHang) {
+      List<ChiTietDonHangDTO> listChiTietDonHang= await chiTietDonHangController.fetchListProduct(donHang.maDH);
+      for (ChiTietDonHangDTO chiTiet in listChiTietDonHang) {
         // Lấy `maCTSP` từ chi tiết đơn hàng
-        String maCTSP = chiTiet.sanPham;
+        String maCTSP = chiTiet.mactsp;
 
         // Tìm phiếu nhập có cùng `maCTSP`
         ChiTietPhieuNhap? phieuNhap = await findMatchingPhieuNhap(maCTSP);

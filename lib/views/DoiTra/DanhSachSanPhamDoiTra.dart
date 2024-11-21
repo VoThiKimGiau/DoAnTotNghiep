@@ -17,6 +17,7 @@ import 'package:datn_cntt304_bandogiadung/models/KMDH.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 
 import '../../dto/ChiTietDoiTraDTO.dart';
+import '../../dto/ChiTietDonHangDTO.dart';
 import '../../dto/DoiTraDTO.dart';
 import '../../models/ChiTietDoiTra.dart';
 
@@ -38,7 +39,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
   final StorageService _storageService = StorageService();
   SharedFunction sharedFunction=SharedFunction();
   Map<String, List<String>> cachedProductDetails = {};
-  List<ChiTietDonHang> orderDetailsList = [];
+  List<ChiTietDonHangDTO> orderDetailsList = [];
   Map<String, bool> selectedProducts = {};
   double totalRefundAmount = 0.0;
   Map<String, int> productQuantities = {};
@@ -55,7 +56,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
       orderDetailsList = await ChiTietDonHangController().fetchListProduct(widget.donHang.maDH);
       for (var item in orderDetailsList) {
         // Load and cache product details for each order item
-        cachedProductDetails[item.sanPham] = await _fetchProductDetails(item.sanPham);
+        cachedProductDetails[item.mactsp] = await _fetchProductDetails(item.mactsp);
       }
       setState(() {}); // Trigger a rebuild once data is cached
     } catch (e) {
@@ -76,8 +77,8 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
   void updateTotalRefundAmount() {
     double total = 0.0;
     for (var item in orderDetailsList) {
-      if (selectedProducts[item.sanPham] == true) {
-        int quantity = productQuantities[item.sanPham] ?? 1;
+      if (selectedProducts[item.mactsp] == true) {
+        int quantity = productQuantities[item.mactsp] ?? 1;
         total += item.donGia * quantity;
       }
     }
@@ -88,7 +89,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
 
   void incrementQuantity(String maCTSP) {
     int currentQuantity = productQuantities[maCTSP] ?? 0;
-    int maxQuantity = orderDetailsList.firstWhere((item) => item.sanPham == maCTSP).soLuong;
+    int maxQuantity = orderDetailsList.firstWhere((item) => item.mactsp == maCTSP).soLuong;
     if (currentQuantity < maxQuantity) {
       setState(() {
         productQuantities[maCTSP] = currentQuantity + 1;
@@ -139,9 +140,9 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
                   ? Center(child: CircularProgressIndicator())
                   : ListView(
                 children: orderDetailsList.map((item) {
-                  final productDetails = cachedProductDetails[item.sanPham] ?? ['', '', '', ''];
+                  final productDetails = cachedProductDetails[item.mactsp] ?? ['', '', '', ''];
                   return _buildProductRow(
-                    item.sanPham,
+                    item.mactsp,
                     productDetails,
                     'SL ${item.soLuong}',
                     '${sharedFunction.formatCurrency(item.donGia)}',
@@ -178,7 +179,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
     selectedProducts.forEach((maCTSP, isSelected) {
       if (isSelected) {
         final quantity = productQuantities[maCTSP] ?? 1;
-        final price = orderDetailsList.firstWhere((item) => item.sanPham == maCTSP).donGia;
+        final price = orderDetailsList.firstWhere((item) => item.mactsp == maCTSP).donGia;
 
         totalRefundAmount += price * quantity;
 
