@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
 import 'package:http/http.dart' as http;
+import '../dto/ChiTietGioHangDTO.dart';
 import '../models/ChiTietGioHang.dart';
 
 class ChiTietGioHangController {
@@ -33,8 +34,8 @@ class ChiTietGioHangController {
   }
 
   // Thêm chi tiết giỏ hàng
-  Future<ChiTietGioHang> themChiTietGioHang(
-      ChiTietGioHang chiTietGioHang) async {
+  Future<ChiTietGioHangDTO> themChiTietGioHang(
+      ChiTietGioHangDTO chiTietGioHang) async {
     print("Dữ liệu gửi đi: ${json.encode(chiTietGioHang.toJson())}");
     final response = await http.post(
       Uri.parse('${IpConfig.ipConfig}api/chitietgiohang'),
@@ -46,7 +47,7 @@ class ChiTietGioHangController {
     );
 
     if (response.statusCode == 200) {
-      return ChiTietGioHang.fromJson(json.decode(response.body));
+      return ChiTietGioHangDTO.fromJson(json.decode(response.body));
     } else {
       print("Phản hồi lỗi: ${response.body}");
       throw Exception("Không thể thêm chi tiết giỏ hàng: ${response.body}");

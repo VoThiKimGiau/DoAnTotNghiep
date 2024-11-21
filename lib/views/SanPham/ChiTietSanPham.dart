@@ -15,6 +15,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../colors/color.dart';
 import '../../controllers/SanPhamController.dart';
+import '../../dto/ChiTietGioHangDTO.dart';
 import '../../models/SanPham.dart';
 import '../../widgets/item_SanPham.dart';
 import '../SanPham/CircleButtonColor.dart';
@@ -813,29 +814,50 @@ class CustomBottomSheet {
                                 );
                               } else {
                                 ChiTietGioHangController
-                                    chiTietGioHangController =
-                                    ChiTietGioHangController();
-                                setState(() {
-                                  isLoading = true;
-                                  tongTien = quantity * chiTietSP!.giaBan;
-                                });
-                                await chiTietGioHangController
-                                    .themChiTietGioHang(
-                                  ChiTietGioHang(
-                                    maGioHang: maGH,
-                                    maCTSP: chiTietSP!.maCTSP,
-                                    soLuong: quantity,
-                                    donGia: chiTietSP!.giaBan,
-                                  ),
-                                );
-                                setState(() {
-                                  isLoading = false;
+                                chiTietGioHangController =
+                                ChiTietGioHangController();
+                                try {
+                                  setState(() {
+                                    isLoading = true;
+                                    tongTien = quantity * chiTietSP!.giaBan;
+                                  });
+
+                                  await chiTietGioHangController.themChiTietGioHang(
+                                    ChiTietGioHangDTO(
+                                      maGioHang: maGH,
+                                      maSanPham: chiTietSP!.maCTSP,
+                                      soLuong: quantity,
+                                    ),
+                                  );
+
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+
+                                  // Hiển thị SnackBar trước khi pop
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Thêm vào giỏ hàng thành công"),
+                                      duration: Duration(seconds: 2), // Tùy chỉnh thời gian hiển thị
+                                    ),
+                                  );
+
+                                  // Pop context sau khi hiển thị SnackBar
                                   Navigator.of(context).pop();
-                                });
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text("Thêm vào giỏ hàng thành công"),
-                                ));
+
+                                } catch (e) {
+                                  // Xử lý nếu có lỗi
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Lỗi: ${e.toString()}"),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               }
                             }
                           }
