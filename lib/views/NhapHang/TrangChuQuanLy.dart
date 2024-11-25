@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 
 import '../../controllers/DonHangController.dart';
 import '../../models/DonHang.dart';
+import '../Admin/KhachHang/QuanLyKhachHang.dart';
+import '../Admin/KhuyenMai/QuanLyKhuyenMai.dart';
 import 'ThongKeKho.dart';
 
 class ShopDashboard extends StatefulWidget {
@@ -235,6 +237,34 @@ class _ShopDashboardState extends State<ShopDashboard> {
                           );
                         },
                       ),
+                      if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
+                        _buildActionButton(
+                          'Khách hàng',
+                          Icons.supervised_user_circle,
+                          onPressed: () {
+                            // Add your navigation or functionality here
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CustomerManagementScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
+                        _buildActionButton(
+                          'Khuyến mãi',
+                          Icons.card_giftcard,
+                          onPressed: () {
+                            // Add your navigation or functionality here
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PromotionManagementScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       _buildActionButton('Nhân viên', Icons.people_outline),
                       _buildActionButton(
                         'Đăng xuất ', Icons.logout, onPressed: () {

@@ -64,22 +64,6 @@ class _StoreReportState extends State<StoreReport> {
     }
   }
 
-  Widget _buildChartToggle(String text) {
-    bool isSelected = selectedChartView == text;
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.green : Colors.grey[300],
-        foregroundColor: isSelected ? Colors.white : Colors.black,
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
-      onPressed: () {
-        setState(() {
-          selectedChartView = text;
-        });
-      },
-      child: Text(text),
-    );
-  }
 
   Future<void> _loadData() async {
     try {
@@ -97,6 +81,15 @@ class _StoreReportState extends State<StoreReport> {
     }
   }
 
+
+  String formatCurrency(double value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(1)}M';
+    } else if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(1)}K';
+    }
+    return value.toStringAsFixed(1);
+  }
   List<FlSpot> _generateChartData() {
     Map<DateTime, double> groupedRevenue = {};
 
@@ -118,25 +111,8 @@ class _StoreReportState extends State<StoreReport> {
         break;
 
       case "Tuần":
-        for (var order in orders) {
-          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
-            DateTime weekStart = order.ngayDat!.subtract(Duration(days: order.ngayDat!.weekday - 1));
-            DateTime weekKey = DateTime(weekStart.year, weekStart.month, weekStart.day);
-            groupedRevenue[weekKey] = (groupedRevenue[weekKey] ?? 0) + order.thanhTien!;
-          }
-        }
-        break;
-
       case "Tháng":
-        for (var order in orders) {
-          if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
-            DateTime monthKey = DateTime(order.ngayDat!.year, order.ngayDat!.month);
-            groupedRevenue[monthKey] = (groupedRevenue[monthKey] ?? 0) + order.thanhTien!;
-          }
-        }
-        break;
-
-      default: // "Ngày"
+      case "Ngày":
         for (var order in orders) {
           if (order.ngayDat != null && order.thanhTien != null && order.trangThaiDH != 'canceled') {
             DateTime dayKey = DateTime(
@@ -147,167 +123,21 @@ class _StoreReportState extends State<StoreReport> {
             groupedRevenue[dayKey] = (groupedRevenue[dayKey] ?? 0) + order.thanhTien!;
           }
         }
+        break;
     }
 
     var sortedDates = groupedRevenue.keys.toList()..sort();
-    return sortedDates.asMap().entries.map((entry) {
+    var filteredDates = sortedDates.where((date) => groupedRevenue[date]! > 0).toList();
+
+    return List.generate(filteredDates.length, (index) {
       return FlSpot(
-          entry.key.toDouble(),
-          groupedRevenue[entry.value]! / 1000 // Convert to thousands for better display
+          index.toDouble(),
+          groupedRevenue[filteredDates[index]]! / 1000 // Convert to thousands for better display
       );
-    }).toList();
+    });
   }
-  String formatCurrency(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}K';
-    }
-    return value.toStringAsFixed(1);
-  }
-  Widget _buildRevenueChart() {
-    final spots = _generateChartData();
-    if (spots.isEmpty) {
-      return Center(
-        child: Text('Không có dữ liệu'),
-      );
-    }
 
-    // Calculate the number of 2-hour intervals
-    final int intervalCount = 6; // 12 hours / 2-hour intervals
 
-    return Container(
-      height: 300,
-      padding: EdgeInsets.all(16),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: true,
-            horizontalInterval: 2000,
-            verticalInterval: 1,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: Colors.grey.withOpacity(0.2),
-                strokeWidth: 1,
-              );
-            },
-          ),
-          titlesData: FlTitlesData(
-            show: true,
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 2000,
-                reservedSize: 40,
-                getTitlesWidget: (value, meta) {
-                  if (value == 0) {
-                    return Text('0',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ));
-                  }
-                  return Text(
-                    '${(value / 1000).toStringAsFixed(1)}K',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  );
-                },
-              ),
-            ),
-            rightTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (value, meta) {
-                  final int hour = (value.toInt() * 2 + 12) % 24;
-                  return Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text(
-                      '${hour.toString().padLeft(2, '0')}:00',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              bottom: BorderSide(color: Colors.grey.withOpacity(0.2)),
-              left: BorderSide(color: Colors.grey.withOpacity(0.2)),
-            ),
-          ),
-          minX: 0,
-          maxX: intervalCount.toDouble() - 1,
-          minY: 0,
-          maxY: spots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b) * 1.2,
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              color: Colors.green,
-              barWidth: 2,
-              isStrokeCapRound: true,
-              dotData: FlDotData(
-                show: true,
-                getDotPainter: (spot, percent, barData, index) {
-                  return FlDotCirclePainter(
-                    radius: 4,
-                    color: Colors.green,
-                    strokeWidth: 2,
-                    strokeColor: Colors.white,
-                  );
-                },
-              ),
-              belowBarData: BarAreaData(
-                show: true,
-                color: Colors.green.withOpacity(0.1),
-              ),
-            ),
-          ],
-          lineTouchData: LineTouchData(
-            touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-              getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                return touchedSpots.map((LineBarSpot touchedSpot) {
-                  final int hour = (touchedSpot.x.toInt() * 2 + 12) % 24;
-                  final DateTime date = DateTime(2024, 1, 1, hour, 0);
-                  return LineTooltipItem(
-                    '${DateFormat('HH:mm').format(date)}\n',
-                    const TextStyle(color: Colors.white, fontSize: 12),
-                    children: [
-                      TextSpan(
-                        text: '${NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(touchedSpot.y * 1000)}',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList();
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
   void _showFilterBottomSheet() {
     tempSelectedPeriod = selectedPeriod;
 
@@ -363,8 +193,6 @@ class _StoreReportState extends State<StoreReport> {
                       _buildFilterChip('Tuần trước', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('Tháng này', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('Tháng trước', tempSelectedPeriod, setSheetState),
-                      _buildFilterChip('30 ngày', tempSelectedPeriod, setSheetState),
-                      _buildFilterChip('60 ngày', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('2 tháng gần đây', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('Thời gian khác', tempSelectedPeriod, setSheetState),
                     ],
@@ -477,11 +305,8 @@ class _StoreReportState extends State<StoreReport> {
         start = DateTime(now.year, now.month - 1, 1);
         end = DateTime(now.year, now.month, 0, 23, 59, 59);
         break;
-      case "30 ngày":
-        start = now.subtract(Duration(days: 29));
-        break;
-      case "60 ngày":
-        start = now.subtract(Duration(days: 59));
+      case "2 Tháng gần đây":
+        start = DateTime(now.year, now.month - 2, 1);
         break;
       default:
         start = DateTime(now.year, now.month, 1);
@@ -576,14 +401,7 @@ class _StoreReportState extends State<StoreReport> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: availableChartViews.map((view) => _buildChartToggle(view)).toList(),
-            ),
-            Container(
-              height: 300,
-              child: _buildRevenueChart(),
-            ),
+            
           ],
         ),
       ),

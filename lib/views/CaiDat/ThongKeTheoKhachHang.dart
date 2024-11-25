@@ -72,7 +72,8 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
                             _fetchData();
                           }
                         },
-                        items: List.generate(12, (index) {
+                        items: List.generate(DateTime.now().month, (index) {
+                          // Lấy danh sách các tháng từ đầu năm đến tháng hiện tại
                           final date = DateTime(DateTime.now().year, index + 1);
                           return DropdownMenuItem<DateTime>(
                             value: date,
@@ -80,6 +81,7 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
                           );
                         }),
                       ),
+
                     ],
                   ),
                 ),
