@@ -1,15 +1,19 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/KMKH.dart';
+import 'package:datn_cntt304_bandogiadung/models/KhuyenMai.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/KichCoController.dart';
 import '../../controllers/MauSPController.dart';
+import '../../models/KMDH.dart';
 import '../../services/shared_function.dart';
 import 'PaymentMethodPage.dart';
 import 'PromoCodePage.dart';
@@ -44,8 +48,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
-  String selectedPromoCode = '';
-  List<Promotion> promoCodes = [];
+  String? selectedCode1;
+  String? selectedCode2;
+  String? selectedMoTa1;
+  String? selectedMoTa2;
+  String? giamCode1;
+  String? giamCode2;
+
   final CheckoutController checkoutController = CheckoutController();
   bool isLoading = false;
 
@@ -69,7 +78,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void initState() {
     super.initState();
     _loadShippingAddresses(); // Tải địa chỉ giao hàng
-    _loadPromotion();
     loadKMShip();
   }
 
@@ -91,16 +99,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<String?> getTenSP(String maSP) {
     return sanPhamController.getProductNameByMaSP(maSP);
-  }
-
-  _loadPromotion() async {
-    List<KMKH> kmkhs = await checkoutController.fetchKMKH(widget.customerId!);
-    kmkhs.forEach((element) async {
-      final promo = await checkoutController.fetchDetailKM(element.khuyenMai);
-      setState(() {
-        promoCodes.add(promo);
-      });
-    });
   }
 
   Future<void> loadKMShip() async {
@@ -147,9 +145,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
   }
 
-  double _tinhTongTien(double giaTien, int soLuong){
+  double _tinhTongTien(double giaTien, int soLuong) {
     return giaTien * soLuong;
   }
+
   @override
   Widget build(BuildContext context) {
     return isLoading
@@ -205,9 +204,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                         _buildSectionCard(
                           title: 'Áp dụng khuyến mãi',
-                          content: Text(selectedPromoCode.isNotEmpty
-                              ? selectedPromoCode
-                              : 'Không có mã giảm giá'),
+                          content: Text(
+                              selectedMoTa1 != null && selectedMoTa2 != null
+                                  ? '$selectedMoTa1, $selectedMoTa2'
+                                  : 'Không có mã giảm giá'),
                           onTap: _showPromoCodeOptions,
                         ),
                         _buildSectionCard(
@@ -277,7 +277,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               style: const TextStyle(fontSize: 16)),
                           if (tenMau != null) Text(tenMau),
                           if (tenKC != null) Text(tenKC),
-
                         ],
                       ),
                     ),
@@ -285,8 +284,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     Column(
                       children: [
                         Text(sharedFunction.formatCurrency(product.giaBan),
-                            style:
-                                const TextStyle(fontSize: 16, color: Colors.red)),
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.red)),
                         Text('x${sl[index]}')
                       ],
                     ),
@@ -391,20 +390,32 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void _showPromoCodeOptions() async {
-    final selected = await Navigator.push<String>(
+    final selected = await Navigator.push<List<String?>>(
       context,
       MaterialPageRoute(
         builder: (context) => PromoCodePage(
-          selectedPromoCode: selectedPromoCode,
-          promotions: promoCodes,
+          selectedCodeType1: selectedCode1,
+          selectedCodeType2: selectedCode2,
+          maKH: widget.customerId,
+          value1: giamCode1,
+          value2: giamCode2,
+          selectedName1: selectedMoTa1,
+          selectedName2: selectedMoTa2,
         ),
       ),
     );
 
-    if (selected != null) {
-      setState(() {
-        selectedPromoCode = selected;
-      });
+    if (selected != null && selected.isNotEmpty) {
+      if (selected.length == 6) {
+        setState(() {
+          selectedCode1 = selected[0];
+          selectedCode2 = selected[1];
+          selectedMoTa1 = selected[2];
+          selectedMoTa2 = selected[3];
+          giamCode1 = selected[4];
+          giamCode2 = selected[5];
+        });
+      }
     }
   }
 
@@ -412,6 +423,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
     double subtotal = 0;
     for (int i = 0; i < widget.dsSP.length; i++) {
       subtotal += _tinhTongTien(widget.dsSP[i].giaBan, widget.slMua[i]);
+    }
+
+    double giaShip = soKM! * 1000;
+    double giaGiam1 = double.parse(giamCode1 ?? '0');
+    double giaGiam2 = double.parse(giamCode2 ?? '0');
+    double tongTien = 0;
+
+    if (giaGiam2 > giaShip) {
+      tongTien = subtotal - giaGiam1;
+    } else {
+      tongTien = subtotal + giaShip - giaGiam1 - giaGiam2;
     }
 
     return Container(
@@ -428,9 +450,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
       child: Column(
         children: [
-          _buildSummaryRow('Tạm tính', subtotal),
-          _buildSummaryRow('Phí giao hàng', soKM! * 1000),
-          _buildSummaryRow('Tổng cộng', subtotal + soKM! * 1000, isTotal: true),
+          _buildSummaryRow('Tạm tính', subtotal, giaGiam: giaGiam1),
+          _buildSummaryRow('Phí giao hàng', giaShip, giaGiam: giaGiam2),
+          _buildSummaryRow('Tổng cộng', tongTien, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () async {
@@ -444,7 +466,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 widget.customerId,
                 selectedShippingMethod,
                 selectedPaymentMethod,
-                subtotal + soKM! * 1000,
+                tongTien,
                 false,
               );
 
@@ -454,6 +476,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     sanPham: ctsp.maCTSP,
                     soLuong: 1,
                     donGia: ctsp.giaBan));
+              }
+
+              if (selectedCode1 != null && selectedCode2 != null) {
+                KMDHController kmdhController = KMDHController();
+
+                await kmdhController.createKMDH(
+                    new KMDH(donHang: maDH, khuyenMai: selectedCode1 ?? ''));
+                await kmdhController.createKMDH(
+                    new KMDH(donHang: maDH, khuyenMai: selectedCode2 ?? ''));
+
+// update sl KMKH hoặc xóa nếu sl = 0, hết hạn
               }
 
               Navigator.of(context).pushAndRemoveUntil(
@@ -481,21 +514,55 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  Widget _buildSummaryRow(String label, double amount, {bool isTotal = false}) {
+  Widget _buildSummaryRow(String label, double amount,
+      {double giaGiam = 0, bool isTotal = false}) {
+    double finalAmount = amount - giaGiam;
+
+    if (finalAmount < 0) {
+      finalAmount = 0;
+    }
+
     SharedFunction sharedFunction = SharedFunction();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
-          Text(
-            sharedFunction.formatCurrency(amount),
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+          SizedBox(
+              width: 125,
+              child: Text(label, style: const TextStyle(fontSize: 16))),
+          if (giaGiam > 0)
+            Row(
+              children: [
+                SizedBox(
+                  width: 85,
+                  child: Text(
+                    sharedFunction.formatCurrency(amount),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight:
+                            isTotal ? FontWeight.bold : FontWeight.normal,
+                        fontFamily: 'Gabarito'),
+                  ),
+                ),
+                Text(
+                  ' - ${sharedFunction.formatCurrency(giaGiam)}',
+                  style: const TextStyle(
+                      fontSize: 16, color: Colors.red, fontFamily: 'Gabarito'),
+                ),
+              ],
             ),
-          ),
+          SizedBox(
+            width: 90,
+            child: Text(
+              sharedFunction.formatCurrency(finalAmount),
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                  fontFamily: 'Gabarito'),
+              textAlign: TextAlign.right,
+            ),
+          )
         ],
       ),
     );

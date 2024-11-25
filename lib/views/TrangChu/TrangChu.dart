@@ -4,6 +4,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:datn_cntt304_bandogiadung/views/DanhMuc/CategoryList.dart';
+import 'package:datn_cntt304_bandogiadung/views/SanPham/ChiTietSanPham.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

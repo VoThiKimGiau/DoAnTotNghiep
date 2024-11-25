@@ -16,7 +16,6 @@ class Promotion {
     DateTime ngayKetThuc;
     double triGiaGiam;
     double triGiaToiThieu;
-    double triGiaToiDa;
     int slkhNhan;
 
     Promotion({
@@ -27,7 +26,6 @@ class Promotion {
         required this.ngayKetThuc,
         required this.triGiaGiam,
         required this.triGiaToiThieu,
-        required this.triGiaToiDa,
         required this.slkhNhan,
     });
 
@@ -39,7 +37,6 @@ class Promotion {
         ngayKetThuc: DateTime.parse(json["ngayKetThuc"]),
         triGiaGiam: json["triGiaGiam"],
         triGiaToiThieu: json["triGiaToiThieu"],
-        triGiaToiDa: json["triGiaToiDa"],
         slkhNhan: json["slkhNhan"],
     );
 
@@ -51,7 +48,7 @@ class Promotion {
         "ngayKetThuc": "${ngayKetThuc.year.toString().padLeft(4, '0')}-${ngayKetThuc.month.toString().padLeft(2, '0')}-${ngayKetThuc.day.toString().padLeft(2, '0')}",
         "triGiaGiam": triGiaGiam,
         "triGiaToiThieu": triGiaToiThieu,
-        "triGiaToiDa": triGiaToiDa,
+        "triGiaToiDa": 0,
         "slkhNhan": slkhNhan,
     };
 }

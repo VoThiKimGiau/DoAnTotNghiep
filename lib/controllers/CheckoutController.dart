@@ -21,7 +21,7 @@ class CheckoutController {
       List<dynamic> jsonResponse = json.decode(response.body);
       return jsonResponse.map((item) => KMKH.fromJson(item)).toList();
     } else {
-      throw Exception('Failed to load product count');
+      throw Exception('Failed to load KMKH');
     }
   }
 
@@ -39,9 +39,11 @@ class CheckoutController {
       dynamic jsonResponse = json.decode(decodedJson);
       return Promotion.fromJson(jsonResponse);
     } else {
-      throw Exception('Failed to load product count');
+      throw Exception('Failed to load KM theo mã');
     }
   }
+
+
 
   Future<String> checkOut(String ttnh, String? kh, String htgh, String pttt,
       double tt, bool ttoan) async {

@@ -75,6 +75,22 @@ class _GridViewSanPhamState extends State<GridViewSanPham> {
     }
   }
 
+  void navigateToChiTietSPScreen(String maSP) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChiTietSanPhamScreen(
+          maSP: maSP,
+          maKH: widget.maKH, // Assuming you want to pass maKH as well
+        ),
+      ),
+    );
+
+    if (result == true) {
+      fetchSPYeuThich(widget.maKH); // Update the favorite products list or any other necessary state
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     StorageService storageService = StorageService();
@@ -93,15 +109,7 @@ class _GridViewSanPhamState extends State<GridViewSanPham> {
 
         return GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChiTietSanPhamScreen(
-                  maSP: product.maSP,
-                  maKH: widget.maKH,
-                ),
-              ),
-            );
+            navigateToChiTietSPScreen(product.maSP);
           },
           child: Stack(
             children: [

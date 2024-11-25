@@ -1,22 +1,25 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 
 class PromotionItem extends StatefulWidget {
-  const PromotionItem({
+  PromotionItem({
     super.key,
     required this.promotion,
     required this.isSelect,
   });
 
   final Promotion promotion;
-  final bool isSelect;
+  bool isSelect;
 
   @override
   State<PromotionItem> createState() => _PromotionItemState();
 }
 
 class _PromotionItemState extends State<PromotionItem> {
+  SharedFunction sharedFunction = SharedFunction();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,33 +39,47 @@ class _PromotionItemState extends State<PromotionItem> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.promotion.moTa,
+                "Giảm ${sharedFunction.formatCurrency(widget.promotion.triGiaGiam)}",
                 style: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                "Đơn tối thiểu ${widget.promotion.triGiaToiThieu}",
+                "Đơn tối thiểu ${sharedFunction.formatCurrency(widget.promotion.triGiaToiThieu)}",
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: Colors.grey,
                 ),
               ),
               Text(
-                'HSD: ${widget.promotion.ngayKetThuc.year}-${widget.promotion.ngayKetThuc.month}-${widget.promotion.ngayKetThuc.day}',
+                'HSD: ${widget.promotion.ngayKetThuc.day}/${widget.promotion.ngayKetThuc.month}/${widget.promotion.ngayKetThuc.year}',
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: Colors.grey,
                 ),
-              )
+              ),
             ],
           ),
           const Spacer(),
-          Icon(
-            widget.isSelect ? Icons.check_circle : Icons.check_circle_outline,
-            color: AppColors.primaryColor,
-          )
+          Column(
+            children: [
+              Text(
+                'x${widget.promotion.slkhNhan}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Gabarito',
+                  color: AppColors.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 5,),
+              Icon(
+                widget.isSelect ? Icons.check_circle : Icons.check_circle_outline,
+                color: AppColors.primaryColor,
+              )
+            ],
+          ),
         ],
       ),
     );

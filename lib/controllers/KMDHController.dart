@@ -19,5 +19,29 @@ class KMDHController {
       throw Exception('Failed to load KMDH data');
     }
   }
+
+  Future<KMDH?> createKMDH(KMDH kmdh) async {
+    const String apiUrl = '${IpConfig.ipConfig}api/kmdh';
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(kmdh.toJson()),
+      );
+
+      if (response.statusCode == 201) {
+        return KMDH.fromJson(jsonDecode(response.body));
+      } else {
+        print('Lỗi: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Đã xảy ra lỗi: $e');
+      return null;
+    }
+  }
 }
 

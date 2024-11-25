@@ -188,7 +188,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                       margin: const EdgeInsets.only(left: 24),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
