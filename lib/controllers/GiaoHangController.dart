@@ -44,11 +44,8 @@ class GiaoHangController {
 
   Future<double> getDistance(
       String address1, String address2, String apiKey) async {
-    final coords1 = await getCoordinates(address1, apiKey);
-    final coords2 = await getCoordinates(address2, apiKey);
-
     final String url =
-        'https://router.hereapi.com/v8/routes?origin=${coords1['latitude']},${coords1['longitude']}&destination=${coords2['latitude']},${coords2['longitude']}&return=summary&transportMode=car&apiKey=$apiKey';
+        'https://router.hereapi.com/v8/routes?origin=$address1&destination=$address2&return=summary&transportMode=car&apiKey=$apiKey';
 
     final response = await http.get(Uri.parse(url));
 

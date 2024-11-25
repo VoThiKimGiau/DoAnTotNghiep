@@ -48,7 +48,7 @@ class TTNhanHangController {
   }
 
   Future<TTNhanHang> updateTTNhanHangByCustomer(
-      String maTTNN, hoten, diachi, maKH, sdt) async {
+      String maTTNN, hoten, diachi, maKH, sdt, toaDo) async {
     final response = await http.put(
       Uri.parse("$baseUrl/$maTTNN"),
       headers: {
@@ -60,6 +60,7 @@ class TTNhanHangController {
         "sdt": sdt,
         "maKH": maKH,
         "macDinh": false,
+        "toaDo": toaDo,
       }),
     );
     if (response.statusCode == 200) {
@@ -84,20 +85,6 @@ class TTNhanHangController {
       throw Exception(
           'Failed to load TTNhanHang. Status code: ${response.statusCode}');
     }
-  }
-
-  String getRandomString(int length) {
-    const chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    Random rnd = Random();
-    return String.fromCharCodes(
-      Iterable.generate(
-        length,
-        (_) => chars.codeUnitAt(
-          rnd.nextInt(chars.length),
-        ),
-      ),
-    );
   }
 
   Future<TTNhanHang?> createTTNhanHang(TTNhanHang ttNhanHang) async {

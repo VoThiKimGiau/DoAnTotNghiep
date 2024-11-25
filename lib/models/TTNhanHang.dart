@@ -1,4 +1,3 @@
-
 class TTNhanHang {
   final String maTTNH;
   final String hoTen;
@@ -6,6 +5,7 @@ class TTNhanHang {
   final String sdt;
   final String maKH;
   late final bool macDinh;
+  final String toaDo;
 
   TTNhanHang({
     required this.maTTNH,
@@ -14,6 +14,7 @@ class TTNhanHang {
     required this.sdt,
     required this.maKH,
     required this.macDinh,
+    required this.toaDo,
   });
 
   factory TTNhanHang.fromJson(Map<String, dynamic> json) {
@@ -24,6 +25,7 @@ class TTNhanHang {
       sdt: json['sdt']?.toString() ?? '',
       maKH: json['maKH']?.toString() ?? '',
       macDinh: json['macDinh'] ?? false,
+      toaDo: json['toaDo'] ?? '',
     );
   }
 
@@ -35,6 +37,7 @@ class TTNhanHang {
       'sdt': sdt,
       'maKH': maKH,
       'macDinh': macDinh,
+      'toaDo': toaDo,
     };
   }
 }

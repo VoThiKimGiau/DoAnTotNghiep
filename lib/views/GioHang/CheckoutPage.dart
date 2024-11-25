@@ -2,11 +2,13 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/KMKH.dart';
+import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/KhuyenMai.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
@@ -103,13 +105,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> loadKMShip() async {
     try {
-      String dcDau = '140 Lê Trọng Tấn, Tây Thạnh, Tân Phú, TP.HCM, Việt Nam';
-      String? dcDich = 'Phường 5, Quận Gò Vấp, TP.HCM, Việt Nam';
-      //String? dcDich = selectedAddress!.diaChi;
+      TTNhanHangController ttNhanHangController = TTNhanHangController();
+      TTNhanHang? ttNhanHang =
+          await ttNhanHangController.fetchTTNhanHang('TT1');
+      String? dcDau = ttNhanHang!.toaDo;
+
+      String? dcDich = selectedAddress?.toaDo;
 
       if (dcDich != null && dcDau != null) {
-        destination = dcDich;
-        origin = dcDau;
+        destination = dcDich.trim();
+        origin = dcDau.trim();
         double? fetchedDistance =
             await giaoHangController.getDistance(origin!, destination!, APIKEY);
 
@@ -128,8 +133,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Future<void> _loadShippingAddresses() async {
     try {
       final List<TTNhanHang> addresses =
-          await controller.fetchTTNhanHangByCustomer(
-              widget.customerId); // Sử dụng mã khách hàng
+          await controller.fetchTTNhanHangByCustomer(widget.customerId);
       setState(() {
         shippingAddresses = addresses;
 
@@ -147,6 +151,41 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   double _tinhTongTien(double giaTien, int soLuong) {
     return giaTien * soLuong;
+  }
+
+  double tinhGiaShip(double phiCB, double soKMGiao){
+    return phiCB + (soKMGiao * 1000);
+  }
+
+  double getPhiCB() {
+    if (selectedShippingMethod == 'Hỏa tốc') {
+      return 50000;
+    } else {
+      String toaDo = selectedAddress?.toaDo ?? '';
+
+      // Tách chuỗi tọa độ thành lat và lng
+      List<String> latLng = toaDo.split(',');
+      if (latLng.length < 1) return 0; // Kiểm tra xem có tọa độ không
+
+      double lat;
+      try {
+        lat = double.parse(latLng[0]); // Chuyển đổi vĩ độ
+      } catch (e) {
+        return 0; // Nếu không thể chuyển đổi, trả về 0
+      }
+
+      // Kiểm tra miền dựa trên vĩ độ
+      if (lat >= 23) { // Miền Bắc
+        return 29000;
+      } else if (lat < 23 && lat >= 17) { // Miền Trung
+        return 29000;
+      } else if (lat < 17) { // Miền Nam
+        return 27000;
+      }else if (lat == 10.8231) { // Tọa độ TP.HCM
+        return 25000;
+      }
+    }
+    return 0; // Trả về 0 nếu không khớp điều kiện nào
   }
 
   @override
@@ -425,7 +464,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       subtotal += _tinhTongTien(widget.dsSP[i].giaBan, widget.slMua[i]);
     }
 
-    double giaShip = soKM! * 1000;
+    double giaShip = tinhGiaShip(getPhiCB(), soKM ?? 0);
     double giaGiam1 = double.parse(giamCode1 ?? '0');
     double giaGiam2 = double.parse(giamCode2 ?? '0');
     double tongTien = 0;
@@ -583,6 +622,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (selected != null) {
       setState(() {
         selectedAddress = selected;
+        loadKMShip();
       });
     }
   }

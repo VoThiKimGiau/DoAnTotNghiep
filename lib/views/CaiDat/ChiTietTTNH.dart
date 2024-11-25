@@ -4,6 +4,8 @@ import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../controllers/GiaoHangController.dart';
+
 class ChiTietTTNHScreen extends StatefulWidget {
   final String maTTNH;
 
@@ -32,7 +34,7 @@ class _ChiTietTTNHScreen extends State<ChiTietTTNHScreen> {
   Future<void> fetchTTNH() async {
     try {
       TTNhanHang? fetchedItem =
-      await ttNhanHangController.fetchTTNhanHang(widget.maTTNH);
+          await ttNhanHangController.fetchTTNhanHang(widget.maTTNH);
       setState(() {
         ttNhanHang = fetchedItem;
         if (fetchedItem != null) {
@@ -89,8 +91,8 @@ class _ChiTietTTNHScreen extends State<ChiTietTTNHScreen> {
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: const Text(
                       'SỬA THÔNG TIN NHẬN HÀNG',
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -156,12 +158,14 @@ class _ChiTietTTNHScreen extends State<ChiTietTTNHScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      bool success = await ttNhanHangController.deleteTTNhanHang(widget.maTTNH);
+                      bool success = await ttNhanHangController
+                          .deleteTTNhanHang(widget.maTTNH);
                       if (success) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -189,27 +193,52 @@ class _ChiTietTTNHScreen extends State<ChiTietTTNHScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
-                      TTNhanHang updatedAddress = TTNhanHang(
-                        maTTNH: widget.maTTNH,
-                        hoTen: hoTenController?.text ?? '',
-                        diaChi: diaChiController?.text ?? '',
-                        sdt: sdtController?.text ?? '',
-                        maKH: ttNhanHang!.maKH,
-                        macDinh: macDinh,
-                      );
+                      GiaoHangController giaoHangController =
+                          GiaoHangController();
+                      const String APIKEY =
+                          '8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY';
 
-                      bool success = await ttNhanHangController.updateTTNhanHang(widget.maTTNH,updatedAddress);
-                      if (success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Cập nhật thông tin thành công'),
-                          ),
+                      String diaChi = diaChiController?.text.trim() ?? '';
+                      String toaDoDC = '';
+
+                      try {
+                        final coords1 = await giaoHangController.getCoordinates(
+                            diaChi, APIKEY);
+                        toaDoDC =
+                            '${coords1['latitude']},${coords1['longitude']}';
+
+                        TTNhanHang updatedAddress = TTNhanHang(
+                          maTTNH: widget.maTTNH,
+                          hoTen: hoTenController?.text ?? '',
+                          diaChi: diaChi,
+                          sdt: sdtController?.text ?? '',
+                          maKH: ttNhanHang!.maKH,
+                          macDinh: macDinh,
+                          toaDo: toaDoDC,
                         );
-                        Navigator.pop(context, true);
-                      } else {
+
+                        bool success = await ttNhanHangController
+                            .updateTTNhanHang(widget.maTTNH, updatedAddress);
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Cập nhật thông tin thành công'),
+                            ),
+                          );
+                          Navigator.pop(context, true);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Cập nhật thông tin thất bại. Vui lòng thử lại'),
+                            ),
+                          );
+                        }
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Cập nhật thông tin chưa thất bại. Vui lòng thử lại'),
+                            content: Text(
+                                'Địa chỉ không hợp lệ. Vui lòng kiểm tra lại'),
                           ),
                         );
                       }

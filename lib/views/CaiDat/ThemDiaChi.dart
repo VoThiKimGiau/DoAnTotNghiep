@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/TTNhanHangController.dart';
 import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
 import 'package:datn_cntt304_bandogiadung/views/CaiDat/TTNhanHang.dart';
@@ -210,11 +211,13 @@ class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
   }
 
   Future<void> _submitForm(String maKH) async {
+    GiaoHangController giaoHangController = GiaoHangController();
+    const String APIKEY = '8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY';
     if (_formKey.currentState!.validate()) {
       TTNhanHangController ttNhanHangController = TTNhanHangController();
 
       String address =
-          '${_controllers['houseNumber']!.text}, ${_controllers['ward']!.text}, ${_controllers['district']!.text}, ${_controllers['city']!.text}';
+          '${_controllers['houseNumber']!.text.trim()}, ${_controllers['ward']!.text.trim()}, ${_controllers['district']!.text.trim()}, ${_controllers['city']!.text.trim()}';
 
       try {
         List<TTNhanHang> dsTT = await ttNhanHangController.getAllTTNhanHang();
@@ -238,22 +241,34 @@ class _AddDeliveryAddressScreenState extends State<AddDeliveryAddressScreen> {
           return 'TT$currentMaxId';
         }
 
-        await ttNhanHangController.createTTNhanHang(
-          TTNhanHang(
-            maTTNH: generateTTNhanHangCode(),
-            hoTen: _controllers['name']!.text,
-            diaChi: address,
-            sdt: _controllers['phone']!.text,
-            maKH: maKH,
-            macDinh: _isDefaultAddress,
-          ),
-        );
+        String toaDoDC = '';
+        try{
+          final coords1 = await giaoHangController.getCoordinates(address, APIKEY);
+          toaDoDC = '${coords1['latitude']},${coords1['longitude']}';
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Thêm địa chỉ thành công!')),
-        );
+          await ttNhanHangController.createTTNhanHang(
+            TTNhanHang(
+              maTTNH: generateTTNhanHangCode(),
+              hoTen: _controllers['name']!.text,
+              diaChi: address,
+              sdt: _controllers['phone']!.text,
+              maKH: maKH,
+              macDinh: _isDefaultAddress,
+              toaDo: toaDoDC,
+            ),
+          );
 
-        Navigator.pop(context, true);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Thêm địa chỉ thành công!')),
+          );
+
+          Navigator.pop(context, true);
+        }
+        catch(e){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Địa chỉ không khả dụng! Vui lòng kiểm tra lại')),
+          );
+        }
       } catch (error) {
         print('Error adding delivery address: $error');
         ScaffoldMessenger.of(context).showSnackBar(
