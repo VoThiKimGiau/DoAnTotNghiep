@@ -48,7 +48,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
       // Prepare futures for fetching details concurrently
       for (KMKH promo in fetchItems) {
         fetchKMDetailsFutures
-            .add(checkoutController.fetchDetailKM(promo.khuyenMai));
+            .add(checkoutController.fetchDetailKM(promo.khuyenMai??''));
       }
 
       // Wait for all futures to complete

@@ -11,6 +11,7 @@ import '../../controllers/DonHangController.dart';
 import '../../models/DonHang.dart';
 import '../Admin/KhachHang/QuanLyKhachHang.dart';
 import '../Admin/KhuyenMai/QuanLyKhuyenMai.dart';
+import '../Admin/NhanVien/QuanLyNhanVien.dart';
 import 'ThongKeKho.dart';
 
 class ShopDashboard extends StatefulWidget {
@@ -256,7 +257,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                           'Khuyến mãi',
                           Icons.card_giftcard,
                           onPressed: () {
-                            // Add your navigation or functionality here
+
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -265,7 +266,20 @@ class _ShopDashboardState extends State<ShopDashboard> {
                             );
                           },
                         ),
-                      _buildActionButton('Nhân viên', Icons.people_outline),
+                      if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
+                        _buildActionButton(
+                          'Nhân viên',
+                          Icons.people_alt_outlined,
+                          onPressed: () {
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EmployeeManagementScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       _buildActionButton(
                         'Đăng xuất ', Icons.logout, onPressed: () {
                         // Add your navigation or functionality here

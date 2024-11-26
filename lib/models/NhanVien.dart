@@ -1,12 +1,12 @@
 class NhanVien {
-  final String maNV;
-  final String tenNV;
-  final String sdt;
-  final String email;
-  final String chucVu;
-  final String tenTK;
-  final String matKhau;
-  final bool hoatDong;
+   String maNV;
+   String tenNV;
+   String sdt;
+   String email;
+   String chucVu;
+   String tenTK;
+   String matKhau;
+  bool hoatDong;
 
   NhanVien({
     required this.maNV,
@@ -18,6 +18,18 @@ class NhanVien {
     required this.matKhau,
     required this.hoatDong
   });
+   Map<String, dynamic> toJson() {
+     return {
+       'maNV': maNV,
+       'tenNV': tenNV,
+       'sdt': sdt,
+       'email': email,
+       'chucVu': chucVu,
+       'tenTK': tenTK,
+       'matKhau': matKhau,
+       'hoatDong': hoatDong,
+     };
+   }
 factory NhanVien.fromJson(Map<String,dynamic> json)
   {
     return NhanVien(

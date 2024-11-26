@@ -1,33 +1,26 @@
-// To parse this JSON data, do
-//
-//     final kmkh = kmkhFromJson(jsonString);
-
-import 'dart:convert';
-
-KMKH kmkhFromJson(String str) => KMKH.fromJson(json.decode(str));
-
-String kmkhToJson(KMKH data) => json.encode(data.toJson());
-
 class KMKH {
-    String khachHang;
-    String khuyenMai;
-    int soluong;
+    String? khachHang;
+    String? khuyenMai;
+    int? soluong;
 
-    KMKH({
-        required this.khachHang,
-        required this.khuyenMai,
-        required this.soluong,
-    });
+    // Default constructor
+    KMKH({this.khachHang, this.khuyenMai, this.soluong});
 
-    factory KMKH.fromJson(Map<String, dynamic> json) => KMKH(
-        khachHang: json["khachHang"],
-        khuyenMai: json["khuyenMai"],
-        soluong: json["soluong"],
-    );
+    // Named constructor to create from JSON
+    factory KMKH.fromJson(Map<String, dynamic> json) {
+        return KMKH(
+            khachHang: json['makh']?.trim(),
+            khuyenMai: json['makhuyenmai']?.trim(),
+            soluong: json['sl'],
+        );
+    }
 
-    Map<String, dynamic> toJson() => {
-        "khachHang": khachHang,
-        "khuyenMai": khuyenMai,
-        "soluong": soluong,
-    };
+    // Method to convert to JSON
+    Map<String, dynamic> toJson() {
+        return {
+            'makh': khachHang?.trim(),
+            'makhuyenmai': khuyenMai?.trim(),
+            'sl': soluong,
+        };
+    }
 }
