@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/views/ThongBao/ThongBaoChiTiet.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ThongBaoController.dart';
 import 'package:datn_cntt304_bandogiadung/models/TBKH.dart';
@@ -29,6 +30,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void initState() {
     super.initState();
     futureTBKHList = thongBaoController.fetchTBKH(widget.maKhachHang);
+  }
+
+  void _navigateToDetailScreen(TBKH tbkh, ThongBao thongBao) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NotificationDetailScreen(tbkh: tbkh, thongBao: thongBao),
+      ),
+    ).then((_) {
+      // Refresh the list when returning from the detail screen
+      setState(() {
+        futureTBKHList = thongBaoController.fetchTBKH(widget.maKhachHang);
+      });
+    });
   }
 
   @override
@@ -74,10 +89,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     return Center(child: Text("Failed to load notification content", style: TextStyle(color: colorScheme.error)));
                   } else if (tbSnapshot.hasData) {
                     ThongBao thongBao = tbSnapshot.data!;
-                    return NotificationItem(
-                      icon: Icons.notifications_outlined,
-                      iconColor: tbkh.daXem ? colorScheme.onSurface.withOpacity(0.5) : colorScheme.primary,
-                      message: thongBao.noiDung,
+                    return GestureDetector(
+                      onTap: () => _navigateToDetailScreen(tbkh, thongBao),
+                      child: NotificationItem(
+                        icon: Icons.notifications_outlined,
+                        iconColor: tbkh.daXem ? colorScheme.onSurface.withOpacity(0.5) : colorScheme.primary,
+                        message: thongBao.noiDung,
+                      ),
                     );
                   } else {
                     return SizedBox.shrink();
@@ -91,6 +109,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 }
+
+// ... (rest of the code remains the same)
+
+
 class NotificationItem extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

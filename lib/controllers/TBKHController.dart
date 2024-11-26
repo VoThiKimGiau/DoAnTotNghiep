@@ -46,7 +46,26 @@ class TBKHController{
       throw Exception('Failed to create TBKH');
     }
   }
+  Future<TBKH> updateTBKH(TBKH updatedTBKH) async {
+    NhanVienController nhanVienController = NhanVienController();
+    String? token = await nhanVienController.getToken();
 
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.put(
+      Uri.parse('${IpConfig.ipConfig}api/tbkh'),
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+      body: jsonEncode(updatedTBKH.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return TBKH.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to update TBKH');
+    }
+  }
 
 
 }

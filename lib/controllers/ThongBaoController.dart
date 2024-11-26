@@ -131,5 +131,14 @@ class ThongBaoController{
       throw Exception("Không thể xoa tb: ${response.body}");
     }
   }
+  Future<int> getUnreadNotificationCount(String? maKhachHang) async {
+    try {
+      List<TBKH> tbkhList = await fetchTBKH(maKhachHang);
+      return tbkhList.where((tbkh) => !tbkh.daXem).length;
+    } catch (e) {
+      print('Error getting unread notification count: $e');
+      return 0;
+    }
+  }
 
 }
