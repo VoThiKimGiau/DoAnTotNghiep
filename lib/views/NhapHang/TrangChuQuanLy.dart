@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/controllers/NhanVienController.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/QuanLyThongBao/QuanLyThongBao.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SanPham.dart';
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/BaoCaoScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/StoreReport.dart';
@@ -276,6 +277,20 @@ class _ShopDashboardState extends State<ShopDashboard> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EmployeeManagementScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
+                        _buildActionButton(
+                          'Thông báo',
+                          Icons.notifications_active_outlined,
+                          onPressed: () {
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => NotificationManagementScreen(),
                               ),
                             );
                           },

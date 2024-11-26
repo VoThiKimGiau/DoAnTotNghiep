@@ -9,18 +9,18 @@ class KMKH {
     // Named constructor to create from JSON
     factory KMKH.fromJson(Map<String, dynamic> json) {
         return KMKH(
-            khachHang: json['makh']?.trim(),
-            khuyenMai: json['makhuyenmai']?.trim(),
-            soluong: json['sl'],
+            khachHang: json['khachHang']?.trim(),
+            khuyenMai: json['khuyenMai']?.trim(),
+            soluong: json['soluong'],
         );
     }
 
     // Method to convert to JSON
     Map<String, dynamic> toJson() {
         return {
-            'makh': khachHang?.trim(),
-            'makhuyenmai': khuyenMai?.trim(),
-            'sl': soluong,
+            'khachHang': khachHang?.trim(),
+            'khuyenMai': khuyenMai?.trim(),
+            'soluong': soluong,
         };
     }
 }

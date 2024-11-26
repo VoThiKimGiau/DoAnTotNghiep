@@ -21,6 +21,24 @@ class KMKHController {
     }
   }
 
+  Future<List<KMKH>> getAll() async {
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.get(Uri.parse('$baseUrl'),headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},);
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonData = json.decode(response.body);
+      return jsonData.map((json) => KMKH.fromJson(json)).toList();
+    } else {
+      throw Exception("Failed to load promotions ");
+    }
+  }
   // Thêm khuyến mãi mới cho khách hàng
   Future<KMKH> addCustomerPromotion(KMKH kmkh) async {
     NhanVienController nhanVienController=NhanVienController();
@@ -30,6 +48,7 @@ class KMKHController {
     if (token == null) {
       throw Exception("Token không tồn tại");
     }
+    print('debug'+json.encode(kmkh.toJson()));
     final response = await http.post(
       Uri.parse('$baseUrl/add'),
       headers: {"Content-Type": "application/json",'Authorization': 'Bearer $token'},
