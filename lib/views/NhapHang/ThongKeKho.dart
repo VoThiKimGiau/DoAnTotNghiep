@@ -75,7 +75,7 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontWeight: FontWeight.bold,
+
                     ),
                   ),
                 ],

@@ -270,10 +270,10 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               children: [
                 Text(
                   productDetails['productName'] ?? '',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+
                 ),
                 Text(
-                  '${utf8.decode(productDetails['size']?.runes.toList() ?? [])} - ${productDetails['color'] ?? ''}',
+                  '${(productDetails['size'] ?? [])} - ${productDetails['color'] ?? ''}',
                 ),
                 Text(
                   '${chiTietSP.giaBan}đ',
@@ -389,7 +389,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                 Text('Tạm tính:', style: TextStyle(fontSize: 18)),
                 Text(
                   '${temporaryTotal.toStringAsFixed(0)}đ',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18),
                 ),
               ],
             ),

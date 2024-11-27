@@ -242,8 +242,8 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                     ),
                     ...suppliers.map((supplier) => DropdownMenuItem(
                       value: supplier.maNCC,
-                      child: Text(utf8.decode(supplier.tenNCC.runes.toList()) ),
-                    )),
+                      child: Text(utf8.decode(supplier.tenNCC.runes.toList())) ),
+                    ),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -282,7 +282,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${ utf8.decode((details['size'] ?? '').codeUnits) } - ${details['color'] ?? ''}'),
+            Text('${ (details['size'] ?? '') } - ${details['color'] ?? ''}'),
             Text('${details['sup']}'),
             Text(
               'Số lượng: ${product.slKho}',
