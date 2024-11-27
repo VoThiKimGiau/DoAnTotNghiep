@@ -1,3 +1,4 @@
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -42,8 +43,9 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Thống kê chi tiêu'),
+        title: const Text('Thống kê chi tiêu',),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -56,12 +58,14 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Card(
+                color: Colors.white,
+                elevation: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      Text('Chọn tháng: '),
-                      SizedBox(width: 10),
+                      const Text('Chọn tháng: '),
+                      const SizedBox(width: 10),
                       DropdownButton<DateTime>(
                         value: DateTime(selectedDate.year, selectedDate.month),
                         onChanged: (DateTime? newValue) {
@@ -88,27 +92,30 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
               ),
               const SizedBox(height: 16),
               Card(
+                color: Colors.white,
+                elevation: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Tổng chi tiêu',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: colorScheme.primary,
+                          color: AppColors.primaryColor,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
                             .format(monthlyStats['totalSpending'] ?? 0),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
+                          color: AppColors.primaryColor,
+                          fontFamily: 'Gabarito'
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -124,12 +131,12 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text(
+              const Text(
                 'Giao dịch gần đây',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: colorScheme.primary,
+                  color: AppColors.primaryColor,
                 ),
               ),
               const SizedBox(height: 8),
@@ -137,26 +144,26 @@ class _ThongketheokhachhangState extends State<Thongketheokhachhang> {
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: colorScheme.secondary.withOpacity(0.2),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.2),
                     child: Text(
                       order.maDH[0],
-                      style: TextStyle(color: colorScheme.secondary),
+                      style: const TextStyle(color: AppColors.primaryColor),
                     ),
                   ),
                   title: Text(
                     'Đơn hàng ${order.maDH}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      color: colorScheme.primary,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                   subtitle: Text(DateFormat('dd/MM/yyyy').format(order.ngayDat)),
                   trailing: Text(
                     NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
                         .format(order.thanhTien),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: colorScheme.primary,
+                      color: AppColors.primaryColor,
                     ),
                   ),
                 ),

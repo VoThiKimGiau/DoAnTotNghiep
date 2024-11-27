@@ -43,7 +43,34 @@ class CheckoutController {
     }
   }
 
+  Future<void> processPayment(String nonce, int amount, String accessToken, String apiUrl) async {
+    final Map<String, dynamic> paymentData = {
+      'idempotency_key': DateTime.now().millisecondsSinceEpoch.toString(),
+      'amount_money': {
+        'amount': amount, // Số tiền (ví dụ: 1000 là 10.00 USD)
+        'currency': 'USD',
+      },
+      'source_id': nonce, // Nonce từ thẻ
+      'autocomplete': true,
+    };
 
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(paymentData),
+    );
+
+    if (response.statusCode == 200) {
+      // Giao dịch thành công
+      print('Payment successful: ${response.body}');
+    } else {
+      // Xử lý lỗi
+      print('Payment failed: ${response.body}');
+    }
+  }
 
   Future<String> checkOut(String ttnh, String? kh, String htgh, String pttt,
       double tt, bool ttoan) async {

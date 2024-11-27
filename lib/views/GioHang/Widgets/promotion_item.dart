@@ -1,4 +1,5 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KMKHController.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +9,12 @@ class PromotionItem extends StatefulWidget {
     super.key,
     required this.promotion,
     required this.isSelect,
+    required this.maKH,
   });
 
   final Promotion promotion;
   bool isSelect;
+  String? maKH;
 
   @override
   State<PromotionItem> createState() => _PromotionItemState();
@@ -19,6 +22,27 @@ class PromotionItem extends StatefulWidget {
 
 class _PromotionItemState extends State<PromotionItem> {
   SharedFunction sharedFunction = SharedFunction();
+  KMKHController kmkhController  = KMKHController();
+  int? slCon;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSLCon();
+  }
+
+  Future<void> _loadSLCon() async {
+    try {
+      int? quantity = await kmkhController.getSoLuong(widget.maKH!, widget.promotion.maKm);
+      setState(() {
+        slCon = quantity;
+      });
+    } catch (e) {
+      setState(() {
+        slCon = -1;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +89,7 @@ class _PromotionItemState extends State<PromotionItem> {
           Column(
             children: [
               Text(
-                'x${widget.promotion.slkhNhan}',
+                'x${slCon ?? -1}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'Gabarito',

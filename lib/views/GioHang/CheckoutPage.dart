@@ -1,7 +1,9 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietGioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KMKHController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
@@ -29,12 +31,16 @@ class CheckoutPage extends StatefulWidget {
   final List<ChiTietSP> dsSP;
   final String? customerId;
   final List<int> slMua;
+  final String maGH;
+  final String muaTu;
 
   const CheckoutPage({
     super.key,
     required this.dsSP,
     required this.customerId,
     required this.slMua,
+    required this.maGH,
+    required this.muaTu,
   }); // Cập nhật constructor
 
   @override
@@ -47,6 +53,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
   // Pass: Cntt304cuahanggiadunghuit@
   // App ID: KnDuhWETcgnVcmXRXS2G
   // API Key: 8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY
+
+  // Square
+  // Mail: cuahanggiadunghuit@gmail.com
+  // Pass: Cntt304huit@
+  // Access token: EAAAl1C96Y41nbT9W41i_5BTIIGjJ6wNoLk7s2pi91qADkF47TaM14Lg7vkSu117
+  // URL: https://connect.squareupsandbox.com/v2/payments
+  // App ID: sandbox-sq0idb-fsc_Rb_AZp1mppp1lyAfnQ
 
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
@@ -153,7 +166,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return giaTien * soLuong;
   }
 
-  double tinhGiaShip(double phiCB, double soKMGiao){
+  double tinhGiaShip(double phiCB, double soKMGiao) {
     return phiCB + (soKMGiao * 1000);
   }
 
@@ -175,13 +188,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
       }
 
       // Kiểm tra miền dựa trên vĩ độ
-      if (lat >= 23) { // Miền Bắc
+      if (lat >= 23) {
+        // Miền Bắc
         return 29000;
-      } else if (lat < 23 && lat >= 17) { // Miền Trung
+      } else if (lat < 23 && lat >= 17) {
+        // Miền Trung
         return 29000;
-      } else if (lat < 17) { // Miền Nam
+      } else if (lat < 17) {
+        // Miền Nam
         return 27000;
-      }else if (lat == 10.8231) { // Tọa độ TP.HCM
+      } else if (lat == 10.8231) {
+        // Tọa độ TP.HCM
         return 25000;
       }
     }
@@ -509,23 +526,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 false,
               );
 
-              for (ChiTietSP ctsp in widget.dsSP) {
+              ChiTietGioHangController ctGHController =
+                  ChiTietGioHangController();
+              KMDHController kmdhController = KMDHController();
+
+              for (int i = 0; i < widget.dsSP.length; i++) {
                 await checkoutController.addChiTietDonHang(new ChiTietDonHang(
                     donHang: maDH,
-                    sanPham: ctsp.maCTSP,
-                    soLuong: 1,
-                    donGia: ctsp.giaBan));
+                    sanPham: widget.dsSP[i].maCTSP,
+                    soLuong: widget.slMua[i],
+                    donGia: widget.dsSP[i].giaBan));
+
+                if (widget.muaTu == "Giỏ hàng") {
+                  await ctGHController.xoaChiTietGioHang(
+                      widget.maGH, widget.dsSP[i].maCTSP);
+                }
               }
 
               if (selectedCode1 != null && selectedCode2 != null) {
-                KMDHController kmdhController = KMDHController();
-
                 await kmdhController.createKMDH(
                     new KMDH(donHang: maDH, khuyenMai: selectedCode1 ?? ''));
                 await kmdhController.createKMDH(
                     new KMDH(donHang: maDH, khuyenMai: selectedCode2 ?? ''));
-
-// update sl KMKH hoặc xóa nếu sl = 0, hết hạn
               }
 
               Navigator.of(context).pushAndRemoveUntil(

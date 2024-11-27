@@ -222,7 +222,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                             setState(() {
                               isFavorite = false;
                             });
-                            print('Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                            print(
+                                'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -242,157 +243,171 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : item == null
-                  ? const Center(child: Text('Không tìm thấy sản phẩm.'))
-                  : Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 250,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: dsHinhSP.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                  top: 5,
-                                  bottom: 10,
-                                  left: 15,
-                                  right: 5,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    storageService.getImageUrl(dsHinhSP[index]),
-                                    fit: BoxFit.cover,
-                                    width: 200,
-                                    height: 200,
+                      ? const Center(child: Text('Không tìm thấy sản phẩm.'))
+                      : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 250,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: dsHinhSP.length,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          margin: const EdgeInsets.only(
+                                            top: 5,
+                                            bottom: 10,
+                                            left: 15,
+                                            right: 5,
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: Image.network(
+                                              storageService
+                                                  .getImageUrl(dsHinhSP[index]),
+                                              fit: BoxFit.cover,
+                                              width: 200,
+                                              height: 200,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 24),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            item!.tenSP,
-                            style: const TextStyle(
-                              fontSize: 25,
-                              color: Colors.black,
-                              fontFamily: 'Gabarito',
-                              fontWeight: FontWeight.bold,
+                              ],
                             ),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            sharedFunction.formatCurrency(item!.giaMacDinh),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: Colors.red,
-                              fontFamily: 'Gabarito',
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 23, top: 24, right: 25),
-                    height: 150,
-                    child: SingleChildScrollView(
-                      child: Text(
-                        item!.moTa,
-                        style: const TextStyle(fontSize: 16),
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 23, top: 24),
-                    child: const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Sản phẩm tương tự ',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Gabarito',
-                        ),
-                      ),
-                    ),
-                  ),
-                  itemsSP == null || itemsSP!.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : Container(
-                    height: 440,
-                    margin: const EdgeInsets.only(left: 24),
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: itemsSP!.length,
-                      itemBuilder: (context, index) {
-                        bool isFavoriteLV = dsSPYT.any((spyt) =>
-                        spyt.maSanPham == itemsSP![index].maSP);
-
-                        return GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChiTietSanPhamScreen(
-                                  maSP: itemsSP![index].maSP,
-                                  maKH: widget.maKH,
+                            Container(
+                              margin: const EdgeInsets.only(left: 24),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      item!.tenSP,
+                                      style: const TextStyle(
+                                        fontSize: 25,
+                                        color: Colors.black,
+                                        fontFamily: 'Gabarito',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                    Text(
+                                      sharedFunction
+                                          .formatCurrency(item!.giaMacDinh),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        color: Colors.red,
+                                        fontFamily: 'Gabarito',
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                          child: SanPhamItem(
-                            item: itemsSP![index],
-                            isFavorite: isFavoriteLV,
-                            onFavoriteToggle: () async {
-                              if (!isFavoriteLV) {
-                                await spYeuThichController.themSPYeuThich(
-                                  SPYeuThich(
-                                    maKhachHang: widget.maKH ?? '',
-                                    maSanPham: itemsSP![index].maSP,
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 23, top: 24, right: 25),
+                              height: 150,
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  item!.moTa,
+                                  style: const TextStyle(fontSize: 16),
+                                  textAlign: TextAlign.justify,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 23, top: 24),
+                              child: const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'Sản phẩm tương tự ',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Gabarito',
                                   ),
-                                );
-                                print('Sản phẩm đã được thêm vào yêu thích.');
-                              } else {
-                                await spYeuThichController.xoaSPYeuThich(
-                                  widget.maKH ?? '',
-                                  itemsSP![index].maSP,
-                                );
-                                print('Sản phẩm đã được xóa khỏi danh sách yêu thích.');
-                              }
-                              setState(() {
-                                isFavorite = !isFavoriteLV;
-                              });
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                                ),
+                              ),
+                            ),
+                            itemsSP == null || itemsSP!.isEmpty
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : Container(
+                                    height: 440,
+                                    margin: const EdgeInsets.only(left: 24),
+                                    child: GridView.builder(
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        crossAxisSpacing: 5,
+                                        mainAxisSpacing: 5,
+                                        childAspectRatio: 0.8,
+                                      ),
+                                      itemCount: itemsSP!.length,
+                                      itemBuilder: (context, index) {
+                                        bool isFavoriteLV = dsSPYT.any((spyt) =>
+                                            spyt.maSanPham ==
+                                            itemsSP![index].maSP);
+
+                                        return GestureDetector(
+                                          onTap: () async {
+                                            await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChiTietSanPhamScreen(
+                                                  maSP: itemsSP![index].maSP,
+                                                  maKH: widget.maKH,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: SanPhamItem(
+                                            item: itemsSP![index],
+                                            isFavorite: isFavoriteLV,
+                                            onFavoriteToggle: () async {
+                                              if (!isFavoriteLV) {
+                                                await spYeuThichController
+                                                    .themSPYeuThich(
+                                                  SPYeuThich(
+                                                    maKhachHang:
+                                                        widget.maKH ?? '',
+                                                    maSanPham:
+                                                        itemsSP![index].maSP,
+                                                  ),
+                                                );
+                                                print(
+                                                    'Sản phẩm đã được thêm vào yêu thích.');
+                                              } else {
+                                                await spYeuThichController
+                                                    .xoaSPYeuThich(
+                                                  widget.maKH ?? '',
+                                                  itemsSP![index].maSP,
+                                                );
+                                                print(
+                                                    'Sản phẩm đã được xóa khỏi danh sách yêu thích.');
+                                              }
+                                              setState(() {
+                                                isFavorite = !isFavoriteLV;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                          ],
+                        ),
             ],
           ),
         ),
@@ -413,6 +428,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                   maSanPham ?? '',
                   maGH ?? '',
                   item?.hinhAnhMacDinh ?? '',
+                  widget.maKH,
                   item?.giaMacDinh ?? 0,
                 );
               },
@@ -443,6 +459,7 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                     maSanPham ?? '',
                     maGH ?? '',
                     item?.hinhAnhMacDinh ?? '',
+                    widget.maKH,
                     item?.giaMacDinh ?? 0,
                   );
                 },
@@ -478,6 +495,7 @@ class CustomBottomSheet {
       String maSP,
       String maGH,
       String maHA,
+      String? maKH,
       double giaMD) {
     int quantity = initialQuantity;
     String? selectedMau;
@@ -814,15 +832,16 @@ class CustomBottomSheet {
                                 );
                               } else {
                                 ChiTietGioHangController
-                                chiTietGioHangController =
-                                ChiTietGioHangController();
+                                    chiTietGioHangController =
+                                    ChiTietGioHangController();
                                 try {
                                   setState(() {
                                     isLoading = true;
                                     tongTien = quantity * chiTietSP!.giaBan;
                                   });
 
-                                  await chiTietGioHangController.themChiTietGioHang(
+                                  await chiTietGioHangController
+                                      .themChiTietGioHang(
                                     ChiTietGioHangDTO(
                                       maGioHang: maGH,
                                       maSanPham: chiTietSP!.maCTSP,
@@ -837,14 +856,132 @@ class CustomBottomSheet {
                                   // Hiển thị SnackBar trước khi pop
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text("Thêm vào giỏ hàng thành công"),
-                                      duration: Duration(seconds: 2), // Tùy chỉnh thời gian hiển thị
+                                      content:
+                                          Text("Thêm vào giỏ hàng thành công"),
+                                      duration: Duration(
+                                          seconds:
+                                              2), // Tùy chỉnh thời gian hiển thị
                                     ),
                                   );
 
                                   // Pop context sau khi hiển thị SnackBar
                                   Navigator.of(context).pop();
+                                } catch (e) {
+                                  // Xử lý nếu có lỗi
+                                  setState(() {
+                                    isLoading = false;
+                                  });
 
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Lỗi: ${e.toString()}"),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            }
+                          } else if (buttonText == "Mua ngay" &&
+                              isLoading == false) {
+                            if (selectedMau != null &&
+                                selectedKichCo != null &&
+                                maSP != null) {
+                              chiTietSP = await getCTSP(
+                                  selectedMau!, selectedKichCo!, maSP);
+                              if (chiTietSP == null) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                        'Thông báo',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: const Text(
+                                        'Vui lòng chọn đầy đủ màu sắc và kích cỡ',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Đóng dialog
+                                          },
+                                          child: const Text(
+                                            'Đóng',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else if (chiTietSP!.slKho == 0) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                        'Thông báo',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      content: const Text(
+                                        'Rất tiếc mặt hàng này đã hết. Xin quý khách vui lòng chọn mặt hàng khác',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Đóng dialog
+                                          },
+                                          child: const Text(
+                                            'Đóng',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                try {
+                                  setState(() {
+                                    isLoading = true;
+                                    tongTien = quantity * chiTietSP!.giaBan;
+                                  });
+
+                                  List<ChiTietSP> lstSP = [];
+                                  lstSP.add(chiTietSP!);
+
+                                  List<int> lstSL = [];
+                                  lstSL.add(quantity);
+
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CheckoutPage(
+                                                dsSP: lstSP,
+                                                customerId: maKH,
+                                                slMua: lstSL,
+                                                maGH: maGH, muaTu: 'Mua ngay',
+                                              )));
+
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                 } catch (e) {
                                   // Xử lý nếu có lỗi
                                   setState(() {
@@ -861,9 +998,6 @@ class CustomBottomSheet {
                               }
                             }
                           }
-                          // else if(buttonText == "Mua ngay" && isLoading == false){
-                          //   Navigator.push(context, MaterialPageRoute(builder: (context) => CheckoutPage(dsSP: chiTietSP, customerId: widget, slMua: slMua)))
-                          // }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,

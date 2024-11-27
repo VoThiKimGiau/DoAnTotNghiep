@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
@@ -53,22 +54,22 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(
+        title: const Text(
           'Đơn hàng',
           style: TextStyle(
             fontSize: 25,
-            color: colorScheme.onPrimary,
+            color: Colors.white,
             fontFamily: 'Comfortaa',
 
           ),
         ),
-        backgroundColor: colorScheme.primary,
+        backgroundColor: AppColors.primaryColor,
         elevation: 0,
         centerTitle: true,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(20),
           ),
@@ -77,7 +78,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               boxShadow: [
@@ -85,7 +86,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   color: Colors.grey.withOpacity(0.2),
                   spreadRadius: 1,
                   blurRadius: 5,
-                  offset: Offset(0, 3),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -133,7 +134,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
                 return ListView.builder(
                   itemCount: donHangs.length,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   itemBuilder: (context, index) {
                     final donHang = donHangs[index];
 
@@ -162,8 +163,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
   Widget _buildOrderCard(DonHang donHang, String subtitle, int? productCount) {
     return Card(
+      color: Colors.white,
       elevation: 3,
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
@@ -178,14 +180,14 @@ class _OrderListScreenState extends State<OrderListScreen> {
           );
         },
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(8),
@@ -197,7 +199,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       color: colorScheme.onPrimaryContainer,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       'Đơn hàng: ${donHang.maDH}',
@@ -211,7 +213,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   Icon(Icons.arrow_forward_ios, size: 16, color: colorScheme.primary),
                 ],
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
                 subtitle,
                 style: TextStyle(
@@ -219,7 +221,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Trạng thái: ${utf8.decode(donHang.trangThaiDH.runes.toList())}',
                 style: TextStyle(
@@ -228,7 +230,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Ngày đặt: ${donHang.ngayDat.day}/${donHang.ngayDat.month}/${donHang.ngayDat.year}',
                 style: TextStyle(
@@ -236,7 +238,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                   color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Thành tiền: ${sharedFunction.formatCurrency(donHang.thanhTien) }',
                 style: TextStyle(

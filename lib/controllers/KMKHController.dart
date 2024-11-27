@@ -39,6 +39,7 @@ class KMKHController {
       throw Exception("Failed to load promotions ");
     }
   }
+
   // Thêm khuyến mãi mới cho khách hàng
   Future<KMKH> addCustomerPromotion(KMKH kmkh) async {
     NhanVienController nhanVienController=NhanVienController();
@@ -59,6 +60,62 @@ class KMKHController {
       return KMKH.fromJson(json.decode(response.body));
     } else {
       throw Exception("Failed to add promotion for customer");
+    }
+  }
+
+  Future<void> updateKhuyenMaiKhachHang(String khachHangId, String khuyenMaiId, KMKH kmkh) async {
+    final String url = '$baseUrl/$khachHangId/$khuyenMaiId';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(kmkh.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        KMKH updatedKMKH = KMKH.fromJson(jsonDecode(response.body));
+        print('Cập nhật thành công: ${updatedKMKH.toJson()}');
+      } else {
+        print('Lỗi: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Đã xảy ra lỗi: $e');
+    }
+  }
+
+  Future<int?> getSoLuong(String khachHangId, String khuyenMaiId) async {
+    final String url = '$baseUrl/laySL/$khachHangId/$khuyenMaiId';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        return int.parse(response.body);
+      } else {
+        print('Lỗi: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      // Xử lý ngoại lệ
+      print('Đã xảy ra lỗi: $e');
+      return null;
+    }
+  }
+
+  Future<void> deleteKhuyenMaiKhachHang(String khachHangId, String khuyenMaiId) async {
+    final String url = '$baseUrl/$khachHangId/$khuyenMaiId';
+
+    try {
+      final response = await http.delete(Uri.parse(url));
+
+      if (response.statusCode == 204) {
+        print('Xóa thành công');
+      } else {
+        print('Lỗi: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Đã xảy ra lỗi: $e');
     }
   }
 }

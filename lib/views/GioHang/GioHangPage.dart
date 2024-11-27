@@ -52,7 +52,8 @@ class _GioHangPageState extends State<GioHangPage> {
       setState(() {
         gioHangItems = items;
         selectedItems = List.generate(gioHangItems.length, (index) => false);
-        dsSLMua = List.generate(gioHangItems.length, (index) => gioHangItems[index].soLuong);
+        dsSLMua = List.generate(
+            gioHangItems.length, (index) => gioHangItems[index].soLuong);
         _isLoading = false;
         _hasFetchedItems = true;
         fetchCTSP();
@@ -111,7 +112,7 @@ class _GioHangPageState extends State<GioHangPage> {
     });
   }
 
-  void _datHang() {
+  Future<void> _datHang() async {
     if (!selectedItems.contains(true)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -140,6 +141,8 @@ class _GioHangPageState extends State<GioHangPage> {
           dsSP: selectedProducts,
           customerId: widget.maKH,
           slMua: selectedQuantities,
+          maGH: widget.maGioHang, muaTu: 'Giỏ hàng',
+
         ),
       ),
     );

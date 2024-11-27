@@ -1,3 +1,5 @@
+import 'package:datn_cntt304_bandogiadung/controllers/KMKHController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
@@ -35,6 +37,10 @@ class _PromoCodePageState extends State<PromoCodePage> {
   CheckoutController checkoutController = CheckoutController();
   bool isLoading = true;
 
+  KMKHController kmkhController = KMKHController();
+  int? SLCon1;
+  int? SLCon2;
+
   @override
   void initState() {
     super.initState();
@@ -45,10 +51,22 @@ class _PromoCodePageState extends State<PromoCodePage> {
     try {
       List<KMKH> fetchItems = await checkoutController.fetchKMKH(widget.maKH!);
       List<Future<Promotion>> fetchKMDetailsFutures = [];
+      List<KMKH> itemsToRemove = [];
+
+      for (KMKH item in fetchItems) {
+        if (item.soluong == 0) {
+          await kmkhController.deleteKhuyenMaiKhachHang(
+              widget.maKH!, item.khuyenMai!);
+          itemsToRemove.add(item);
+        }
+      }
+
+      fetchItems.removeWhere((item) => itemsToRemove.contains(item));
+
       // Prepare futures for fetching details concurrently
       for (KMKH promo in fetchItems) {
         fetchKMDetailsFutures
-            .add(checkoutController.fetchDetailKM(promo.khuyenMai??''));
+            .add(checkoutController.fetchDetailKM(promo.khuyenMai ?? ''));
       }
 
       // Wait for all futures to complete
@@ -57,11 +75,16 @@ class _PromoCodePageState extends State<PromoCodePage> {
       List<Promotion> fetchKMType1 = [];
       List<Promotion> fetchKMType2 = [];
 
+      DateTime today = DateTime.now();
       for (Promotion km in fetchKMDetails) {
-        if (km.loaiKm == 'Phí vận chuyển') {
-          fetchKMType1.add(km);
-        } else if (km.loaiKm == 'Giá trị đơn') {
-          fetchKMType2.add(km);
+        if (km.ngayKetThuc.isBefore(today)) {
+          await kmkhController.deleteKhuyenMaiKhachHang(widget.maKH!, km.maKm);
+        } else {
+          if (km.loaiKm == 'Phí vận chuyển') {
+            fetchKMType1.add(km);
+          } else if (km.loaiKm == 'Giá trị đơn') {
+            fetchKMType2.add(km);
+          }
         }
       }
 
@@ -119,7 +142,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
                   child: ListView(
                     children: promotionsType1.map((promo) {
                       return GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           setState(() {
                             widget.selectedCodeType1 = promo.maKm;
                             widget.selectedName1 = promo.moTa;
@@ -129,6 +152,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
                         child: PromotionItem(
                           promotion: promo,
                           isSelect: widget.selectedCodeType1 == promo.maKm,
+                          maKH: widget.maKH,
                         ),
                       );
                     }).toList(),
@@ -149,7 +173,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
                   child: ListView(
                     children: promotionsType2.map((promo) {
                       return GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           setState(() {
                             widget.selectedCodeType2 = promo.maKm;
                             widget.selectedName2 = promo.moTa;
@@ -159,6 +183,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
                         child: PromotionItem(
                           promotion: promo,
                           isSelect: widget.selectedCodeType2 == promo.maKm,
+                          maKH: widget.maKH,
                         ),
                       );
                     }).toList(),

@@ -62,7 +62,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
           children: [
             Text(
               widget.thongBao.noiDung,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Gabarito'),
             ),
             SizedBox(height: 16),
             Text(
