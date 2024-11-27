@@ -110,7 +110,7 @@ class DonHangController {
   }
   Map<String, dynamic> calculateStatistics(List<DonHang> donHangList) {
 
-    List<DonHang> validOrders = donHangList.where((order) => order.trangThaiDH != 'canceled').toList();
+    List<DonHang> validOrders = donHangList.where((order) => utf8.decode (order.trangThaiDH.runes.toList()) != 'Đã huỷ').toList();
 
 
     double totalRevenue = validOrders.fold(0.0, (sum, order) => sum + (order.thanhTien ?? 0.0));
@@ -119,7 +119,7 @@ class DonHangController {
 
     int totalCustomers = donHangList.map((order) => order.khachHang).toSet().length;
 
-    int canceledOrdersCount = donHangList.where((order) => order.trangThaiDH == 'canceled').length;
+    int canceledOrdersCount = donHangList.where((order) => utf8.decode (order.trangThaiDH.runes.toList()) == 'Đã huỷ').length;
     double cancelRate = (totalOrders > 0) ? (canceledOrdersCount / totalOrders) * 100 : 0.0;
 
     // Tính trung bình đơn hàng trên mỗi khách hàng
@@ -170,8 +170,10 @@ class DonHangController {
     String endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(end);
 
     // Bước 1: Lấy danh sách đơn hàng hôm nay
-    List<DonHang> donHangListToday = await fetchDonHangByDateRange(startDate, endDate);
-    
+    List<DonHang> donHangListToday2 = await fetchDonHangByDateRange(startDate, endDate);
+    List<DonHang> donHangListToday=donHangListToday2
+        .where((order) =>
+    utf8.decode(order.trangThaiDH.runes.toList()) != 'Đã huỷ').toList();
     double totalCost = 0.0;
 
     // Bước 2: Lặp qua từng đơn hàng hôm nay để tính tổng giá trị vốn

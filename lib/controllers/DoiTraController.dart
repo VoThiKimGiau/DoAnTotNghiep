@@ -70,15 +70,9 @@ class DoiTraController{
     );
 
     if (response.statusCode == 200) {
-      dynamic jsonResponse = json.decode(response.body);
-      if (jsonResponse is List) {
-        return jsonResponse.map((data) => ChiTietDoiTra.fromJson(data)).toList();
-      } else if (jsonResponse is Map<String, dynamic>) {
-        // If it's a single object, wrap it in a list
-        return [ChiTietDoiTra.fromJson(jsonResponse)];
-      } else {
-        throw Exception('Unexpected response format');
-      }
+      List<dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => ChiTietDoiTra.fromJson(data)).toList();
+
     } else {
       throw Exception('Failed to load ChiTietDoiTra list');
     }

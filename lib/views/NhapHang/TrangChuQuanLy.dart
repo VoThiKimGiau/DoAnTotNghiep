@@ -329,7 +329,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
             SizedBox(height: 10),
             Text(title, style: TextStyle(fontSize: 16)),
             Text(value,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 24)),
           ],
         ),
       ),

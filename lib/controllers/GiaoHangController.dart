@@ -4,13 +4,26 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/IpConfig.dart';
 import '../models/GiaoHang.dart';
+import 'NhanVienController.dart';
 
 class GiaoHangController {
   final String baseUrl = '${IpConfig.ipConfig}api/giaohang';
 
   Future<GiaoHang?> fetchGiaoHang(String donHang) async {
+    NhanVienController nhanVienController=NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
     final response =
-        await http.get(Uri.parse('$baseUrl/donHang?donHang=$donHang'));
+        await http.get(Uri.parse('$baseUrl/donHang?donHang=$donHang'),
+          headers: <String, String>{
+            'accept': '*/*',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token'
+          });
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       return GiaoHang.fromJson(data);

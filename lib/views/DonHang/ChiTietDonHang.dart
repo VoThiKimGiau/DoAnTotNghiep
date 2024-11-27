@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:datn_cntt304_bandogiadung/controllers/DonHangController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/views/DoiTra/DanhSachSanPhamDoiTra.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/HuyDH.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/TBTraHang.dart';
 import 'package:flutter/material.dart';
+import '../../models/GiaoHang.dart';
 import '/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/models/DonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/TTNhanHang.dart';
@@ -24,10 +26,11 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   TTNhanHang? tTNhanHang;
   bool isLoading = true;
-
+  GiaoHang? giaoHang;
   @override
   void initState() {
     super.initState();
+    fetchGiaoHang();
     fetchTTNhanHang();
   }
 
@@ -38,6 +41,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }catch(error)
     {
       print("Error: +$error");
+    }
+  }
+  Future<void> fetchGiaoHang() async {
+    GiaoHangController controller = GiaoHangController();
+    try {
+      giaoHang = await controller.fetchGiaoHang(widget.donHang.maDH);
+    } catch (error) {
+      print('Failed to load GiaoHang: $error');
     }
   }
   Future<void> fetchTTNhanHang() async {
@@ -238,9 +249,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: TextStyle(
                 fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
         const SizedBox(height: 12.0),
-        _buildStatusItem('Đã giao hàng', isDelivered, date: ''),
-        _buildStatusItem('Đang giao hàng', isShipping, date: ''),
-        _buildStatusItem('Đã xác nhận', isConfirmed, date: ''),
+        _buildStatusItem('Đã giao hàng', isDelivered, date: giaoHang?.ngayGiao != null
+            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGiao!! ))
+            : ''),
+        _buildStatusItem('Đang giao hàng', isShipping, date: giaoHang?.ngayGui != null
+            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGui!!))
+            : ''),
+        _buildStatusItem('Đã xác nhận', isConfirmed, date: giaoHang?.ngayGiao != null
+            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGui!! ))
+            : ''),
         _buildStatusItem('Đang xử lý', isProcessing,
             date: DateFormat('dd/MM/yyyy')
                 .format(DateTime.parse(widget.donHang.ngayDat.toString()))),

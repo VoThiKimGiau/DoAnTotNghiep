@@ -144,7 +144,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
           ),
-          title: Text('${chiTiet.maCTSP}\n$tenSP - $tenMau - ${utf8.decode(tenKichCo.runes.toList())}', style: TextStyle(fontSize: 18)),
+          title: Text('${chiTiet.maCTSP}\n$tenSP - $tenMau - ${tenKichCo}', style: TextStyle(fontSize: 18)),
           subtitle: Text('Số lượng: ${chiTiet.soluong}\n Giá: ${NumberFormat.currency(locale: 'vi').format(chiTiet.gia)}', style: TextStyle(fontSize: 16)),
         ),
       );

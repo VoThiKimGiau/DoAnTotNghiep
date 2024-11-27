@@ -5,7 +5,6 @@ class GiaoHang {
   DateTime? ngayGiao;            // Delivery date
   String trangThai;              // Delivery status
   double? tienUng;               // Advance payment
-  String hinhThuc;               // Delivery method
 
   GiaoHang({
     required this.maVanDon,
@@ -14,7 +13,7 @@ class GiaoHang {
     this.ngayGiao,
     required this.trangThai,
     this.tienUng,
-    required this.hinhThuc,
+
   });
 
   // Convert JSON to model
@@ -26,7 +25,7 @@ class GiaoHang {
       ngayGiao: json['ngayGiao'] != null ? DateTime.parse(json['ngayGiao']) : null,
       trangThai: json['trangThai'],
       tienUng: json['tienUng']?.toDouble(),
-      hinhThuc: json['hinhThuc'],
+
     );
   }
   Map<String, dynamic> toJson() {
@@ -37,7 +36,7 @@ class GiaoHang {
       'ngayGiao': ngayGiao?.toIso8601String(),
       'trangThai': trangThai,
       'tienUng': tienUng,
-      'hinhThuc': hinhThuc,
+
     };
   }
 }
