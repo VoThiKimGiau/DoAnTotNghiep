@@ -21,7 +21,7 @@ class SanPham {
       maSP: json['maSP'] as String,
       tenSP: json['tenSP'] as String,
       moTa: json['moTa'] as String,
-      danhMuc: json['danhMuc'] as String,
+      danhMuc: json['maDanhMuc'] as String,
       hinhAnhMacDinh: json['maHinhAnhMacDinh'] as String,
       giaMacDinh: (json['giaMacDinh'] as num).toDouble(),
     );
@@ -33,7 +33,7 @@ class SanPham {
       'maSP': maSP,
       'tenSP': tenSP,
       'moTa': moTa,
-      'danhMuc': danhMuc,
+      'maDanhMuc': danhMuc,
       'maHinhAnhMacDinh': hinhAnhMacDinh,
       'giaMacDinh': giaMacDinh,
     };

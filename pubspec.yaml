@@ -36,5 +36,5 @@ flutter:
   fonts:
     - family: Comfortaa
       fonts:
-       - asset: assets/fonts/Comfortaa-Regular.ttf
+      - asset: assets/fonts/Comfortaa-Regular.ttf
 

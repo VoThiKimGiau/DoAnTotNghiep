@@ -54,13 +54,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
   // App ID: KnDuhWETcgnVcmXRXS2G
   // API Key: 8AOpT7e0QxfGS0TLD08A4M66K80ioaXiwMU1zUUv9IY
 
-  // Square
-  // Mail: cuahanggiadunghuit@gmail.com
-  // Pass: Cntt304huit@
-  // Access token: EAAAl1C96Y41nbT9W41i_5BTIIGjJ6wNoLk7s2pi91qADkF47TaM14Lg7vkSu117
-  // URL: https://connect.squareupsandbox.com/v2/payments
-  // App ID: sandbox-sq0idb-fsc_Rb_AZp1mppp1lyAfnQ
-
   String selectedPaymentMethod = 'Thanh toán khi nhận hàng';
   String selectedShippingMethod = 'Thường';
   String? selectedCode1;

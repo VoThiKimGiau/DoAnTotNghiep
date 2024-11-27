@@ -1,5 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -8,6 +10,8 @@ import '../../../models/DanhMucSP.dart';
 import '../../../models/SanPham.dart';
 import '../../../services/shared_function.dart';
 import '../../../services/storage/storage_service.dart';
+import 'Admin_ItemCTSP.dart';
+import 'Admin_ItemSP.dart';
 
 class AdminSuaSPScreen extends StatefulWidget {
   late String maSP;
@@ -33,27 +37,32 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
   String? selectedCategory;
   DanhMucSPController danhMucSPController = DanhMucSPController();
   List<DanhMucSP>? dsDanhMuc;
-  List<String> dsTenDM = [];
+
+  ChiTietSPController chiTietSPController = ChiTietSPController();
+  List<ChiTietSP> dsCT = [];
 
   @override
   void initState() {
     super.initState();
     fetchSP();
+    fetchDanhMucSP();
+    fetchChiTietSP(widget.maSP);
   }
 
   Future<void> fetchSP() async {
     try {
-      SanPham fetchedItems = await sanPhamController.getProductByMaSP(widget.maSP);
+      SanPham fetchedItems =
+          await sanPhamController.getProductByMaSP(widget.maSP);
       setState(() {
         itemSP = fetchedItems;
         isLoading = false;
         tenSPController.text = itemSP!.tenSP;
-        hinhAnhController.text = storageService.getImageUrl(itemSP!.hinhAnhMacDinh);
+        hinhAnhController.text =
+            storageService.getImageUrl(itemSP!.hinhAnhMacDinh);
         moTaController.text = itemSP!.moTa;
         selectedCategory = itemSP!.danhMuc;
         giaMacDinhController.text = itemSP!.giaMacDinh.toString();
       });
-      await loadTenDM();
     } catch (e) {
       print('Error: $e');
       setState(() {
@@ -66,31 +75,41 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
   Future<void> fetchDanhMucSP() async {
     try {
       List<DanhMucSP> fetchedItems = await danhMucSPController.fetchDanhMucSP();
-      if (mounted) {
-        setState(() {
-          dsDanhMuc = fetchedItems;
-          dsTenDM = dsDanhMuc!.map((dm) => dm.tenDanhMuc).toSet().toList();
-          isLoading = false;
 
-          if (!dsTenDM.contains(selectedCategory)) {
-            selectedCategory = dsTenDM.isNotEmpty ? dsTenDM.first : null;
-          }
-        });
-      }
+      setState(() {
+        dsDanhMuc = fetchedItems;
+        isLoading = false;
+
+        if (!dsDanhMuc!.any((dm) => dm.maDanhMuc == selectedCategory)) {
+          selectedCategory = dsDanhMuc!.isNotEmpty
+              ? dsDanhMuc!.first.maDanhMuc
+              : null; // Set to the first maDanhMuc if none matches
+        }
+      });
     } catch (e) {
       print('Error: $e');
-      if (mounted) {
-        setState(() {
-          dsDanhMuc = [];
-          dsTenDM = [];
-          isLoading = false;
-        });
-      }
+
+      setState(() {
+        dsDanhMuc = [];
+        isLoading = false;
+      });
     }
   }
 
-  Future<void> loadTenDM() async {
-    await fetchDanhMucSP();
+  Future<void> fetchChiTietSP(String maSanPham) async {
+    try {
+      List<ChiTietSP> fetchedItems =
+      await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
+
+      setState(() {
+        dsCT = fetchedItems;
+      });
+    } catch (e) {
+      print('Error: $e'); // Handle error
+      setState(() {
+        dsCT = [];
+      });
+    }
   }
 
   Future<void> saveChanges() async {
@@ -98,14 +117,21 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
       SanPham updatedSP = SanPham(
         maSP: itemSP!.maSP,
         tenSP: tenSPController.text,
-        hinhAnhMacDinh: hinhAnhController.text,
+        hinhAnhMacDinh: itemSP!.hinhAnhMacDinh,
         moTa: moTaController.text,
-        danhMuc: selectedCategory ?? '',
+        danhMuc: itemSP!.danhMuc,
         giaMacDinh: double.tryParse(giaMacDinhController.text) ?? 0.0,
       );
       await sanPhamController.updateProduct(itemSP!.maSP, updatedSP);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cập nhật sản phẩm thành công')),
+      );
+      Navigator.pop(context);
     } catch (e) {
       print('Error saving changes: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lỗi cập nhật. Vui lòng kiểm tra lại')),
+      );
     }
   }
 
@@ -118,7 +144,8 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 17, vertical: 25),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                 child: Row(
                   children: [
                     SizedBox(
@@ -135,101 +162,117 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                         child: SvgPicture.asset('assets/icons/arrowleft.svg'),
                       ),
                     ),
-                    const SizedBox(width: 50),
-                    const Text(
-                      'SỬA SẢN PHẨM',
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: const Text(
+                        'SỬA SẢN PHẨM',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: isLoading
                     ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+                        child: CircularProgressIndicator(),
+                      )
                     : Column(
-                  children: [
-                    Center(
-                      child: Image.network(
-                        storageService.getImageUrl(itemSP!.hinhAnhMacDinh),
-                      ),
-                    ),
-                    TextField(
-                      controller: tenSPController,
-                      decoration: const InputDecoration(
-                        labelText: 'Tên sản phẩm',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: hinhAnhController,
-                      decoration: const InputDecoration(
-                        labelText: 'Hình ảnh sản phẩm URL',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: moTaController,
-                      decoration: const InputDecoration(
-                        labelText: 'Mô tả sản phẩm',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: selectedCategory,
-                      decoration: const InputDecoration(
-                        labelText: 'Danh mục sản phẩm',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: dsTenDM.map((String category) {
-                        return DropdownMenuItem<String>(
-                          value: category,
-                          child: Text(category),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedCategory = newValue;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: giaMacDinhController,
-                      decoration: const InputDecoration(
-                        labelText: 'Giá sản phẩm',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.number,
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
-                      child: ElevatedButton(
-                        onPressed: saveChanges,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Lưu',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                        children: [
+                          Center(
+                            child: Image.network(
+                              storageService
+                                  .getImageUrl(itemSP!.hinhAnhMacDinh),
+                            ),
                           ),
-                        ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          TextField(
+                            controller: tenSPController,
+                            decoration: const InputDecoration(
+                              labelText: 'Tên sản phẩm',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: moTaController,
+                            decoration: const InputDecoration(
+                              labelText: 'Mô tả sản phẩm',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          DropdownButtonFormField<String>(
+                            value: selectedCategory,
+                            decoration: const InputDecoration(
+                              labelText: 'Danh mục sản phẩm',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: dsDanhMuc?.map((DanhMucSP category) {
+                              return DropdownMenuItem<String>(
+                                value:
+                                    category.maDanhMuc, // Ensure this is unique
+                                child:
+                                    Text(category.tenDanhMuc), // Display name
+                              );
+                            }).toList(),
+                            // Ensure you use toList() directly without toSet()
+                            onChanged: (String? newValue) {
+                              print("Danh mục sản phẩm:");
+                              dsDanhMuc?.forEach((dm) {
+                                print(
+                                    'Mã danh mục: ${dm.maDanhMuc}, Tên danh mục: ${dm.tenDanhMuc}');
+                              });
+                              setState(() {
+                                selectedCategory = newValue;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextField(
+                            controller: giaMacDinhController,
+                            decoration: const InputDecoration(
+                              labelText: 'Giá sản phẩm',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: saveChanges,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              minimumSize: const Size(double.infinity, 40),
+                            ),
+                            child: const Text(
+                              'Lưu',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text('Chi tiết sản phẩm:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 10),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: dsCT.length,
+                            itemBuilder: (context, index) {
+                              final product = dsCT[index];
+                              return ItemCTSP_Admin(product: product); // Display each ChiTietSP
+                            },
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              )
+              ),
             ],
           ),
         ),

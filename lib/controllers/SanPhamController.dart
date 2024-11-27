@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:datn_cntt304_bandogiadung/config/IpConfig.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/NhanVienController.dart';
 import 'package:datn_cntt304_bandogiadung/models/SanPham.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,12 +68,21 @@ class SanPhamController {
   }
 
   Future<SanPham?> updateProduct(String id, SanPham updatedSanPham) async {
+    NhanVienController nhanVienController = NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
     final String apiUrl = '${IpConfig.ipConfig}api/sanpham/update/$id';
 
     final response = await http.put(
       Uri.parse(apiUrl),
       headers: {
+        'accept': '*/*',
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
       },
       body: jsonEncode(updatedSanPham.toJson()),
     );
@@ -80,7 +90,7 @@ class SanPhamController {
     if (response.statusCode == 200) {
       return SanPham.fromJson(jsonDecode(response.body));
     } else {
-      print('Failed to update product: ${response.statusCode}');
+      print('Failed to update product: ${response.statusCode} - ${response.body}');
       return null;
     }
   }

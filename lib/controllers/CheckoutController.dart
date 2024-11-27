@@ -43,31 +43,36 @@ class CheckoutController {
     }
   }
 
-  Future<void> processPayment(String nonce, int amount, String accessToken, String apiUrl) async {
-    final Map<String, dynamic> paymentData = {
-      'idempotency_key': DateTime.now().millisecondsSinceEpoch.toString(),
-      'amount_money': {
-        'amount': amount, // Số tiền (ví dụ: 1000 là 10.00 USD)
-        'currency': 'USD',
-      },
-      'source_id': nonce, // Nonce từ thẻ
-      'autocomplete': true,
-    };
+  // Square
+  // Mail: cuahanggiadunghuit@gmail.com
+  // Pass: Cntt304huit@
+  // Access token: EAAAl1C96Y41nbT9W41i_5BTIIGjJ6wNoLk7s2pi91qADkF47TaM14Lg7vkSu117
+  // URL: https://connect.squareupsandbox.com/v2/payments
+  // App ID: sandbox-sq0idb-fsc_Rb_AZp1mppp1lyAfnQ
 
+  final String accessToken = 'EAAAl1C96Y41nbT9W41i_5BTIIGjJ6wNoLk7s2pi91qADkF47TaM14Lg7vkSu117';
+  final String baseUrl = 'https://connect.sandbox.squareup.com/v2';
+
+  Future<void> createPayment(String amount, String currency, String sourceId) async {
     final response = await http.post(
-      Uri.parse(apiUrl),
+      Uri.parse('$baseUrl/payments'),
       headers: {
         'Authorization': 'Bearer $accessToken',
         'Content-Type': 'application/json',
       },
-      body: json.encode(paymentData),
+      body: jsonEncode({
+        'amount_money': {
+          'amount': int.parse(amount), // Số tiền thanh toán (đơn vị: cent)
+          'currency': currency, // Đơn vị tiền tệ (ví dụ: USD)
+        },
+        'source_id': sourceId, // ID thẻ tín dụng
+        'idempotency_key': DateTime.now().millisecondsSinceEpoch.toString(),
+      }),
     );
 
     if (response.statusCode == 200) {
-      // Giao dịch thành công
       print('Payment successful: ${response.body}');
     } else {
-      // Xử lý lỗi
       print('Payment failed: ${response.body}');
     }
   }

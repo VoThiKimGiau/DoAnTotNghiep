@@ -43,7 +43,7 @@ class _LoginScreen extends State<LoginScreen> {
   Future<void> _login() async {
     if (tenTKController.text.isEmpty || matKhauController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter both username and password')),
+        const SnackBar(content: Text('Vui lòng nhập đủ tên tài khoản và mật khẩu')),
       );
       return;
     }
@@ -53,8 +53,14 @@ class _LoginScreen extends State<LoginScreen> {
             tenTKController.text, matKhauController.text);
         if (khachHang == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Xin lỗi, bạn không có quyền thực hiện hành động này. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị')),
+            const SnackBar(
+                content: Text('Sai tải khoản hoặc mật khẩu. Vui lòng kiểm tra lại')),
+          );
+        } else if (!khachHang!.hoatDong) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tài khoản đã bị vô hiệu hóa. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị.'),
+            ),
           );
         } else {
           String? maKH = khachHang?.maKH;
@@ -70,7 +76,7 @@ class _LoginScreen extends State<LoginScreen> {
       maNV = await nhanVienController.dangNhapNV(
           tenTKController.text, matKhauController.text);
       if (maNV == null) {
-        SnackBar(content: Text('Xin lỗi, bạn không có quyền thực hiện hành động này. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị'));
+        const SnackBar(content: Text('Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại'));
       } else {
 
         Navigator.push(context,

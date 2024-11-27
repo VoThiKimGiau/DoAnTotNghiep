@@ -1,18 +1,48 @@
+import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SuaSP.dart';
 import 'package:flutter/material.dart';
 
 import '../../../colors/color.dart';
-import '../../../models/SanPham.dart';
 import '../../../services/shared_function.dart';
 import '../../../services/storage/storage_service.dart';
 
-class ItemSP_Admin extends StatelessWidget {
-  final SanPham product;
+class ItemCTSP_Admin extends StatefulWidget {
+  final ChiTietSP product;
 
-  ItemSP_Admin({Key? key, required this.product}) : super(key: key);
+  ItemCTSP_Admin({Key? key, required this.product}) : super(key: key);
 
+  @override
+  _ItemCTSP_AdminState createState() => _ItemCTSP_AdminState();
+}
+
+class _ItemCTSP_AdminState extends State<ItemCTSP_Admin> {
   StorageService storageService = StorageService();
   SharedFunction sharedFunction = SharedFunction();
+  KichCoController kichCoController = KichCoController();
+  MauSPController mauSPController = MauSPController();
+
+  String tenMau = '';
+  String tenKC = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getTen();
+  }
+
+  Future<void> getTen() async {
+    String fetchMau =
+        await mauSPController.layTenMauByMaMau(widget.product.maMau);
+    String fetchKC =
+        await kichCoController.layTenKichCo(widget.product.maKichCo);
+
+    setState(() {
+      tenMau = fetchMau;
+      tenKC = fetchKC;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +57,7 @@ class ItemSP_Admin extends StatelessWidget {
         child: Row(
           children: [
             Image.network(
-              storageService.getImageUrl(product.hinhAnhMacDinh),
+              storageService.getImageUrl(widget.product.maHinhAnh),
               height: 70,
               width: 70,
               fit: BoxFit.cover,
@@ -38,7 +68,7 @@ class ItemSP_Admin extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    product.tenSP,
+                    '$tenKC - $tenMau',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -49,7 +79,7 @@ class ItemSP_Admin extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    sharedFunction.formatCurrency(product.giaMacDinh),
+                    sharedFunction.formatCurrency(widget.product.giaBan),
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.red,
@@ -65,7 +95,7 @@ class ItemSP_Admin extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            AdminSuaSPScreen(maSP: product.maSP)));
+                            AdminSuaSPScreen(maSP: widget.product.maSP)));
               },
               child: const Text(
                 'Sửa',

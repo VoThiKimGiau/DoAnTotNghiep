@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ItemCTSP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../controllers/DanhMucSPController.dart';
@@ -56,7 +57,7 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
         body: Column(
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 17, vertical: 25),
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
               child: Row(
                 children: [
                   SizedBox(
@@ -73,17 +74,19 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                       child: SvgPicture.asset('assets/icons/arrowleft.svg'),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  const Text(
-                    'QUẢN LÝ SẢN PHẨM',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: const Text(
+                      'QUẢN LÝ SẢN PHẨM',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ],
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(bottom: 24, left: 24, right: 24),
+              margin: const EdgeInsets.only(bottom: 5, left: 20, right: 20),
               child: GestureDetector(
                 onTap: () {
                   showSearch(
@@ -108,7 +111,7 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                       hintText: 'Tìm kiếm',
                       hintStyle: const TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -119,9 +122,8 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : Container(
-                    height: 80,
-                    margin: const EdgeInsets.only(bottom: 25),
+                : SizedBox(
+                    height: 60,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: dsDanhMuc?.length ?? 0,
@@ -134,7 +136,7 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                             });
                           },
                           child: Container(
-                            width: 140,
+                            width: 100,
                             margin: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: isSelected
@@ -163,7 +165,7 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 12,
                                   color:
                                       isSelected ? Colors.white : Colors.black,
                                 ),
