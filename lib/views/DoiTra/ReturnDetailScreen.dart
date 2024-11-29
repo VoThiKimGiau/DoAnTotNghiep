@@ -47,7 +47,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết phiếu trả hàng hoàn tiền', style: TextStyle(fontSize: 25)),
+        title: Text('Chi tiết phiếu trả hàng', style: TextStyle(fontSize: 25)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -65,6 +65,9 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
               SizedBox(height: 20),
               Text('Vật chứng đổi trả:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               _buildEvidenceList(),
+              SizedBox(height: 20),
+              Text('Thông tin hoàn tiền:', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              _buildReturnMoneyInfo(),
             ],
           ),
         ),
@@ -86,6 +89,21 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
             Text('Lý do: ${utf8.decode(widget.doiTra.lyDo.runes.toList()) }', style: TextStyle(fontSize: 18)),
             Text('Tiền hoàn trả: ${NumberFormat.currency(locale: 'vi').format(widget.doiTra.tienHoanTra)}', style: TextStyle(fontSize: 18)),
           ],
+        ),
+      ),
+    );
+  }
+  Widget _buildReturnMoneyInfo() {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Số tài khoản: ${widget.doiTra.soTK}', style: TextStyle(fontSize: 20)),
+            Text('Tên ngân hàng: ${utf8.decode(widget.doiTra.tenNganHang.runes.toList())}', style: TextStyle(fontSize: 18)),
+            Text('Tên tài khoản: ${ widget.doiTra.tenTK}', style: TextStyle(fontSize: 18)),
+            ],
         ),
       ),
     );

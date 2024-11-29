@@ -213,19 +213,7 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
                   return Card(
                     margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: ListTile(
-                      leading: IconButton(
-                        icon: Icon(Icons.link),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AssignPromotionDialog(promotion: promotion);
-                            },
-                          );
 
-                        },
-                        color: colorScheme.secondary,
-                      ),
                       title: Text(promotion.maKM+'-'+ utf8.decode(promotion.moTa.runes.toList())),
                       subtitle: Text(
                         '${utf8.decode(promotion.loaiKM.runes.toList())} \n ${DateFormat('dd/MM/yyyy').format(promotion.ngayBatDau)} to ${DateFormat('dd/MM/yyyy').format(promotion.ngayKetThuc)}',

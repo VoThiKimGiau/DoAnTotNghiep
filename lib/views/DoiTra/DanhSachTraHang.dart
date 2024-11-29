@@ -5,12 +5,14 @@ import '../../controllers/DoiTraController.dart';
 import '../../models/DoiTra.dart';
 import 'ReturnDetailScreen.dart';
 
-class ReturnListScreen extends StatefulWidget {
+class ReturnListScreenByCustomer extends StatefulWidget {
+  final String maKH;
+  ReturnListScreenByCustomer({required this.maKH});
   @override
-  _ReturnListScreenState createState() => _ReturnListScreenState();
+  _ReturnListScreenByCustomerState createState() => _ReturnListScreenByCustomerState();
 }
 
-class _ReturnListScreenState extends State<ReturnListScreen> {
+class _ReturnListScreenByCustomerState extends State<ReturnListScreenByCustomer> {
   final DoiTraController _doiTraController = DoiTraController();
   late Future<List<DoiTra>> _doiTraList;
   DateTime? _startDate;
@@ -30,109 +32,9 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
   @override
   void initState() {
     super.initState();
-    _doiTraList = _doiTraController.getDoiTraList();
+    _doiTraList = _doiTraController.getDoiTraListByCustomer(widget.maKH);
   }
 
-  Future<void> _showConfirmDialog(DoiTra doiTra) async {
-    DateTime? selectedDate;
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: Text('Xác nhận đổi trả', style: TextStyle(color: colorScheme.primary)),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Chọn ngày lấy hàng:', style: TextStyle(color: colorScheme.onSurface)),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {
-                      DateTime? date = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2100),
-                        builder: (context, child) {
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              colorScheme: colorScheme,
-                            ),
-                            child: child!,
-                          );
-                        },
-                      );
-                      if (date != null) {
-                        setStateDialog(() {
-                          selectedDate = date;
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(backgroundColor: colorScheme.secondary),
-                    child: Text('Chọn ngày', style: TextStyle(color: colorScheme.onSecondary)),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    selectedDate == null
-                        ? 'Chưa chọn ngày'
-                        : 'Ngày đã chọn: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}',
-                    style: TextStyle(fontSize: 16, color: colorScheme.primary),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Hủy', style: TextStyle(color: colorScheme.error)),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (selectedDate != null) {
-                      try {
-                        doiTra.trangThai = 'Đã xác nhận';
-                        doiTra.lyDo = utf8.decode(doiTra.lyDo.runes.toList());
-                        doiTra.ngayXacNhan = DateTime.now();
-                        doiTra.ngayTraHang = selectedDate;
-                        await _doiTraController.updateDoiTra(doiTra.maDoiTra!, doiTra);
-                        setState(() {
-                          _doiTraList = _doiTraController.getDoiTraList();
-                        });
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Xác nhận đổi trả thành công!'),
-                            backgroundColor: colorScheme.secondary,
-                          ),
-                        );
-                      } catch (e) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Lỗi khi xác nhận đổi trả: $e'),
-                            backgroundColor: colorScheme.error,
-                          ),
-                        );
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Vui lòng chọn ngày lấy hàng!'),
-                          backgroundColor: colorScheme.error,
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
-                  child: Text('Xác nhận', style: TextStyle(color: colorScheme.onPrimary)),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 
   Widget _buildFilterDrawer() {
     return Drawer(
@@ -216,58 +118,12 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
       ),
     );
   }
-  Future<void> _showConfirmRefundDialog(DoiTra doiTra) async {
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Xác nhận hoàn tiền', style: TextStyle(color: colorScheme.primary)),
-          content: Text('Bạn có chắc chắn muốn xác nhận hoàn tiền cho đơn đổi trả này?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Hủy', style: TextStyle(color: colorScheme.error)),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  doiTra.trangThai = 'Đã hoàn tiền';
-                  doiTra.ngayHoanTien = DateTime.now();
-                  await _doiTraController.updateDoiTra(doiTra.maDoiTra!, doiTra);
-                  setState(() {
-                    _doiTraList = _doiTraController.getDoiTraList();
-                  });
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Xác nhận hoàn tiền thành công!'),
-                      backgroundColor: colorScheme.secondary,
-                    ),
-                  );
-                } catch (e) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Lỗi khi xác nhận hoàn tiền: $e'),
-                      backgroundColor: colorScheme.error,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: colorScheme.primary),
-              child: Text('Xác nhận', style: TextStyle(color: colorScheme.onPrimary)),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý danh sách trả hàng hoàn tiền', style: TextStyle(fontSize: 20, color: colorScheme.onPrimary)),
+        title: Text('Danh sách trả hàng ', style: TextStyle(fontSize: 20, color: colorScheme.onPrimary)),
         backgroundColor: colorScheme.primary,
         elevation: 0,
         actions: [
@@ -346,30 +202,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
                       ),
                     ],
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Chờ xác nhận")
-                        IconButton(
-                          icon: Icon(Icons.check, color: colorScheme.secondary),
-                          onPressed: () => _showConfirmDialog(doiTra),
-                        ),
-                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Đã xác nhận")
-                        IconButton(
-                          icon: Icon(Icons.attach_money, color: colorScheme.secondary),
-                          onPressed: () => _showConfirmRefundDialog(doiTra),
-                        ),
-                    ],
-                  ),
 
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReturnDetailScreen(doiTra: doiTra),
-                      ),
-                    );
-                  },
                 ),
               );
             },

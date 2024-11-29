@@ -6,6 +6,7 @@ import 'package:datn_cntt304_bandogiadung/views/CaiDat/ThongKeTheoKhachHang.dart
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import '../../models/KhachHang.dart';
+import '../DoiTra/DanhSachTraHang.dart';
 import 'SanPhamYeuThich.dart';
 import 'ThemDiaChi.dart';
 
@@ -119,6 +120,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       builder: (context) => SanPhamYeuThichScreen(
                             maKH: widget.makh,
                           )),
+                );
+              }),
+              _buildMenuItem('Danh sách trả hàng', Icons.change_circle, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ReturnListScreenByCustomer(
+                        maKH: widget.makh??'',
+                      )),
                 );
               }),
               _buildMenuItem('Hỗ trợ', Icons.help, () {
