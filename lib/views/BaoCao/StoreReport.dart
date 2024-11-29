@@ -1,10 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../../controllers/DonHangController.dart';
 import '../../models/DonHang.dart';
-import 'package:intl/intl.dart';
 
 class StoreReport extends StatefulWidget {
   const StoreReport({Key? key}) : super(key: key);
@@ -27,6 +26,8 @@ class _StoreReportState extends State<StoreReport> {
     'cancelRate': 0.0,
     'avgOrdersPerCustomer': 0.0,
   };
+  DateTime? _customStartDate;
+  DateTime? _customEndDate;
 
   @override
   void initState() {
@@ -66,7 +67,6 @@ class _StoreReportState extends State<StoreReport> {
     }
   }
 
-
   Future<void> _loadData() async {
     try {
       DateTimeRange dateRange = _getDateRange();
@@ -74,7 +74,6 @@ class _StoreReportState extends State<StoreReport> {
       String endDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dateRange.end);
 
       orders = await _donHangController.fetchDonHangByDateRange(startDate, endDate);
-      print(orders);
       setState(() {
         statistics = _donHangController.calculateStatistics(orders);
       });
@@ -82,7 +81,6 @@ class _StoreReportState extends State<StoreReport> {
       print('Error loading data: $e');
     }
   }
-
 
   String formatCurrency(double value) {
     if (value >= 1000000) {
@@ -92,6 +90,7 @@ class _StoreReportState extends State<StoreReport> {
     }
     return value.toStringAsFixed(1);
   }
+
   List<FlSpot> _generateChartData() {
     Map<DateTime, double> groupedRevenue = {};
 
@@ -139,7 +138,6 @@ class _StoreReportState extends State<StoreReport> {
     });
   }
 
-
   void _showFilterBottomSheet() {
     tempSelectedPeriod = selectedPeriod;
 
@@ -166,7 +164,7 @@ class _StoreReportState extends State<StoreReport> {
                         'Bộ lọc',
                         style: TextStyle(
                           fontSize: 20,
-
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
@@ -196,9 +194,25 @@ class _StoreReportState extends State<StoreReport> {
                       _buildFilterChip('Tháng này', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('Tháng trước', tempSelectedPeriod, setSheetState),
                       _buildFilterChip('2 tháng gần đây', tempSelectedPeriod, setSheetState),
-                      _buildFilterChip('Thời gian khác', tempSelectedPeriod, setSheetState),
+                      _buildFilterChip('Tùy chọn', tempSelectedPeriod, setSheetState),
                     ],
                   ),
+                  if (tempSelectedPeriod == 'Tùy chọn')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: ElevatedButton(
+                        child: Text('Chọn khoảng thời gian'),
+                        onPressed: () => _showDateRangePicker(context, setSheetState),
+                      ),
+                    ),
+                  if (tempSelectedPeriod == 'Tùy chọn' && _customStartDate != null && _customEndDate != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Từ: ${DateFormat('dd/MM/yyyy').format(_customStartDate!)} đến: ${DateFormat('dd/MM/yyyy').format(_customEndDate!)}',
+                        style: TextStyle(fontSize: 14, color: Colors.blue),
+                      ),
+                    ),
                   SizedBox(height: 16),
                   CheckboxListTile(
                     title: Text('Lưu bộ lọc làm mặc định'),
@@ -217,7 +231,6 @@ class _StoreReportState extends State<StoreReport> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.grey[200],
-
                             foregroundColor: Colors.black,
                           ),
                           child: Text('Đặt về mặc định'),
@@ -276,27 +289,26 @@ class _StoreReportState extends State<StoreReport> {
       backgroundColor: Colors.grey[200],
     );
   }
-  List<FlSpot> _generateMonthlyRevenueData() {
-    Map<int, double> dailyRevenue = {};
 
-    for (var order in orders) {
-      if (order.ngayDat != null && order.thanhTien != null && utf8.decode (order.trangThaiDH.runes.toList()) != 'Đã huỷ') {
-        int day = order.ngayDat!.day;
-        dailyRevenue[day] = (dailyRevenue[day] ?? 0) + order.thanhTien!;
-      }
+  Future<void> _showDateRangePicker(BuildContext context, StateSetter setSheetState) async {
+    DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      initialDateRange: _customStartDate != null && _customEndDate != null
+          ? DateTimeRange(start: _customStartDate!, end: _customEndDate!)
+          : null,
+    );
+
+    if (picked != null) {
+      setSheetState(() {
+        _customStartDate = picked.start;
+        _customEndDate = picked.end;
+      });
     }
-
-    List<FlSpot> spots = [];
-    for (int i = 1; i <= 31; i += 5) {
-      double revenue = 0;
-      for (int j = i; j < i + 5 && j <= 31; j++) {
-        revenue += dailyRevenue[j] ?? 0;
-      }
-      spots.add(FlSpot(i.toDouble(), revenue / 1000000));
-    }
-
-    return spots;
   }
+
+
   DateTimeRange _getDateRange() {
     DateTime now = DateTime.now();
     DateTime start;
@@ -304,7 +316,7 @@ class _StoreReportState extends State<StoreReport> {
 
     switch (selectedPeriod) {
       case "Tất cả thời gian":
-        start = DateTime(now.year-99, now.month, now.day);
+        start = DateTime(now.year - 99, now.month, now.day);
         break;
       case "Hôm nay":
         start = DateTime(now.year, now.month, now.day);
@@ -329,6 +341,15 @@ class _StoreReportState extends State<StoreReport> {
         break;
       case "2 Tháng gần đây":
         start = DateTime(now.year, now.month - 2, 1);
+        break;
+      case "Tùy chọn":
+        if (_customStartDate != null && _customEndDate != null) {
+          start = _customStartDate!;
+          end = _customEndDate!;
+        } else {
+          // Fallback to default range if custom dates are not set
+          start = DateTime(now.year, now.month, 1);
+        }
         break;
       default:
         start = DateTime(now.year, now.month, 1);
@@ -376,7 +397,6 @@ class _StoreReportState extends State<StoreReport> {
                 onPressed: _showFilterBottomSheet,
               ),
             ),
-            // Metrics grid with larger chart
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: GridView.count(
@@ -385,21 +405,38 @@ class _StoreReportState extends State<StoreReport> {
                 crossAxisCount: 2,
                 childAspectRatio: 1.5,
                 children: [
-                  // First 5 metric cards
-                  ...List.generate(5, (index) => _buildMetricCard(
-                      ['Doanh thu', 'Đơn hàng', 'Trung bình đơn', 'Tổng khách hàng', 'TB Đơn/Khách'][index],
-                      [
-                        currencyFormat.format(statistics['totalRevenue']),
-                        statistics['totalOrders'].toString(),
-                        statistics['totalOrders'] > 0
-                            ? currencyFormat.format(statistics['totalRevenue'] / statistics['totalOrders'])
-                            : '0đ',
-                        statistics['totalCustomers'].toString(),
-                        statistics['avgOrdersPerCustomer'].toStringAsFixed(1)
-                      ][index],
-                      [Icons.trending_up, Icons.shopping_cart, Icons.analytics, Icons.people, Icons.person][index],
+                  _buildMetricCard(
+                      'Doanh thu',
+                      currencyFormat.format(statistics['totalRevenue']),
+                      Icons.trending_up,
                       Colors.green
-                  )),
+                  ),
+                  _buildMetricCard(
+                      'Đơn hàng',
+                      statistics['totalOrders'].toString(),
+                      Icons.shopping_cart,
+                      Colors.green
+                  ),
+                  _buildMetricCard(
+                      'Trung bình đơn',
+                      statistics['totalOrders'] > 0
+                          ? currencyFormat.format(statistics['totalRevenue'] / statistics['totalOrders'])
+                          : '0đ',
+                      Icons.analytics,
+                      Colors.green
+                  ),
+                  _buildMetricCard(
+                      'Tổng khách hàng',
+                      statistics['totalCustomers'].toString(),
+                      Icons.people,
+                      Colors.green
+                  ),
+                  _buildMetricCard(
+                      'TB Đơn/Khách',
+                      statistics['avgOrdersPerCustomer'].toStringAsFixed(1),
+                      Icons.person,
+                      Colors.green
+                  ),
                   _buildMetricCard(
                       'Tỉ lệ huỷ đơn',
                       '${statistics['cancelRate'].toStringAsFixed(1)}%',
@@ -409,128 +446,7 @@ class _StoreReportState extends State<StoreReport> {
                 ],
               ),
             ),
-
-            // Large Chart Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Doanh Thu Theo Thời Gian',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      AspectRatio(
-                        aspectRatio: 1.5, // Increased aspect ratio for wider chart
-                        child: LineChart(
-                          LineChartData(
-                            gridData: FlGridData(
-                              show: true,
-                              drawHorizontalLine: true,
-                              drawVerticalLine: false,
-                              horizontalInterval: 1,
-                              getDrawingHorizontalLine: (value) {
-                                return FlLine(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  strokeWidth: 1,
-                                );
-                              },
-                            ),
-                            titlesData: FlTitlesData(
-                              leftTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 50,
-                                  getTitlesWidget: (value, meta) {
-                                    return Text(
-                                        '${value.toInt()}M',
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.grey[600]
-                                        )
-                                    );
-                                  },
-                                ),
-                              ),
-                              bottomTitles: AxisTitles(
-                                sideTitles: SideTitles(
-                                  showTitles: true,
-                                  reservedSize: 30,
-                                  getTitlesWidget: (value, meta) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                          '${value.toInt()}',
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.grey[600]
-                                          )
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            ),
-                            borderData: FlBorderData(show: false),
-                            lineBarsData: [
-                              LineChartBarData(
-                                spots: _generateMonthlyRevenueData(),
-                                isCurved: true,
-                                color: Colors.green,
-                                barWidth: 4,
-                                isStrokeCapRound: true,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.green.withOpacity(0.8),
-                                    Colors.green.withOpacity(0.3),
-                                  ],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                                dotData: FlDotData(
-                                  show: true,
-                                  getDotPainter: (spot, percent, barData, index) {
-                                    return FlDotCirclePainter(
-                                      radius: 4,
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                      strokeColor: Colors.green,
-                                    );
-                                  },
-                                ),
-                                belowBarData: BarAreaData(
-                                  show: true,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.green.withOpacity(0.3),
-                                      Colors.green.withOpacity(0.1),
-                                    ],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+           
           ],
         ),
       ),
@@ -572,3 +488,4 @@ class _StoreReportState extends State<StoreReport> {
     );
   }
 }
+

@@ -3,6 +3,7 @@ import 'package:datn_cntt304_bandogiadung/views/Admin/QuanLyThongBao/QuanLyThong
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SanPham.dart';
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/BaoCaoScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/BaoCao/StoreReport.dart';
+import 'package:datn_cntt304_bandogiadung/views/BaoCao/ThongKe.dart';
 import 'package:datn_cntt304_bandogiadung/views/DangNhap/LoginScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DoiTra/ReturnListScreen.dart';
 import 'package:datn_cntt304_bandogiadung/views/DonHang/QuanLyDonHang.dart';
@@ -144,7 +145,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Đơn hàng', style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
+                          fontSize: 18, fontWeight: FontWeight.w300)),
                     ],
                   ),
                   SizedBox(height: 10),
@@ -225,6 +226,20 @@ class _ShopDashboardState extends State<ShopDashboard> {
                           );
                         },
                       ),
+                      if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
+                        _buildActionButton(
+                          'Biểu đồ',
+                          Icons.area_chart,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RevenueStatisticsScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       if(chucVu!='THU_KHO'&&chucVu!='BAN_HANG')
                       _buildActionButton(
                         'Báo cáo',
