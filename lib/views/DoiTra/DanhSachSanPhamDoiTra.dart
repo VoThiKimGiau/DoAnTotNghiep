@@ -58,7 +58,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
         // Load and cache product details for each order item
         cachedProductDetails[item.mactsp] = await _fetchProductDetails(item.mactsp);
       }
-      setState(() {}); // Trigger a rebuild once data is cached
+      setState(() {});
     } catch (e) {
       print('Error loading order details: $e');
     }
@@ -249,7 +249,7 @@ class _DanhsachsanphamdoitraState extends State<Danhsachsanphamdoitra> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  '${utf8.decode(productSize.runes.toList())} - $productColor',
+                  '${(productSize)} - $productColor',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 8),
