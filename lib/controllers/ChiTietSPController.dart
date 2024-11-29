@@ -200,7 +200,7 @@ class ChiTietSPController {
       queryParameters['maDanhMuc'] = maDanhMuc;
     }
     if (tenSP != null && tenSP.isNotEmpty) {
-      queryParameters['tenSP'] = Uri.encodeComponent(tenSP);
+      queryParameters['tenSP'] = tenSP;
     }
 
 

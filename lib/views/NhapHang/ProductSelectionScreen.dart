@@ -1,18 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
-import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/DanhMucSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
-import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
-import '../../controllers/DanhMucSPController.dart';
-import '../../models/ChiTietPhieuNhap.dart';
-import '../../models/DanhMucSP.dart';
+import 'package:datn_cntt304_bandogiadung/models/ChiTietPhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
+import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
 
 class ProductSelectionScreen extends StatefulWidget {
   final String maPhieuNhap;
@@ -28,38 +27,47 @@ class ProductSelectionScreen extends StatefulWidget {
   @override
   _ProductSelectionScreenState createState() => _ProductSelectionScreenState();
 }
+
 class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   final ChiTietSPController chiTietSPController = ChiTietSPController();
-  final ChiTietPhieuNhapController chiTietPhieuNhapController=ChiTietPhieuNhapController();
+  final ChiTietPhieuNhapController chiTietPhieuNhapController = ChiTietPhieuNhapController();
   final StorageService storageService = StorageService();
   final MauSPController mauSPController = MauSPController();
   final KichCoController kichCoController = KichCoController();
   final SanPhamController sanPhamController = SanPhamController();
   final DanhMucSPController danhMucSPController = DanhMucSPController();
-  Map<String, int> quantities = {};
+
   TextEditingController searchController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+
   List<DanhMucSP> categories = [];
   List<ChiTietSP> filteredProducts = [];
-  List<ChiTietSP> chiTietSPs = [];
+  Map<String, int> quantities = {};
   Map<String, bool> selectedItems = {};
   Map<String, Map<String, String?>> productDetailsCache = {};
-  double temporaryTotal = 0.0;
+
   String? selectedCategory;
   bool isLoading = false;
+  bool allItemsLoaded = false;
+  int currentPage = 0;
+  final int pageSize = 10;
+  double temporaryTotal = 0.0;
+
   Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
     _fetchCategories();
-
+    _fetchProducts();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
     searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -73,6 +81,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       print('Error fetching categories: $e');
     }
   }
+
   Future<Map<String, String?>> fetchProductDetails(ChiTietSP ctsp) async {
     Map<String, String?> details = {};
     try {
@@ -86,85 +95,79 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   }
 
   Future<void> _fetchProducts() async {
-    try {
-      List<ChiTietSP> fetchedProducts = await chiTietSPController.fetchAllChiTietSPByMaNCC(widget.maNCC);
+    if (isLoading || allItemsLoaded) return;
 
-      for (var ctsp in fetchedProducts) {
-        if (!productDetailsCache.containsKey(ctsp.maCTSP)) {
-          productDetailsCache[ctsp.maCTSP] = await fetchProductDetails(ctsp);
-        }
-      }
-
-      setState(() {
-        chiTietSPs = fetchedProducts;
-        filteredProducts = fetchedProducts;
-        for (var product in chiTietSPs) {
-          quantities[product.maCTSP] = 0;
-        }
-      });
-    } catch (e) {
-      print('Error fetching products: $e');
-    }
-  }
-
-  Future<void> _searchProducts(String query, {String? maDanhMuc}) async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      List<ChiTietSP> searchResults = [];
-      List<ChiTietSP> supplierProducts = await chiTietSPController.fetchAllChiTietSPByMaNCC(widget.maNCC);
-      if (maDanhMuc != null) {
-        final categoryProducts = await chiTietSPController.fetchChiTietSPByCategory(maDanhMuc);
-        final categoryProductIds = categoryProducts.map((item) => ChiTietSP.fromJson(item).maCTSP).toSet();
-        supplierProducts = supplierProducts.where((product) =>
-            categoryProductIds.contains(product.maCTSP)).toList();
-      }
+      final newProducts = await chiTietSPController.searchProducts(
+        tenSP: searchController.text,
+        maDanhMuc: selectedCategory,
+        maNCC: widget.maNCC,
+        page: currentPage,
+        size: pageSize,
+      );
 
-      if (query.isNotEmpty) {
-        final searchedProducts = await chiTietSPController.fetchChiTietSPByTenSanPham(query);
-        final searchedProductIds = searchedProducts.map((item) =>
-        ChiTietSP.fromJson(item).maCTSP).toSet();
-
-        // Lọc sản phẩm có trong kết quả tìm kiếm
-        searchResults = supplierProducts.where((product) =>
-            searchedProductIds.contains(product.maCTSP)).toList();
-      } else {
-        // Nếu không có query, sử dụng danh sách đã lọc theo danh mục
-        searchResults = supplierProducts;
-      }
-
-      // 4. Fetch product details cho các sản phẩm đã lọc
-      for (var ctsp in searchResults) {
-        if (!productDetailsCache.containsKey(ctsp.maCTSP)) {
-          try {
-            productDetailsCache[ctsp.maCTSP] = await fetchProductDetails(ctsp);
-          } catch (e) {
-            print('Error fetching product details for ${ctsp.maCTSP}: $e');
+      if (mounted) {
+        setState(() {
+          if (newProducts.isEmpty) {
+            allItemsLoaded = true;
+          } else {
+            if (currentPage == 0) {
+              filteredProducts = newProducts;
+            } else {
+              filteredProducts.addAll(newProducts);
+            }
+            currentPage++;
           }
+          isLoading = false;
+        });
+      }
+
+      // Fetch product details for new products
+      for (var product in newProducts) {
+        if (!productDetailsCache.containsKey(product.maCTSP)) {
+          productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
         }
       }
-
-      setState(() {
-        filteredProducts = searchResults;
-        isLoading = false;
-      });
     } catch (e) {
-      print('Error searching products: $e');
-      setState(() {
-        isLoading = false;
-        filteredProducts = [];
-      });
+      print('Error fetching products: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
-// Hàm debounce để tránh gọi API quá nhiều
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !isLoading) {
+      _fetchProducts();
+    }
+  }
+
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(Duration(milliseconds: 500), () {
-      _searchProducts(query, maDanhMuc: selectedCategory);
+      setState(() {
+        currentPage = 0;
+        allItemsLoaded = false;
+        filteredProducts.clear();
+      });
+      _fetchProducts();
     });
+  }
+
+  void _updateTemporaryTotal() {
+    temporaryTotal = 0.0;
+    for (var product in filteredProducts) {
+      if (selectedItems[product.maCTSP] == true) {
+        temporaryTotal += (quantities[product.maCTSP] ?? 0) * product.giaBan;
+      }
+    }
+    setState(() {});
   }
 
   Widget _buildCategoryList() {
@@ -193,9 +196,11 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               onSelected: (bool selected) {
                 setState(() {
                   selectedCategory = selected ? category.maDanhMuc : null;
-                  searchController.clear();
-                  _searchProducts('', maDanhMuc: selectedCategory);
+                  currentPage = 0;
+                  allItemsLoaded = false;
+                  filteredProducts.clear();
                 });
+                _fetchProducts();
               },
             ),
           );
@@ -203,19 +208,10 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       ),
     );
   }
-  void _updateTemporaryTotal() {
-    temporaryTotal = 0.0;
-    for (var product in filteredProducts) {
-      if (selectedItems[product.maCTSP] == true) {
-        temporaryTotal += (quantities[product.maCTSP] ?? 0) * product.giaBan;
-      }
-    }
-    setState(() {});
-  }
 
-  Widget _buildProductEntry(int index, ChiTietSP chiTietSP) {
+  Widget _buildProductEntry(ChiTietSP chiTietSP) {
     selectedItems.putIfAbsent(chiTietSP.maCTSP, () => false);
-    quantities.putIfAbsent(chiTietSP.maCTSP, () => 0); // Ensure quantity exists
+    quantities.putIfAbsent(chiTietSP.maCTSP, () => 0);
     final productDetails = productDetailsCache[chiTietSP.maCTSP];
 
     if (productDetails == null) {
@@ -268,13 +264,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  productDetails['productName'] ?? '',
-
-                ),
-                Text(
-                  '${(productDetails['size'] ?? [])} - ${productDetails['color'] ?? ''}',
-                ),
+                Text(productDetails['productName'] ?? ''),
+                Text('${(productDetails['size'] ?? '')} - ${productDetails['color'] ?? ''}'),
                 Text(
                   '${chiTietSP.giaBan}đ',
                   style: TextStyle(color: Colors.red),
@@ -331,57 +322,34 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            // Search Bar
             TextField(
               controller: searchController,
               decoration: InputDecoration(
                 hintText: 'Tìm kiếm sản phẩm...',
                 prefixIcon: Icon(Icons.search),
-                suffixIcon: isLoading
-                    ? Container(
-                  width: 24,
-                  height: 24,
-                  padding: EdgeInsets.all(8),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-                    : searchController.text.isNotEmpty
-                    ? IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () {
-                    searchController.clear();
-                    _searchProducts('');
-                  },
-                )
-                    : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16),
               ),
               onChanged: _onSearchChanged,
             ),
             SizedBox(height: 16),
-            // Category List
             _buildCategoryList(),
             Expanded(
-
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : filteredProducts.isEmpty
-                  ? Center(child: Text('Không tìm thấy sản phẩm nào'))
-                  : ListView.builder(
-                itemCount: filteredProducts.length,
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: filteredProducts.length + (isLoading ? 1 : 0),
                 itemBuilder: (context, index) {
-                  final product = filteredProducts[index];
-                  print("Filtered Products: $filteredProducts");
-                  return _buildProductEntry(
-                    chiTietSPs.indexOf(product),
-                    product,
-                  );
+                  if (index < filteredProducts.length) {
+                    return _buildProductEntry(filteredProducts[index]);
+                  } else if (isLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    return SizedBox.shrink();
+                  }
                 },
               ),
             ),
-            // Bottom section with total and confirm button
             SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -412,7 +380,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       ),
     );
   }
-  void _addChiTietPhieuNhap()  async{
+
+  void _addChiTietPhieuNhap() async {
     PhieuNhap phieuNhap = PhieuNhap(
       maPhieuNhap: widget.maPhieuNhap,
       nhaCungCap: widget.maNCC,
@@ -423,14 +392,12 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     );
 
     List<ChiTietPhieuNhap> danhSachChiTiet = [];
-    // Iterate over the selected items
     for (var entry in selectedItems.entries) {
       if (entry.value && quantities[entry.key] != null && quantities[entry.key]! > 0) {
-        // Ensure 'entry.key' exists in the 'quantities' map
-        final chiTietSP = chiTietSPs.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
+        final chiTietSP = filteredProducts.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
         ChiTietPhieuNhap chiTiet = ChiTietPhieuNhap(
           maPN: widget.maPhieuNhap,
-          maCTSP: chiTietSP.maCTSP, // Add the 'maSP' from the matching ChiTietSP
+          maCTSP: chiTietSP.maCTSP,
           soLuong: quantities[entry.key]!,
           donGia: chiTietSP.giaBan,
         );
@@ -438,15 +405,13 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       }
     }
 
-    // Call `themNhieuChiTietPhieuNhap` and wait for the results
     try {
       List<ChiTietPhieuNhap> ketQua = await chiTietPhieuNhapController.themNhieuChiTietPhieuNhap(danhSachChiTiet);
       if (ketQua.isNotEmpty) {
-        // Success - Show a message or navigate back
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Thêm chi tiết phiếu nhập thành công!')),
         );
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>PurchaseOrderList(maNV: widget.maNV)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => PurchaseOrderList(maNV: widget.maNV)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Không có sản phẩm nào được thêm.')),
@@ -462,7 +427,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   Future<void> _showConfirmationDialog() async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // Không cho phép đóng dialog khi bấm ngoài khu vực dialog
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Xác nhận'),
@@ -470,16 +435,14 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Đóng dialog và không làm gì
                 Navigator.of(context).pop();
               },
               child: Text('Hủy'),
             ),
             TextButton(
               onPressed: () {
-                // Thực hiện thêm Chi Tiết Phiếu Nhập tại đây
                 _addChiTietPhieuNhap();
-                Navigator.of(context).pop(); // Đóng dialog
+                Navigator.of(context).pop();
               },
               child: Text('Xác nhận'),
             ),
@@ -488,5 +451,5 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       },
     );
   }
-
 }
+
