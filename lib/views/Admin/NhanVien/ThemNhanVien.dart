@@ -18,7 +18,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   String _tenTK = '';
   String _matKhau = '';
 
-  final List<String> _chucVuOptions = ['QUAN_LY', 'BAN_HANG','THU_KHO'];
+  final List<String> _chucVuOptions = ['QUAN_LY', 'BAN_HANG', 'THU_KHO'];
 
   final ColorScheme colorScheme = ColorScheme.fromSeed(
     seedColor: Colors.blue,
@@ -44,16 +44,15 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
         hoatDong: true,
       );
 
-
       try {
         final response = await _controller.registerEmployee(newEmployee);
         if (response.statusCode == 201) {
           Navigator.pop(context, true);
         } else {
-          _showSnackBar('Failed to add employee. Please try again.');
+          _showSnackBar('Thêm nhân viên thất bại. Vui lòng thử lại.');
         }
       } catch (e) {
-        _showSnackBar('Error adding employee: $e');
+        _showSnackBar('Có lỗi xảy ra khi thêm nhân viên: $e');
       }
     }
   }
@@ -68,7 +67,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Employee'),
+        title: Text('Thêm Nhân Viên Mới'),
         backgroundColor: colorScheme.primary,
       ),
       body: SingleChildScrollView(
@@ -80,13 +79,14 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Full Name'),
-                  validator: (value) => value!.isEmpty ? 'Please enter a name' : null,
+                  decoration: InputDecoration(labelText: 'Họ và Tên'),
+                  validator: (value) =>
+                  value!.isEmpty ? 'Vui lòng nhập họ và tên' : null,
                   onSaved: (value) => _tenNV = value!,
                 ),
                 DropdownButtonFormField<String>(
                   value: _chucVu,
-                  decoration: InputDecoration(labelText: 'Position'),
+                  decoration: InputDecoration(labelText: 'Chức Vụ'),
                   items: _chucVuOptions.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -100,19 +100,22 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Username'),
-                  validator: (value) => value!.isEmpty ? 'Please enter a username' : null,
+                  decoration: InputDecoration(labelText: 'Tên Đăng Nhập'),
+                  validator: (value) =>
+                  value!.isEmpty ? 'Vui lòng nhập tên đăng nhập' : null,
                   onSaved: (value) => _tenTK = value!,
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Password'),
-                  validator: (value) => value!.isEmpty || value.length < 6 ? 'Password must be at least 6 characters' : null,
+                  decoration: InputDecoration(labelText: 'Mật Khẩu'),
+                  validator: (value) => value!.isEmpty || value.length < 6
+                      ? 'Mật khẩu phải ít nhất 6 ký tự'
+                      : null,
                   onSaved: (value) => _matKhau = value!,
                   obscureText: true,
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  child: Text('Add Employee'),
+                  child: Text('Thêm Nhân Viên'),
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.secondary,
@@ -128,4 +131,3 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     );
   }
 }
-

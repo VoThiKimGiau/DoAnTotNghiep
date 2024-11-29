@@ -312,14 +312,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                         ),
                       _buildActionButton(
                         'Đăng xuất ', Icons.logout, onPressed: () {
-                        // Add your navigation or functionality here
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                LoginScreen(), // Change to your report screen
-                          ),
-                        );
+                        _showLogoutConfirmation(context);
                       },),
                     ],
                   ),
@@ -331,7 +324,35 @@ class _ShopDashboardState extends State<ShopDashboard> {
         )
     );
   }
-
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Xác nhận đăng xuất'),
+        content: Text('Bạn có chắc chắn muốn đăng xuất không?'),
+        actions: [
+          TextButton(
+            child: Text('Hủy'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Đóng hộp thoại
+            },
+          ),
+          TextButton(
+            child: Text('Đăng xuất'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Đóng hộp thoại
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginScreen(), // Điều hướng đến màn hình đăng nhập
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildStatCard(String title, String value, IconData icon,
       Color color) {
     return Card(

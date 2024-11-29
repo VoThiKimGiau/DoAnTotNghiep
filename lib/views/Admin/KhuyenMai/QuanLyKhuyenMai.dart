@@ -91,32 +91,33 @@ class _PromotionManagementScreenState extends State<PromotionManagementScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Promotion Details'),
+        title: Text('Chi tiết khuyến mãi'), // Tiêu đề tiếng Việt
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              _detailRow('ID', promotion.maKM),
-              _detailRow('Description', utf8.decode(promotion.moTa.runes.toList())),
-              _detailRow('Type', utf8.decode(promotion.loaiKM.runes.toList())),
-              _detailRow('Start Date', DateFormat('dd/MM/yyyy').format(promotion.ngayBatDau)),
-              _detailRow('End Date', DateFormat('dd/MM/yyyy').format(promotion.ngayKetThuc)),
-              _detailRow('Discount Value', '${promotion.triGiaGiam}'),
-              _detailRow('Minimum Order Value', '${promotion.triGiaToiThieu}'),
-              _detailRow('Number of Uses', '${promotion.slkhNhan}'),
+              _detailRow('Mã KM', promotion.maKM),
+              _detailRow('Mô tả', utf8.decode(promotion.moTa.runes.toList())),
+              _detailRow('Loại KM', utf8.decode(promotion.loaiKM.runes.toList())),
+              _detailRow('Ngày bắt đầu', DateFormat('dd/MM/yyyy').format(promotion.ngayBatDau)),
+              _detailRow('Ngày kết thúc', DateFormat('dd/MM/yyyy').format(promotion.ngayKetThuc)),
+              _detailRow('Giá trị giảm', '${promotion.triGiaGiam}'),
+              _detailRow('Giá trị tối thiểu', '${promotion.triGiaToiThieu}'),
+              _detailRow('Số lần sử dụng', '${promotion.slkhNhan}'),
             ],
           ),
         ),
         actions: [
           TextButton(
-            child: Text('Close'),
+            child: Text('Đóng'),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
       ),
     );
   }
+
 
   Widget _detailRow(String label, String value) {
     return Padding(

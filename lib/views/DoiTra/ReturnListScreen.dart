@@ -349,7 +349,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Chờ xác nhận")
+                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Đang xử lý")
                         IconButton(
                           icon: Icon(Icons.check, color: colorScheme.secondary),
                           onPressed: () => _showConfirmDialog(doiTra),
