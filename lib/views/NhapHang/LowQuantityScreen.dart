@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
-
 import '../../controllers/ChiTietSPController.dart';
 import '../../controllers/DanhMucSPController.dart';
 import '../../controllers/KichCoController.dart';
@@ -13,6 +11,8 @@ import '../../models/ChiTietSP.dart';
 import '../../models/DanhMucSP.dart';
 import '../../models/NhaCungCap.dart';
 import '../../services/storage/storage_service.dart';
+import '../../services/shared_function.dart';
+
 class LowQuantityScreen extends StatefulWidget {
   @override
   _LowQuantityScreenState createState() => _LowQuantityScreenState();
@@ -24,60 +24,63 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
   final NCCController nccController = NCCController();
   final StorageService storageService = StorageService();
   final SanPhamController sanPhamController = SanPhamController();
-  late MauSPController mauSPController=MauSPController();
-  late KichCoController kichCoController=KichCoController();
-  TextEditingController searchController = TextEditingController();
+  final MauSPController mauSPController = MauSPController();
+  final KichCoController kichCoController = KichCoController();
+
+  final TextEditingController searchTextController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
   List<ChiTietSP> filteredProducts = [];
   List<DanhMucSP> categories = [];
   List<NhaCungCap> suppliers = [];
   Map<String, Map<String, String?>> productDetailsCache = {};
-  SharedFunction sharedFunction=SharedFunction();
+  SharedFunction sharedFunction = SharedFunction();
+
   String? selectedCategory;
   String? selectedSupplier;
   bool isLoading = false;
+  bool isLoadingMore = false;
   Timer? _debounceTimer;
+
+  int currentPage = 0;
+  final int pageSize = 5;
+  final int threshold = 10;
+  bool hasMoreProducts = true;
 
   @override
   void initState() {
     super.initState();
     _fetchInitialData();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _debounceTimer?.cancel();
-    searchController.dispose();
+    searchTextController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   Future<void> _fetchInitialData() async {
     setState(() {
       isLoading = true;
+      currentPage = 0;
+      hasMoreProducts = true;
     });
 
     try {
-      // Fetch all required data in parallel
       final futures = await Future.wait([
-        chiTietSPController.fetchLowQuantity(),
+        _fetchProducts(),
         danhMucSPController.fetchDanhMucSP(),
         nccController.fetchSuppliers(),
       ]);
 
-      // Lấy danh sách sản phẩm sắp hết hàng
-      final lowQuantityProducts = futures[0] as List<ChiTietSP>;
-
       setState(() {
-        filteredProducts = lowQuantityProducts;
+        filteredProducts = futures[0] as List<ChiTietSP>;
         categories = futures[1] as List<DanhMucSP>;
         suppliers = futures[2] as List<NhaCungCap>;
       });
-
-      // Cập nhật cache
-      for (var product in lowQuantityProducts) {
-        if (!productDetailsCache.containsKey(product.maCTSP)) {
-          productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
-        }
-      }
     } catch (e) {
       print('Error fetching initial data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -90,64 +93,63 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
     }
   }
 
-  Future<void> _applyFilters() async {
-    setState(() {
-      isLoading = true;
-    });
+  Future<List<ChiTietSP>> _fetchProducts() async {
+    if (!hasMoreProducts) return [];
 
     try {
-      // Lấy danh sách các sản phẩm sắp hết hàng ban đầu
-      List<ChiTietSP> lowQuantityProducts = await chiTietSPController.fetchLowQuantity();
-      List<ChiTietSP> results = lowQuantityProducts;
+      List<ChiTietSP> newProducts;
 
-      // 1. Lọc theo danh mục nếu có
-      if (selectedCategory != null) {
-        List<dynamic> categoryProducts = await chiTietSPController.fetchChiTietSPByCategory(selectedCategory!);
-        Set<String> categoryProductIds = categoryProducts
-            .map((item) => item['maSanPham'].toString())
-            .toSet();
+        newProducts = await chiTietSPController.searchProducts(
+          tenSP:  searchTextController.text ,
+          maDanhMuc: selectedCategory,
+          maNCC: selectedSupplier,
+          page: currentPage,
+          size: pageSize,
 
-        results = results.where((product) =>
-            categoryProductIds.contains(product.maSP)).toList();
-      }
+        );
 
-      // 2. Lọc theo nhà cung cấp nếu có
-      if (selectedSupplier != null) {
-        results = results.where((product) =>
-        product.maNCC == selectedSupplier).toList();
-      }
 
-      // 3. Lọc theo từ khóa tìm kiếm nếu có
-      final searchQuery = searchController.text.toLowerCase();
-      if (searchQuery.isNotEmpty) {
-        results = results.where((product) {
-          final details = productDetailsCache[product.maCTSP];
-          final productName = details?['productName']?.toLowerCase() ?? '';
-          return productName.contains(searchQuery);
-        }).toList();
-      }
-
-      // Cập nhật cache cho các sản phẩm mới
-      for (var product in results) {
+      for (var product in newProducts) {
         if (!productDetailsCache.containsKey(product.maCTSP)) {
           productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
         }
       }
 
+      currentPage++;
+      hasMoreProducts = newProducts.length == pageSize;
+
+      return newProducts;
+    } catch (e) {
+      print('Error fetching products: $e');
+      return [];
+    }
+  }
+
+  Future<void> _applyFilters() async {
+    setState(() {
+      isLoading = true;
+      currentPage = 0;
+      hasMoreProducts = true;
+      filteredProducts.clear();
+    });
+
+    try {
+      final newProducts = await _fetchProducts();
       setState(() {
-        filteredProducts = results;
+        filteredProducts = newProducts;
+        isLoading = false;
       });
     } catch (e) {
       print('Error applying filters: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Có lỗi xảy ra khi lọc sản phẩm')),
       );
-    } finally {
       setState(() {
         isLoading = false;
       });
     }
   }
+
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(Duration(milliseconds: 500), () {
@@ -155,22 +157,43 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
     });
   }
 
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      _loadMoreProducts();
+    }
+  }
+
+  Future<void> _loadMoreProducts() async {
+    if (isLoadingMore || !hasMoreProducts) return;
+
+    setState(() {
+      isLoadingMore = true;
+    });
+
+    try {
+      final newProducts = await _fetchProducts();
+      setState(() {
+        filteredProducts.addAll(newProducts);
+        isLoadingMore = false;
+      });
+    } catch (e) {
+      print('Error loading more products: $e');
+      setState(() {
+        isLoadingMore = false;
+      });
+    }
+  }
+
+
+
   Future<Map<String, String?>> fetchProductDetails(ChiTietSP ctsp) async {
     Map<String, String?> details = {};
     try {
       details['productName'] = await sanPhamController.getProductNameByMaSP(ctsp.maSP);
       details['size'] = await kichCoController.layTenKichCo(ctsp.maKichCo);
       details['color'] = await mauSPController.layTenMauByMaMau(ctsp.maMau);
-      NhaCungCap? fetchSup= await nccController.fetchSupById(ctsp.maNCC);
-      if(fetchSup!=null)
-        {
-          details['sup']=fetchSup.tenNCC;
-        }
-      else
-        {
-          details['sup']=' ';
-        }
-
+      NhaCungCap? fetchSup = await nccController.fetchSupById(ctsp.maNCC);
+      details['sup'] = fetchSup?.tenNCC ?? ' ';
     } catch (e) {
       print('Error fetching product details: $e');
     }
@@ -183,7 +206,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       child: Column(
         children: [
           TextField(
-            controller: searchController,
+            controller: searchTextController,
             decoration: InputDecoration(
               hintText: 'Tìm kiếm sản phẩm...',
               prefixIcon: Icon(Icons.search),
@@ -194,7 +217,6 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
             onChanged: _onSearchChanged,
           ),
           SizedBox(height: 16),
-          // First Row for Category Dropdown
           Row(
             children: [
               Expanded(
@@ -207,7 +229,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                   items: [
                     DropdownMenuItem(
                       value: null,
-                      child: Text('Tất cả danh mục'),
+                      child: Text('Chọn danh mục'),
                     ),
                     ...categories.map((category) => DropdownMenuItem(
                       value: category.maDanhMuc,
@@ -224,8 +246,7 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
               ),
             ],
           ),
-          SizedBox(height: 16), // Add spacing between rows
-          // Second Row for Supplier Dropdown
+          SizedBox(height: 16),
           Row(
             children: [
               Expanded(
@@ -238,12 +259,12 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
                   items: [
                     DropdownMenuItem(
                       value: null,
-                      child: Text('Tất cả NCC'),
+                      child: Text('Chọn nhà cung cấp '),
                     ),
                     ...suppliers.map((supplier) => DropdownMenuItem(
                       value: supplier.maNCC,
-                      child: Text(utf8.decode(supplier.tenNCC.runes.toList())) ),
-                    ),
+                      child: Text(utf8.decode(supplier.tenNCC.runes.toList())),
+                    )),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -259,11 +280,9 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
       ),
     );
   }
-
   Widget _buildProductItem(ChiTietSP product) {
     final details = productDetailsCache[product.maCTSP];
     if (details == null) return SizedBox.shrink();
-
     return Card(
       margin: EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
@@ -324,10 +343,24 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
               child: isLoading
                   ? Center(child: CircularProgressIndicator())
                   : filteredProducts.isEmpty
-                  ? Center(child: Text('Không có sản phẩm nào'))
+                  ? Center(child: Text('Chọn lựa tiêu chí lọc sản phẩm '))
                   : ListView.builder(
-                itemCount: filteredProducts.length,
-                itemBuilder: (context, index) => _buildProductItem(filteredProducts[index]),
+                controller: _scrollController,
+                itemCount: filteredProducts.length + (hasMoreProducts ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index < filteredProducts.length) {
+                    return _buildProductItem(filteredProducts[index]);
+                  } else if (hasMoreProducts) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  } else {
+                    return SizedBox.shrink();
+                  }
+                },
               ),
             ),
           ],
@@ -336,3 +369,4 @@ class _LowQuantityScreenState extends State<LowQuantityScreen> {
     );
   }
 }
+

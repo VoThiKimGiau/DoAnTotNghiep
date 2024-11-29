@@ -267,7 +267,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quản lý danh sách trả hàng hoàn tiền', style: TextStyle(fontSize: 20, color: colorScheme.onPrimary)),
+        title: Text('Danh sách trả hàng', style: TextStyle(fontSize: 20, color: colorScheme.onPrimary)),
         backgroundColor: colorScheme.primary,
         elevation: 0,
         actions: [

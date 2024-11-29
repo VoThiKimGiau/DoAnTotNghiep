@@ -40,15 +40,15 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
       final stockQuantityResult = await chiTietSPController.getTotalSlKho();
       final stockValueResult = await chiTietSPController.getTotalInventoryValue();
       final estimatedSaleValueResult = await chiTietSPController.getTotalSoldValue();
-      final lowInventoryCountResult = await chiTietSPController.getItemsWithLowInventory(10);
+      // final lowInventoryCountResult = await chiTietSPController.getItemsWithLowInventory(10);
       final availableItemsCountResult = await chiTietSPController.getAvailableItems();
 
       setState(() {
         stockQuantity = stockQuantityResult;
         stockValue = stockValueResult;
         estimatedSaleValue = estimatedSaleValueResult;
-        expectedProfit = estimatedSaleValue - stockValue;
-        lowInventoryCount = lowInventoryCountResult;
+        expectedProfit = stockValue -estimatedSaleValue;
+        // lowInventoryCount = lowInventoryCountResult;
         availableItemsCount = availableItemsCountResult;
       });
     } catch (e) {
@@ -68,7 +68,13 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  Icon(Icons.arrow_back, color: Colors.white),
+                  GestureDetector(
+                    onTap: () {
+
+                      Navigator.pop(context);
+                    },
+                    child: Icon(Icons.arrow_back, color: Colors.white),
+                  ),
                   SizedBox(width: 16),
                   Text(
                     'Thông tin kho',
@@ -153,18 +159,7 @@ class _WarehouseInfoScreenState extends State<WarehouseInfoScreen> {
                             ),
                           ),
                           SizedBox(width: 8),
-                          InkWell(
-                            onTap: () {
-                              // Add your onPress logic here
-                              print('Còn hàng để bán pressed');
-                            },
-                            child: InfoCard(
-                              icon: Icons.shopping_cart,
-                              title: "Còn hàng để bán",
-                              value: "",
-                              iconColor: Colors.green,
-                            ),
-                          ),
+
                         ],
                       ),
                     )

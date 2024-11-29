@@ -19,7 +19,7 @@ class StatCard extends StatelessWidget {
         children: [
           Text(title, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
           SizedBox(height: 8),
-          Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: valueColor)),
+          Text(value, style: TextStyle(fontSize: 20, color: valueColor)),
         ],
       ),
     );

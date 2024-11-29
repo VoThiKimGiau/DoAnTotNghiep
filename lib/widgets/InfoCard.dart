@@ -10,10 +10,11 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+        width: 500,
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
+
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
