@@ -250,14 +250,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 fontFamily: 'Comfortaa', fontSize: 22, color: Colors.black87)),
         const SizedBox(height: 12.0),
         _buildStatusItem('Đã giao hàng', isDelivered, date: giaoHang?.ngayGiao != null
-            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGiao!! ))
+            ? DateFormat('dd/MM/yyyy').format(giaoHang!.ngayGiao!)
             : ''),
         _buildStatusItem('Đang giao hàng', isShipping, date: giaoHang?.ngayGui != null
-            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGui!!))
+            ? DateFormat('dd/MM/yyyy').format(giaoHang!.ngayGui!)
             : ''),
-        _buildStatusItem('Đã xác nhận', isConfirmed, date: giaoHang?.ngayGiao != null
-            ? DateFormat('dd/MM/yyyy').format((giaoHang!.ngayGui!! ))
+        _buildStatusItem('Đã xác nhận', isConfirmed, date: giaoHang?.ngayGui != null
+            ? DateFormat('dd/MM/yyyy').format(giaoHang!.ngayGui!)
             : ''),
+
         _buildStatusItem('Đang xử lý', isProcessing,
             date: DateFormat('dd/MM/yyyy')
                 .format(DateTime.parse(widget.donHang.ngayDat.toString()))),
