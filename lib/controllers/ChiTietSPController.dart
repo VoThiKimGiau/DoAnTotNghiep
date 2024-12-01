@@ -9,6 +9,48 @@ import 'NhanVienController.dart';
 class ChiTietSPController {
   final baseUrl = "${IpConfig.ipConfig}";
 
+  Future<ChiTietSP> addChiTietSP(ChiTietSP chiTietSP) async {
+    NhanVienController nhanVienController = NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.post(
+      Uri.parse('${baseUrl}api/chitietsp'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: json.encode(chiTietSP.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return ChiTietSP.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 400) {
+      throw Exception('Yêu cầu không hợp lệ: ${response.body}');
+    } else {
+      throw Exception('Thêm chi tiết sản phẩm thất bại: ${response.statusCode}');
+    }
+  }
+
+  Future<ChiTietSP> updateChiTietSP(ChiTietSP chiTietSP) async {
+    final response = await http.put(
+      Uri.parse('${baseUrl}api/chitietsp'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(chiTietSP.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return ChiTietSP.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to update ChiTietSP: ${response.statusCode}');
+    }
+  }
+
   Future<ChiTietSP> layCTSPTheoMa(String maCTSP) async {
     final response = await http.get(Uri.parse(
         '${IpConfig.ipConfig}api/chitietsp/detail/mactsp?maCTSP=$maCTSP'));
@@ -183,6 +225,7 @@ class ChiTietSPController {
       return [];
     }
   }
+
   Future<List<ChiTietSP>> searchProducts({
     String? tenSP,
     String? maDanhMuc,
@@ -190,9 +233,7 @@ class ChiTietSPController {
     int page = 0,
     int size = 10,
   }) async {
-
     final queryParameters = {
-
       'page': page.toString(),
       'size': size.toString(),
     };
@@ -203,12 +244,12 @@ class ChiTietSPController {
       queryParameters['tenSP'] = tenSP;
     }
 
-
     if (maNCC != null) {
       queryParameters['maNCC'] = maNCC;
     }
     // Send the GET request
-    final uri = Uri.parse('${IpConfig.ipConfig}api/chitietsp/search').replace(queryParameters: queryParameters);
+    final uri = Uri.parse('${IpConfig.ipConfig}api/chitietsp/search')
+        .replace(queryParameters: queryParameters);
 
     final response = await http.get(uri);
 
@@ -221,6 +262,7 @@ class ChiTietSPController {
       throw Exception('Failed to load products');
     }
   }
+
   // Hàm fetch sản phẩm theo tên sản phẩm (search)
   Future<List<dynamic>> fetchChiTietSPByTenSanPham(String tenSP) async {
     final url = Uri.parse("${baseUrl}api/chitietsp/search?tenSP=$tenSP");
@@ -251,6 +293,7 @@ class ChiTietSPController {
       throw Exception('Failed to load ChiTietSP');
     }
   }
+
   Future<List<ChiTietSP>> fetchChiTietSPByNCCDanhMuc({
     String? maDanhMuc,
     String? maNCC,
@@ -272,7 +315,8 @@ class ChiTietSPController {
       queryParameters['maNCC'] = maNCC;
     }
 
-    final uri = Uri.parse('${IpConfig.ipConfig}api/chitietsp/filter').replace(queryParameters: queryParameters);
+    final uri = Uri.parse('${IpConfig.ipConfig}api/chitietsp/filter')
+        .replace(queryParameters: queryParameters);
 
     final response = await http.get(uri);
 
@@ -290,25 +334,25 @@ class ChiTietSPController {
     int size = 5,
     int threshold = 10,
   }) async {
+    final url = Uri.parse(
+        '${baseUrl}api/chitietsp/low-stock?page=$page&size=$size&threshold=$threshold');
 
-      final url = Uri.parse('${baseUrl}api/chitietsp/low-stock?page=$page&size=$size&threshold=$threshold');
+    try {
+      final response = await http.get(url);
 
-      try {
-        final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final Map<String, dynamic> data = responseData['data'];
 
-        if (response.statusCode == 200) {
-          final Map<String, dynamic> responseData = json.decode(response.body);
-          final Map<String, dynamic> data = responseData['data'];
-
-          return (data['items'] as List).map((item) => ChiTietSP.fromJson(item)).toList();
-
-        } else {
-          throw Exception('Failed to load low stock products');
-        }
-      } catch (e) {
-        throw Exception('Error fetching low stock products: $e');
+        return (data['items'] as List)
+            .map((item) => ChiTietSP.fromJson(item))
+            .toList();
+      } else {
+        throw Exception('Failed to load low stock products');
       }
-
+    } catch (e) {
+      throw Exception('Error fetching low stock products: $e');
+    }
   }
 
   Future<List<ChiTietSP>> locChiTietSPTheoDanhMuc(

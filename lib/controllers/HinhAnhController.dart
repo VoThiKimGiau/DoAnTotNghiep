@@ -26,4 +26,49 @@ class HinhAnhController {
       return 'Error: $e';
     }
   }
+
+  Future<List<HinhAnhSP>> fetchAllImages() async {
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/hinhanh'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => HinhAnhSP.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load images');
+    }
+  }
+
+  Future<HinhAnhSP> createImage(HinhAnhSP hinhAnhSP) async {
+    final response = await http.post(
+      Uri.parse('${IpConfig.ipConfig}api/hinhanh'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(hinhAnhSP.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return HinhAnhSP.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to create image: ${response.statusCode}');
+    }
+  }
+
+  Future<HinhAnhSP> updateImage(String id, HinhAnhSP hinhAnhSP) async {
+    final response = await http.put(
+      Uri.parse('${IpConfig.ipConfig}api/hinhanh/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(hinhAnhSP.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return HinhAnhSP.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception('Hình ảnh không tồn tại');
+    } else {
+      throw Exception('Cập nhật hình ảnh thất bại: ${response.statusCode}');
+    }
+  }
 }

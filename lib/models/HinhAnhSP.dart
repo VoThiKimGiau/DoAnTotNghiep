@@ -13,4 +13,11 @@ class HinhAnhSP {
       lienKetURL: json['duongDan'] as String,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'maHinh': maHinhAnh,
+      'duongDan': lienKetURL,
+    };
+  }
 }

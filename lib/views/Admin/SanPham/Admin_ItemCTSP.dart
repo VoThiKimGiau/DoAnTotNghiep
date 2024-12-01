@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SuaCTSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SuaSP.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +11,10 @@ import '../../../services/storage/storage_service.dart';
 
 class ItemCTSP_Admin extends StatefulWidget {
   final ChiTietSP product;
+  final VoidCallback onUpdate;
 
-  ItemCTSP_Admin({Key? key, required this.product}) : super(key: key);
+  ItemCTSP_Admin({Key? key, required this.product, required this.onUpdate})
+      : super(key: key);
 
   @override
   _ItemCTSP_AdminState createState() => _ItemCTSP_AdminState();
@@ -90,12 +93,18 @@ class _ItemCTSP_AdminState extends State<ItemCTSP_Admin> {
               ),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            AdminSuaSPScreen(maSP: widget.product.maSP)));
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AdminSuaCTSPScreen(
+                          maCTSP: widget.product.maCTSP,
+                          maSP: widget.product.maSP)),
+                );
+
+                if (result) {
+                  widget.onUpdate();
+                }
               },
               child: const Text(
                 'Sửa',

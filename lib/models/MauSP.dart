@@ -8,12 +8,19 @@ class MauSP {
     required this.tenMau,
     required this.maHEX,
   });
+
   factory MauSP.fromJson(Map<String, dynamic> json) {
     return MauSP(
-        maMau: json['maMau'] ?? '',
-        tenMau: json['tenMau'] ?? '',
-        maHEX: json['maHex'] ??''
-    );
+        maMau: json['maMau'].trim() ?? '',
+        tenMau: json['tenMau'].trim() ?? '',
+        maHEX: json['maHex'].trim() ?? '');
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'maMau': maMau,
+      'tenMau': tenMau,
+      'maHex': maHEX,
+    };
+  }
 }

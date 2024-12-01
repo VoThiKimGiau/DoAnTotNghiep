@@ -6,10 +6,18 @@ class KichCo {
     required this.maKichCo,
     required this.tenKichCo,
   });
+
   factory KichCo.fromJson(Map<String, dynamic> json) {
     return KichCo(
-      maKichCo: json['maKichCo'] ?? '',
-      tenKichCo: json['tenKichCo'] ?? '',
+      maKichCo: json['maKichCo'].trim() ?? '',
+      tenKichCo: json['tenKichCo'].trim() ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'maKichCo': maKichCo,
+      'tenKichCo': tenKichCo,
+    };
   }
 }

@@ -56,4 +56,49 @@ class MauSPController{
       throw Exception("Lỗi khi lấy màu sản phẩm");
     }
   }
+
+  Future<List<MauSP>> fetchAllMauSP() async {
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/mau-sps'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(utf8.decode(response.bodyBytes));
+      return jsonResponse.map((data) => MauSP.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load MauSPs');
+    }
+  }
+
+  Future<MauSP> addMauSP(MauSP mauSP) async {
+    final response = await http.post(
+      Uri.parse('${IpConfig.ipConfig}api/mau-sps'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(mauSP.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      return MauSP.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Thêm màu sản phẩm thất bại: ${response.statusCode}');
+    }
+  }
+
+  Future<MauSP> updateMauSP(String maMau, MauSP mauSP) async {
+    final response = await http.put(
+      Uri.parse('${IpConfig.ipConfig}api/mau-sps/$maMau'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(mauSP.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return MauSP.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      throw Exception('Màu sản phẩm không tồn tại');
+    } else {
+      throw Exception('Cập nhật màu sản phẩm thất bại: ${response.statusCode}');
+    }
+  }
 }

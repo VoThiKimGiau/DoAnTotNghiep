@@ -1,7 +1,9 @@
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/DanhMucSP/Admin_DanhMucSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ItemCTSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ThemSP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../controllers/DanhMucSPController.dart';
@@ -78,7 +80,8 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: const Text(
                       'QUẢN LÝ SẢN PHẨM',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -86,7 +89,7 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(bottom: 5, left: 20, right: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 10),
               child: GestureDetector(
                 onTap: () {
                   showSearch(
@@ -117,6 +120,26 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                   ),
                 ),
               ),
+            ),
+            SizedBox(
+              height: 40,
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    AdminCategoryListScreen()));
+                      },
+                      child: const Text(
+                        'Tất cả danh mục',
+                        style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      ))),
             ),
             isLoading
                 ? const Center(
@@ -176,6 +199,25 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                       },
                     ),
                   ),
+            SizedBox(
+              height: 40,
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminThemSP()));
+                      },
+                      child: const Text(
+                        'Thêm sản phẩm',
+                        style: TextStyle(
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14),
+                      ))),
+            ),
             Expanded(
               child: FutureBuilder<List<SanPham>>(
                 future: danhMucSPController.fetchProductByCategory(

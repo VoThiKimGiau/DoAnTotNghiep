@@ -2,6 +2,7 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SuaCTSP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -99,7 +100,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
   Future<void> fetchChiTietSP(String maSanPham) async {
     try {
       List<ChiTietSP> fetchedItems =
-      await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
+          await chiTietSPController.layDanhSachCTSPTheoMaSP(maSanPham);
 
       setState(() {
         dsCT = fetchedItems;
@@ -117,7 +118,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
       SanPham updatedSP = SanPham(
         maSP: itemSP!.maSP,
         tenSP: tenSPController.text,
-        hinhAnhMacDinh: itemSP!.hinhAnhMacDinh,
+        hinhAnhMacDinh: dsCT[0].maHinhAnh,
         moTa: moTaController.text,
         danhMuc: itemSP!.danhMuc,
         giaMacDinh: double.tryParse(giaMacDinhController.text) ?? 0.0,
@@ -187,6 +188,8 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                             child: Image.network(
                               storageService
                                   .getImageUrl(itemSP!.hinhAnhMacDinh),
+                              height: 250,
+                              width: 250,
                             ),
                           ),
                           const SizedBox(
@@ -259,15 +262,20 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          Text('Chi tiết sản phẩm:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          const Text('Chi tiết sản phẩm:',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 10),
                           ListView.builder(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: dsCT.length,
                             itemBuilder: (context, index) {
                               final product = dsCT[index];
-                              return ItemCTSP_Admin(product: product); // Display each ChiTietSP
+                              return ItemCTSP_Admin(
+                                product: product,
+                                onUpdate: () => fetchChiTietSP(widget.maSP),
+                              ); // Display each ChiTietSP
                             },
                           ),
                         ],

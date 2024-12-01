@@ -23,6 +23,19 @@ class SanPhamController {
   final String baseUrl_AllSP =
       '${IpConfig.ipConfig}api/sanpham?page=1&size=10';
 
+  Future<int> fetchAllSanPham() async {
+    final response = await http.get(
+      Uri.parse('${IpConfig.ipConfig}api/sanpham'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return jsonData['data']['totalCount']; // Trả về giá trị totalCount
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   Future<List<SanPham>> fetchSanPham() async {
     final response = await http.get(
       Uri.parse(baseUrl_AllSP),
@@ -92,6 +105,32 @@ class SanPhamController {
     } else {
       print('Failed to update product: ${response.statusCode} - ${response.body}');
       return null;
+    }
+  }
+
+  Future<SanPham> addSanPham(SanPham sanPham) async {
+    NhanVienController nhanVienController = NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.post(
+      Uri.parse('${IpConfig.ipConfig}api/sanpham/add'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: json.encode(sanPham.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return SanPham.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 400) {
+      throw Exception('Dữ liệu sản phẩm không hợp lệ: ${response.body}');
+    } else {
+      throw Exception('Thêm sản phẩm thất bại: ${response.statusCode}');
     }
   }
 }
