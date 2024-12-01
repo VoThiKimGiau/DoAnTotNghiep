@@ -6,6 +6,33 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NhanVienController {
+  Future<NhanVien?> getNVbyMaNV(String maNV) async {
+    NhanVienController nhanVienController = NhanVienController();
+    String? token = await nhanVienController.getToken();
+
+    // Nếu không có token, throw một exception
+    if (token == null) {
+      throw Exception("Token không tồn tại");
+    }
+
+    final response = await http.get(
+      Uri.parse('${IpConfig.ipConfig}api/nhanvien/$maNV'),
+      headers: {
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return NhanVien.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 404) {
+      // Nhân viên không được tìm thấy
+      return null;
+    } else {
+      throw Exception(
+          'Lỗi khi lấy thông tin nhân viên: ${response.statusCode}');
+    }
+  }
+
   Future<String?> dangNhapNV(String tk, String mk) async {
     final response = await http.post(
       Uri.parse('${IpConfig.ipConfig}api/nhanvien/login?tenTK=$tk&matKhau=$mk'),
@@ -18,7 +45,7 @@ class NhanVienController {
       // Giải mã token để lấy claim "chucVu"
       Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       String chucVu = decodedToken['chucVu'];
-      String maNV= decodedToken['ma'];
+      String maNV = decodedToken['ma'];
       // Lưu chucVu vào SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('chucVu', chucVu);
@@ -29,20 +56,24 @@ class NhanVienController {
       return null;
     }
   }
+
   Future<String?> getChucVu() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // Lấy giá trị của biến "chucVu" từ SharedPreferences
     String? chucVu = prefs.getString('chucVu');
     return chucVu;
   }
+
   Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // Lấy giá trị của biến "chucVu" từ SharedPreferences
     String? token = prefs.getString('token');
     return token;
   }
-  Future<http.Response> registerEmployee(NhanVien registerEmployeeRequest) async {
-    NhanVienController nhanVienController=NhanVienController();
+
+  Future<http.Response> registerEmployee(
+      NhanVien registerEmployeeRequest) async {
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -52,10 +83,12 @@ class NhanVienController {
     final url = Uri.parse('${IpConfig.ipConfig}api/nhanvien/register');
     try {
       final response = await http.post(
-        url, headers: <String, String>{
-      'accept': '*/*',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'},
+        url,
+        headers: <String, String>{
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
         body: jsonEncode(registerEmployeeRequest.toJson()),
       );
       return response;
@@ -63,9 +96,10 @@ class NhanVienController {
       throw Exception("Error registering employee: $e");
     }
   }
+
   // Get all employees
   Future<List<dynamic>> getAllEmployees() async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -74,11 +108,14 @@ class NhanVienController {
     }
     final url = Uri.parse('${IpConfig.ipConfig}api/nhanvien/all');
     try {
-      final response = await http.get(url, headers: <String, String>{
-        'accept': '*/*',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      },);
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'accept': '*/*',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+      );
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -91,7 +128,7 @@ class NhanVienController {
 
   // Get employee by ID
   Future<Map<String, dynamic>> getEmployeeById(String maNV) async {
-    NhanVienController nhanVienController=NhanVienController();
+    NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
     // Nếu không có token, throw một exception
@@ -118,7 +155,8 @@ class NhanVienController {
 
   // Update employee
 
-  Future<http.Response> updateEmployee(String maNV, NhanVien nhanVienDetails) async {
+  Future<http.Response> updateEmployee(
+      String maNV, NhanVien nhanVienDetails) async {
     NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();
 
@@ -136,12 +174,12 @@ class NhanVienController {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode(nhanVienDetails.toJson()), // Chuyển đổi thành JSON string
+        body: jsonEncode(
+            nhanVienDetails.toJson()), // Chuyển đổi thành JSON string
       );
       return response;
     } catch (e) {
       throw Exception("Error updating employee: $e");
     }
   }
-
 }

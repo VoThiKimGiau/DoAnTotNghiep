@@ -3,6 +3,7 @@ import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_SuaCTSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ThemCTSP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -154,7 +155,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
@@ -262,9 +263,24 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          const Text('Chi tiết sản phẩm:',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const Text('Chi tiết sản phẩm:',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => AdminThemCTSP(
+                                                maSP: itemSP!.maSP)));
+                                  },
+                                  child: const Text('Thêm chi tiết')),
+                            ],
+                          ),
                           const SizedBox(height: 10),
                           ListView.builder(
                             shrinkWrap: true,
@@ -275,7 +291,7 @@ class _AdminSuaSPScreen extends State<AdminSuaSPScreen> {
                               return ItemCTSP_Admin(
                                 product: product,
                                 onUpdate: () => fetchChiTietSP(widget.maSP),
-                              ); // Display each ChiTietSP
+                              );
                             },
                           ),
                         ],

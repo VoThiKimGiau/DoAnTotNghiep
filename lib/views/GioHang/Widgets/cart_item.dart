@@ -116,7 +116,7 @@ class _CartItemState extends State<CartItem> {
                       : const Color(0xFFdcdcdc),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: widget.isSelected
                       ? const Icon(Icons.check_circle, color: Colors.white)
                       : const Icon(Icons.check_circle_outline,
@@ -124,7 +124,7 @@ class _CartItemState extends State<CartItem> {
                 ),
               ),
             ),
-            // Product image display
+            const SizedBox(width: 5),
             InkWell(
               onTap: () async {
                 await Navigator.push(
@@ -153,7 +153,7 @@ class _CartItemState extends State<CartItem> {
                 },
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 5),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,20 +161,22 @@ class _CartItemState extends State<CartItem> {
                   Text(
                     sanpham?.tenSP ?? '',
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Gabarito',
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(tenMau ?? ''),
+                  Text(tenMau ?? '', style: const TextStyle(fontSize: 12,
+                    fontFamily: 'Gabarito',),),
                   const SizedBox(height: 4),
-                  Text(tenKC ?? ''),
+                  Text(tenKC ?? '', style: const TextStyle(fontSize: 12,
+                    fontFamily: 'Gabarito',),),
                   const SizedBox(height: 4),
                   Text(
                     sharedFunction.formatCurrency(widget.item.giaBan),
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 15,
                       color: Colors.red,
                       fontFamily: 'Gabarito',
                     ),
@@ -186,12 +188,12 @@ class _CartItemState extends State<CartItem> {
               children: [
                 IconButton(
                   onPressed: widget.onDelete,
-                  icon: const Icon(Icons.delete),
+                  icon: const Icon(Icons.delete, size: 25,),
                 ),
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.remove),
+                      icon: const Icon(Icons.remove, size: 20,),
                       onPressed: () {
                         if (soLuong > 1) {
                           setState(() {
@@ -203,10 +205,11 @@ class _CartItemState extends State<CartItem> {
                     ),
                     Text(
                       soLuong.toString(),
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 14,
+                        fontFamily: 'Gabarito',),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(Icons.add, size: 20,),
                       onPressed: () {
                         if (soLuong < widget.item.slKho) {
                           setState(() {

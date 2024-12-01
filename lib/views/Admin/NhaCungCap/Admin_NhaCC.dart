@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../colors/color.dart';
 import '../../../controllers/NhaCungCapController.dart';
 import '../../../models/NhaCungCap.dart';
 import 'Admin_SuaNCC.dart';
@@ -33,6 +34,109 @@ class _AdminSupplierListScreen extends State<AdminSupplierListScreen> {
     }
   }
 
+  void _showErrorDialog(String message, String title) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Đóng'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addNhaCungCap() {
+    String newTenNCC = '';
+    String newSDT = '';
+    String newEmail = '';
+    String newDiaChi = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Thêm Nhà Cung Cấp Mới'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    newTenNCC = value;
+                  },
+                  decoration:
+                  const InputDecoration(labelText: 'Tên nhà cung cấp'),
+                ),
+                TextField(
+                  onChanged: (value) {
+                    newSDT = value;
+                  },
+                  decoration: const InputDecoration(labelText: 'Số điện thoại'),
+                  keyboardType: TextInputType.phone,
+                ),
+                TextField(
+                  onChanged: (value) {
+                    newEmail = value;
+                  },
+                  decoration: const InputDecoration(labelText: 'Email'),
+                ),
+                TextField(
+                  onChanged: (value) {
+                    newDiaChi = value;
+                  },
+                  decoration: const InputDecoration(labelText: 'Địa chỉ'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng dialog
+              },
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (newTenNCC.isNotEmpty &&
+                    newSDT.isNotEmpty &&
+                    newEmail.isNotEmpty &&
+                    newDiaChi.isNotEmpty) {
+                  int idNCC = suppliers?.length ?? 0;
+                  NhaCungCap newNCC = NhaCungCap(
+                    maNCC: 'NCC${idNCC + 1}',
+                    tenNCC: newTenNCC,
+                    sdt: newSDT,
+                    email: newEmail,
+                    diaChi: newDiaChi,
+                  );
+
+                  await nccController.createNhaCungCap(newNCC);
+
+                  fetchSuppliers();
+
+                  Navigator.of(context).pop();
+                  _showErrorDialog(
+                      'Thêm nhà cung cấp thành công!', 'Thông báo');
+                } else {
+                  _showErrorDialog('Vui lòng điền đầy đủ thông tin!', 'Lỗi');
+                }
+              },
+              child: const Text('Xác Nhận'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -45,7 +149,7 @@ class _AdminSupplierListScreen extends State<AdminSupplierListScreen> {
               child: Container(
                 width: 40,
                 height: 40,
-                margin: const EdgeInsets.only(left: 24, top: 30, bottom: 15),
+                margin: const EdgeInsets.only(left: 15, top: 30, bottom: 15),
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -81,7 +185,7 @@ class _AdminSupplierListScreen extends State<AdminSupplierListScreen> {
                         borderSide: const BorderSide(color: Colors.transparent),
                       ),
                       prefixIcon: Image.asset('assets/icons/search.png'),
-                      hintText: 'Tìm kiếm',
+                      hintText: 'Tìm kiếm theo tên hoặc số điện thoại',
                       hintStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 13,
@@ -100,7 +204,7 @@ class _AdminSupplierListScreen extends State<AdminSupplierListScreen> {
                     'Nhà cung cấp',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 25,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -110,14 +214,14 @@ class _AdminSupplierListScreen extends State<AdminSupplierListScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Navigate to add supplier screen
+                          _addNhaCungCap();
                         },
                         child: const Text(
                           'Thêm nhà cung cấp',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppColors.primaryColor,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                         ),
                       ),
@@ -210,33 +314,37 @@ class CustomSupplierSearch extends SearchDelegate {
           return const Center(child: Text('Không có nhà cung cấp trùng khớp!'));
         }
 
-        final results = snapshot.data!
-            .where((item) => item.tenNCC.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        final results = snapshot.data!.where((item) {
+          return item.tenNCC.toLowerCase().contains(query.toLowerCase()) ||
+              item.sdt.contains(query);
+        }).toList();
 
-        return ListView.builder(
-          itemCount: results.length,
-          itemBuilder: (context, index) {
-            final supplier = results[index];
-            return ListTile(
-              title: Text(supplier.tenNCC),
-              subtitle: Text(supplier.sdt),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSuaNCC(
-                      maNCC: supplier.maNCC,
+        return Container(
+          color: Colors.white,
+          child: ListView.builder(
+            itemCount: results.length,
+            itemBuilder: (context, index) {
+              final supplier = results[index];
+              return ListTile(
+                title: Text(supplier.tenNCC),
+                subtitle: Text(supplier.sdt),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminSuaNCC(
+                        maNCC: supplier.maNCC,
+                      ),
                     ),
-                  ),
-                );
+                  );
 
-                if (result) {
-                  fetchSuppliers();
-                }
-              },
-            );
-          },
+                  if (result) {
+                    fetchSuppliers();
+                  }
+                },
+              );
+            },
+          ),
         );
       },
     );
@@ -255,33 +363,37 @@ class CustomSupplierSearch extends SearchDelegate {
           return const Center(child: Text('Không có nhà cung cấp trùng khớp!'));
         }
 
-        final suggestions = snapshot.data!
-            .where((item) => item.tenNCC.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        final suggestions = snapshot.data!.where((item) {
+          return item.tenNCC.toLowerCase().contains(query.toLowerCase()) ||
+              item.sdt.contains(query);
+        }).toList();
 
-        return ListView.builder(
-          itemCount: suggestions.length,
-          itemBuilder: (context, index) {
-            final item = suggestions[index];
-            return ListTile(
-              title: Text(item.tenNCC),
-              subtitle: Text(item.sdt),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSuaNCC(
-                      maNCC: item.maNCC,
+        return Container(
+          color: Colors.white,
+          child: ListView.builder(
+            itemCount: suggestions.length,
+            itemBuilder: (context, index) {
+              final item = suggestions[index];
+              return ListTile(
+                title: Text(item.tenNCC),
+                subtitle: Text(item.sdt),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminSuaNCC(
+                        maNCC: item.maNCC,
+                      ),
                     ),
-                  ),
-                );
+                  );
 
-                if (result) {
-                  fetchSuppliers();
-                }
-              },
-            );
-          },
+                  if (result) {
+                    fetchSuppliers();
+                  }
+                },
+              );
+            },
+          ),
         );
       },
     );

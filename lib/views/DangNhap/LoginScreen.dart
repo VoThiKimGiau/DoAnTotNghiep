@@ -29,7 +29,7 @@ class _LoginScreen extends State<LoginScreen> {
   bool isEmployee = false;
   late NhanVienController nhanVienController;
   late NhanVien? nhanVien;
-  String? maNV="";
+  String? maNV = "";
   final filterSpace = FilteringTextInputFormatter.deny(RegExp(r'\s'));
 
   @override
@@ -43,7 +43,8 @@ class _LoginScreen extends State<LoginScreen> {
   Future<void> _login() async {
     if (tenTKController.text.isEmpty || matKhauController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập đủ tên tài khoản và mật khẩu')),
+        const SnackBar(
+            content: Text('Vui lòng nhập đủ tên tài khoản và mật khẩu')),
       );
       return;
     }
@@ -54,12 +55,14 @@ class _LoginScreen extends State<LoginScreen> {
         if (khachHang == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Sai tải khoản hoặc mật khẩu. Vui lòng kiểm tra lại')),
+                content:
+                    Text('Sai tải khoản hoặc mật khẩu. Vui lòng kiểm tra lại')),
           );
         } else if (!khachHang!.hoatDong) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Tài khoản đã bị vô hiệu hóa. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị.'),
+              content: Text(
+                  'Tài khoản đã bị vô hiệu hóa. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị.'),
             ),
           );
         } else {
@@ -76,11 +79,25 @@ class _LoginScreen extends State<LoginScreen> {
       maNV = await nhanVienController.dangNhapNV(
           tenTKController.text, matKhauController.text);
       if (maNV == null) {
-        const SnackBar(content: Text('Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại'));
+        const SnackBar(
+            content:
+                Text('Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại'));
       } else {
-
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ShopDashboard(maNV: maNV?? ' ')));
+        NhanVien? nv = await nhanVienController.getNVbyMaNV(maNV!);
+        if(!nv!.hoatDong){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Tài khoản đã bị vô hiệu hóa. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị.'),
+            ),
+          );
+        }
+        else{
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ShopDashboard(maNV: maNV ?? ' ')));
+        }
       }
     }
   }
@@ -116,7 +133,8 @@ class _LoginScreen extends State<LoginScreen> {
                 child: Column(
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(left: 2.0, top: 39.0, right: 2.0),
+                      margin: const EdgeInsets.only(
+                          left: 2.0, top: 39.0, right: 2.0),
                       child: Column(
                         children: [
                           TextField(
@@ -130,7 +148,8 @@ class _LoginScreen extends State<LoginScreen> {
                               if (noSpaceText != value) {
                                 tenTKController.text = noSpaceText;
                                 // Di chuyển con trỏ về cuối text
-                                tenTKController.selection = TextSelection.fromPosition(
+                                tenTKController.selection =
+                                    TextSelection.fromPosition(
                                   TextPosition(offset: noSpaceText.length),
                                 );
                               }
@@ -154,7 +173,8 @@ class _LoginScreen extends State<LoginScreen> {
                                 final noSpaceText = value.replaceAll(' ', '');
                                 if (noSpaceText != value) {
                                   matKhauController.text = noSpaceText;
-                                  matKhauController.selection = TextSelection.fromPosition(
+                                  matKhauController.selection =
+                                      TextSelection.fromPosition(
                                     TextPosition(offset: noSpaceText.length),
                                   );
                                 }

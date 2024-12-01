@@ -5,10 +5,12 @@ import 'package:datn_cntt304_bandogiadung/controllers/DanhMucSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ThemCTSP.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../../../models/SanPham.dart';
+import 'Admin_ItemCTSP.dart';
 
 class AdminThemSP extends StatefulWidget {
   @override
@@ -28,6 +30,7 @@ class _AdminThemSPState extends State<AdminThemSP> {
 
   List<ChiTietSP>? dsCT;
   List<DanhMucSP>? dsDanhMuc;
+  SanPham? itemSP;
 
   double? giaMD;
   String? newID;
@@ -36,6 +39,58 @@ class _AdminThemSPState extends State<AdminThemSP> {
   void initState() {
     super.initState();
     fetchDanhMucSP();
+    fetchNewID();
+  }
+
+  Future<void> updateSP() async {
+    try {
+      SanPham updatedSP = SanPham(
+        maSP: itemSP!.maSP,
+        tenSP: tenSPController.text,
+        hinhAnhMacDinh: uploadedImageUrl ?? 'HA0',
+        moTa: moTaController.text,
+        danhMuc: itemSP!.danhMuc,
+        giaMacDinh: giaMD ?? 0.0,
+      );
+      await sanPhamController.updateProduct(itemSP!.maSP, updatedSP);
+    } catch (e) {
+      print('Error saving changes: $e');
+    }
+  }
+
+  Future<void> fetchCTSP() async {
+    try {
+      List<ChiTietSP> fetchedItems =
+      await chiTietSPController.layDanhSachCTSPTheoMaSP(itemSP!.maSP);
+      setState(() {
+        dsCT = fetchedItems;
+        uploadedImageUrl = fetchedItems[0].maHinhAnh;
+        giaMD = fetchedItems[0].giaBan;
+        isLoading = false;
+      });
+      await updateSP();
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        dsCT = [];
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchSP() async {
+    try {
+      SanPham fetchedItem =
+      await sanPhamController.getProductByMaSP(newID ?? '');
+      setState(() {
+        itemSP = fetchedItem;
+      });
+    } catch (e) {
+      print('Error: $e');
+      setState(() {
+        itemSP = null;
+      });
+    }
   }
 
   Future<void> fetchDanhMucSP() async {
@@ -78,16 +133,13 @@ class _AdminThemSPState extends State<AdminThemSP> {
           tenSP: tenSPController.text,
           moTa: moTaController.text,
           danhMuc: selectedDanhMuc ?? '',
-          hinhAnhMacDinh: uploadedImageUrl ?? 'HA0', // Use uploaded image URL
-          giaMacDinh: giaMD ?? 0));
+          hinhAnhMacDinh: 'HA0',
+          giaMacDinh: 0));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Thêm sản phẩm thành công')),
-      );
+      fetchSP();
+      _showErrorDialog('Thêm sản phẩm thành công', 'Thông báo');
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Thêm sản phẩm thất bại. Vui lòng thử lại')),
-      );
+      _showErrorDialog('Thêm sản phẩm thất bại. Vui lòng thử lại!', 'Lỗi');
     }
   }
 
@@ -122,8 +174,25 @@ class _AdminThemSPState extends State<AdminThemSP> {
     }
   }
 
-  void _addChiTietSP() {
-    // Implementation for adding product details can be added here
+  Future<void> _addChiTietSP() async {
+    fetchSP();
+    if (itemSP == null) {
+      _showErrorDialog(
+          'Vui lòng thêm sản phẩm trước khi thêm chi tiết sản phẩm',
+          'Cảnh báo');
+    } else {
+      final isChange = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  AdminThemCTSP(
+                    maSP: newID ?? '',
+                  )));
+
+      if (isChange) {
+        await fetchCTSP();
+      }
+    }
   }
 
   @override
@@ -131,7 +200,16 @@ class _AdminThemSPState extends State<AdminThemSP> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Thêm Sản Phẩm'),
+        title: SizedBox(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.6,
+            child: const Text(
+              'Thêm sản phẩm',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            )),
         backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -140,11 +218,11 @@ class _AdminThemSPState extends State<AdminThemSP> {
           children: [
             TextField(
               controller: tenSPController,
-              decoration: const InputDecoration(labelText: 'Tên Sản Phẩm'),
+              decoration: const InputDecoration(labelText: 'Tên sản phẩm'),
             ),
             TextField(
               controller: moTaController,
-              decoration: const InputDecoration(labelText: 'Mô Tả'),
+              decoration: const InputDecoration(labelText: 'Mô tả'),
               maxLines: 5,
               keyboardType: TextInputType.multiline,
             ),
@@ -153,8 +231,8 @@ class _AdminThemSPState extends State<AdminThemSP> {
                 ? const CircularProgressIndicator()
                 : _buildCategoryDropdown(),
             const SizedBox(height: 20),
-            _buildActionButton('Lưu Sản Phẩm', _saveProduct),
-            _buildActionButton('Thêm Chi Tiết Sản Phẩm', _addChiTietSP),
+            _buildActionButton('Lưu sản phẩm', _saveProduct),
+            _buildActionButton('Thêm chi tiết sản phẩm', _addChiTietSP),
             const SizedBox(height: 20),
             _buildDetailsList(),
           ],
@@ -215,8 +293,10 @@ class _AdminThemSPState extends State<AdminThemSP> {
       child: ListView.builder(
         itemCount: dsCT?.length ?? 0,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text('Chi tiết: ${dsCT?[index].maMau ?? "Không có"}'),
+          final product = dsCT![index];
+          return ItemCTSP_Admin(
+            product: product,
+            onUpdate: () => fetchCTSP(),
           );
         },
       ),
@@ -230,13 +310,13 @@ class _AdminThemSPState extends State<AdminThemSP> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Thêm Danh Mục Mới'),
+          title: const Text('Thêm danh mục mới'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: newCategoryController,
-                decoration: const InputDecoration(labelText: 'Tên Danh Mục'),
+                decoration: const InputDecoration(labelText: 'Tên danh mục'),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
@@ -246,7 +326,10 @@ class _AdminThemSPState extends State<AdminThemSP> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                 ),
-                child: const Text('Tải Hình Ảnh Lên', style: TextStyle(color: Colors.white),),
+                child: const Text(
+                  'Tải hình ảnh lên',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
@@ -275,11 +358,18 @@ class _AdminThemSPState extends State<AdminThemSP> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryColor,
               ),
-              child: const Text('Thêm', style: TextStyle(color: Colors.white),),
+              child: const Text(
+                'Lưu',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Hủy', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold),),
+              child: const Text(
+                'Hủy',
+                style: TextStyle(
+                    color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         );

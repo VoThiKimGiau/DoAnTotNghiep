@@ -19,7 +19,7 @@ class _EditNotificationDialogState extends State<EditNotificationDialog> {
   @override
   void initState() {
     super.initState();
-    _descriptionController = TextEditingController(text: utf8.decode (widget.thongBao.noiDung.runes.toList()));
+    _descriptionController = TextEditingController(text: widget.thongBao.noiDung);
   }
 
   @override

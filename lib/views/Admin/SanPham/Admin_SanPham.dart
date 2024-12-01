@@ -2,6 +2,8 @@ import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/DanhMucSP/Admin_DanhMucSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/KichCo/Admin_KichCo.dart';
+import 'package:datn_cntt304_bandogiadung/views/Admin/MauSP/Admin_MauSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ItemCTSP.dart';
 import 'package:datn_cntt304_bandogiadung/views/Admin/SanPham/Admin_ThemSP.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import '../../../controllers/DanhMucSPController.dart';
 import '../../../controllers/SanPhamController.dart';
 import '../../../models/DanhMucSP.dart';
 import '../../../models/SanPham.dart';
+import '../NhaCungCap/Admin_NhaCC.dart';
 import 'Admin_ItemSP.dart';
 
 class AdminSanPhamScreen extends StatefulWidget {
@@ -111,13 +114,104 @@ class _AdminSanPhamScreen extends State<AdminSanPhamScreen> {
                         borderSide: const BorderSide(color: Colors.transparent),
                       ),
                       prefixIcon: Image.asset('assets/icons/search.png'),
-                      hintText: 'Tìm kiếm',
+                      hintText: 'Tìm kiếm theo tên',
                       hintStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 13,
                       ),
                     ),
                   ),
+                ),
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    AdminSupplierListScreen()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 2,
+                      ),
+                      label: const Text(
+                        'Quản lý nhà cung cấp',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          fontFamily: 'Gabarito',
+                        ),
+                      ),
+                      icon: Image.asset(
+                        'assets/icons/supplier.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminKichCoScreen()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 2,
+                      ),
+                      label: const Text(
+                        'Quản lý kích cỡ sản phẩm',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          fontFamily: 'Gabarito',
+                        ),
+                      ),
+                      icon: Image.asset(
+                        'assets/icons/size.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdminMauSPScreen()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 2,
+                      ),
+                      label: const Text(
+                        'Quản lý màu sản phẩm',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          fontFamily: 'Gabarito',
+                        ),
+                      ),
+                      icon: Image.asset(
+                        'assets/icons/color.png',
+                        width: 25,
+                        height: 25,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

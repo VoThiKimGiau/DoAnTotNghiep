@@ -250,7 +250,7 @@ class _NotificationManagementScreenState extends State<NotificationManagementScr
                   child: Card(
                     color: colorScheme.surface,
                     child: ListTile(
-                      title: Text(utf8.decode (notification.noiDung.runes.toList())),
+                      title: Text(notification.noiDung),
                       subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(notification.ngayTB)),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,

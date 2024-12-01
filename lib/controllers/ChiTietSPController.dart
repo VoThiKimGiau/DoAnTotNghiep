@@ -9,6 +9,19 @@ import 'NhanVienController.dart';
 class ChiTietSPController {
   final baseUrl = "${IpConfig.ipConfig}";
 
+  Future<int> fetchSLCTSP() async {
+    final response = await http.get(
+      Uri.parse('${IpConfig.ipConfig}api/chitietsp'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      return jsonData['data']['totalCount']; // Trả về giá trị totalCount
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   Future<ChiTietSP> addChiTietSP(ChiTietSP chiTietSP) async {
     NhanVienController nhanVienController = NhanVienController();
     String? token = await nhanVienController.getToken();

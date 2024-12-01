@@ -1,6 +1,7 @@
 import 'package:datn_cntt304_bandogiadung/views/Admin/KichCo/Admin_SuaKC.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../colors/color.dart';
 import '../../../controllers/KichCoController.dart';
 import '../../../models/KichCo.dart';
 
@@ -32,6 +33,71 @@ class _AdminKichCoScreen extends State<AdminKichCoScreen> {
         kichCos = [];
       });
     }
+  }
+
+  void _showErrorDialog(String message, String title) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Đóng'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addKichCo() {
+    String newKichCo = '';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Thêm kích cỡ mới'),
+          content: TextField(
+            onChanged: (value) {
+              newKichCo = value;
+            },
+            decoration: const InputDecoration(labelText: 'Nhập tên kích cỡ'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Đóng dialog
+              },
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (newKichCo.isNotEmpty) {
+                  // Thêm kích cỡ mới vào cơ sở dữ liệu
+                  int newKC = kichCos?.length ?? 0;
+                  await kichCoController.addKichCo(new KichCo(
+                      tenKichCo: newKichCo, maKichCo: 'KC${newKC + 1}'));
+
+                  // Cập nhật danh sách kích cỡ
+                  fetchKichCos();
+
+                  // Đóng dialog
+                  Navigator.of(context).pop();
+                  _showErrorDialog('Thêm kích cỡ thành công!', 'Thông báo');
+                } else {
+                  _showErrorDialog('Tên kích cỡ không được để trống!', 'Lỗi');
+                }
+              },
+              child: const Text('Xác Nhận'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -82,7 +148,7 @@ class _AdminKichCoScreen extends State<AdminKichCoScreen> {
                         borderSide: const BorderSide(color: Colors.transparent),
                       ),
                       prefixIcon: Image.asset('assets/icons/search.png'),
-                      hintText: 'Tìm kiếm',
+                      hintText: 'Tìm kiếm theo tên',
                       hintStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 13,
@@ -101,8 +167,9 @@ class _AdminKichCoScreen extends State<AdminKichCoScreen> {
                     'Kích cỡ',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Gabarito',
                     ),
                   ),
                   SizedBox(
@@ -111,14 +178,15 @@ class _AdminKichCoScreen extends State<AdminKichCoScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          // Navigate to add KichCo screen
+                          _addKichCo();
                         },
                         child: const Text(
                           'Thêm kích cỡ',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: AppColors.primaryColor,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 16,
+                            fontFamily: 'Gabarito',
                           ),
                         ),
                       ),
@@ -214,28 +282,31 @@ class CustomKichCoSearch extends SearchDelegate {
             .where((item) => item.tenKichCo.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
-        return ListView.builder(
-          itemCount: results.length,
-          itemBuilder: (context, index) {
-            final kichCo = results[index];
-            return ListTile(
-              title: Text(kichCo.tenKichCo),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSuaKC(
-                      maKichCo: kichCo.maKichCo,
+        return Container(
+          color: Colors.white,
+          child: ListView.builder(
+            itemCount: results.length,
+            itemBuilder: (context, index) {
+              final kichCo = results[index];
+              return ListTile(
+                title: Text(kichCo.tenKichCo),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminSuaKC(
+                        maKichCo: kichCo.maKichCo,
+                      ),
                     ),
-                  ),
-                );
+                  );
 
-                if (result) {
-                  fetchKichCos();
-                }
-              },
-            );
-          },
+                  if (result) {
+                    fetchKichCos();
+                  }
+                },
+              );
+            },
+          ),
         );
       },
     );
@@ -258,28 +329,31 @@ class CustomKichCoSearch extends SearchDelegate {
             .where((item) => item.tenKichCo.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
-        return ListView.builder(
-          itemCount: suggestions.length,
-          itemBuilder: (context, index) {
-            final item = suggestions[index];
-            return ListTile(
-              title: Text(item.tenKichCo),
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdminSuaKC(
-                      maKichCo: item.maKichCo,
+        return Container(
+          color: Colors.white,
+          child: ListView.builder(
+            itemCount: suggestions.length,
+            itemBuilder: (context, index) {
+              final item = suggestions[index];
+              return ListTile(
+                title: Text(item.tenKichCo),
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminSuaKC(
+                        maKichCo: item.maKichCo,
+                      ),
                     ),
-                  ),
-                );
+                  );
 
-                if (result) {
-                  fetchKichCos();
-                }
-              },
-            );
-          },
+                  if (result) {
+                    fetchKichCos();
+                  }
+                },
+              );
+            },
+          ),
         );
       },
     );

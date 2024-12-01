@@ -95,7 +95,7 @@ class _AdminSuaNCCState extends State<AdminSuaNCC> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
@@ -135,6 +135,7 @@ class _AdminSuaNCCState extends State<AdminSuaNCC> {
                         labelText: 'Số điện thoại',
                         border: OutlineInputBorder(),
                       ),
+                      keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
                     TextField(

@@ -41,7 +41,8 @@ class _AdminSuaKCState extends State<AdminSuaKC> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Không thể tải kích cỡ. Vui lòng thử lại.')),
+        const SnackBar(
+            content: Text('Không thể tải kích cỡ. Vui lòng thử lại.')),
       );
     }
   }
@@ -77,7 +78,8 @@ class _AdminSuaKCState extends State<AdminSuaKC> {
           child: Column(
             children: [
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                 child: Row(
                   children: [
                     SizedBox(
@@ -85,7 +87,7 @@ class _AdminSuaKCState extends State<AdminSuaKC> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),
@@ -98,7 +100,11 @@ class _AdminSuaKCState extends State<AdminSuaKC> {
                       width: MediaQuery.of(context).size.width * 0.8,
                       child: const Text(
                         'SỬA KÍCH CỠ',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Gabarito',
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -106,36 +112,38 @@ class _AdminSuaKCState extends State<AdminSuaKC> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : Column(
-                  children: [
-                    TextField(
-                      controller: tenKichCoController,
-                      decoration: const InputDecoration(
-                        labelText: 'Tên kích cỡ',
-                        border: OutlineInputBorder(),
+                        children: [
+                          TextField(
+                            controller: tenKichCoController,
+                            decoration: const InputDecoration(
+                              labelText: 'Tên kích cỡ',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          // Save button
+                          ElevatedButton(
+                            onPressed: () {
+                              saveChanges(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              minimumSize: const Size(double.infinity, 40),
+                            ),
+                            child: const Text(
+                              'Lưu',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    // Save button
-                    ElevatedButton(
-                      onPressed: () {
-                        saveChanges(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                        minimumSize: const Size(double.infinity, 40),
-                      ),
-                      child: const Text(
-                        'Lưu',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
               ),
             ],
           ),

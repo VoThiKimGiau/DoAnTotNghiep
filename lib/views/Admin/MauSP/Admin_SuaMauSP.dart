@@ -124,7 +124,7 @@ class _AdminSuaMauSPState extends State<AdminSuaMauSP> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.all(12),

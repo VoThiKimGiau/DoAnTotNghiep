@@ -218,7 +218,7 @@ class _GioHangPageState extends State<GioHangPage> {
                 'Xoá tất cả',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
             ),
@@ -316,14 +316,14 @@ class _GioHangPageState extends State<GioHangPage> {
                               const Text(
                                 'Tổng cộng:',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
                                 sharedFunction.formatCurrency(tongTien),
                                 style: const TextStyle(
-                                  fontSize: 25,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Gabarito',
                                   color: Colors.red,
@@ -336,12 +336,12 @@ class _GioHangPageState extends State<GioHangPage> {
                             onPressed: _datHang,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryColor,
-                              minimumSize: const Size(double.infinity, 50),
+                              minimumSize: const Size(double.infinity, 40),
                             ),
                             child: const Text(
                               'Đặt hàng',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 color: Colors.white,
                               ),
                             ),
