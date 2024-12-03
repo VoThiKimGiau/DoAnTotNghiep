@@ -19,9 +19,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreen extends State<LoginScreen> {
   final TextEditingController tenTKController =
-      TextEditingController(text: "KG");
+      TextEditingController();
   final TextEditingController matKhauController =
-      TextEditingController(text: "12345678");
+      TextEditingController();
   late Future<KhachHang?> login;
   late KhachHang? khachHang;
   late KhachHangController controller;
