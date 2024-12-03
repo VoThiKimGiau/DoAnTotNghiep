@@ -84,7 +84,7 @@ class ChiTietGioHangController {
     if (response.statusCode == 200) {
       return ChiTietGioHang.fromJson(json.decode(response.body));
     } else {
-      print("Phản hồi lỗi: ${response.body}");
+      print("Phản hồi lỗi: ${response.statusCode}  ${ response.body}");
       throw Exception("Không thể cap nhat chi tiết giỏ hàng: ${response.body}");
     }
   }

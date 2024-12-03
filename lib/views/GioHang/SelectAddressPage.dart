@@ -92,7 +92,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chọn địa chỉ nhận hàng'),
+        title: const Text('Chọn địa chỉ nhận hàng', style: TextStyle(fontSize: 18),),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context, currentSelectedAddress),
@@ -117,7 +117,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                     onPressed: () => _showAddressForm(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
-                      minimumSize: const Size(double.infinity, 50),
+                      minimumSize: const Size(double.infinity, 40),
                     ),
                   );
                 }
@@ -150,10 +150,10 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Gabarito',
-                              fontSize: 15),
+                              fontSize: 14),
                         ),
                         const SizedBox(height: 4),
-                        Text(address.diaChi),
+                        Text(address.diaChi, style: TextStyle(fontSize: 13),),
                         const SizedBox(height: 8),
                         if (address.macDinh == true)
                           Container(
@@ -168,19 +168,22 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
                               'Mặc định',
                               style: TextStyle(
                                 color: Colors.red,
-                                fontSize: 12,
+                                fontSize: 11,
                               ),
                             ),
                           ),
                         const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => _showAddressForm(context, address),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                          child: const Text(
-                            'Chỉnh sửa',
-                            style: TextStyle(color: Colors.white),
+                        SizedBox(
+                          height: 30,
+                          child: ElevatedButton(
+                            onPressed: () => _showAddressForm(context, address),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                            ),
+                            child: const Text(
+                              'Chỉnh sửa',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ),
                       ],
@@ -196,7 +199,7 @@ class _SelectAddressPageState extends State<SelectAddressPage> {
             Navigator.pop(context, currentSelectedAddress);
           },
           style: ElevatedButton.styleFrom(
-            minimumSize: const Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 40),
             backgroundColor: AppColors.primaryColor,
           ),
           child: const Text(

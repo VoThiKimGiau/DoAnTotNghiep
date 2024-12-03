@@ -48,10 +48,10 @@ class _PromotionItemState extends State<PromotionItem> {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(
-        horizontal: 27,
-        vertical: 6,
+        horizontal: 15,
+        vertical: 5,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 19),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(8),
@@ -65,21 +65,21 @@ class _PromotionItemState extends State<PromotionItem> {
               Text(
                 "Giảm ${sharedFunction.formatCurrency(widget.promotion.triGiaGiam)}",
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 "Đơn tối thiểu ${sharedFunction.formatCurrency(widget.promotion.triGiaToiThieu)}",
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   color: Colors.grey,
                 ),
               ),
               Text(
                 'HSD: ${widget.promotion.ngayKetThuc.day}/${widget.promotion.ngayKetThuc.month}/${widget.promotion.ngayKetThuc.year}',
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   color: Colors.grey,
                 ),
               ),
@@ -91,7 +91,7 @@ class _PromotionItemState extends State<PromotionItem> {
               Text(
                 'x${slCon ?? -1}',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontFamily: 'Gabarito',
                   color: AppColors.primaryColor,
                   fontWeight: FontWeight.bold,
@@ -101,6 +101,7 @@ class _PromotionItemState extends State<PromotionItem> {
               Icon(
                 widget.isSelect ? Icons.check_circle : Icons.check_circle_outline,
                 color: AppColors.primaryColor,
+                size: 25,
               )
             ],
           ),

@@ -557,8 +557,8 @@ class CustomBottomSheet {
                               child: Image.network(
                                 storageService.getImageUrl(maHA),
                                 fit: BoxFit.cover,
-                                width: 180,
-                                height: 180,
+                                width: 150,
+                                height: 150,
                               ),
                             ),
                           ),
@@ -572,14 +572,14 @@ class CustomBottomSheet {
                                   fontFamily: 'Gabarito',
                                   color: Colors.red,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                  fontSize: 16,
                                 ),
                               ),
                               Text(
                                 "Kho: $slKho",
                                 style: const TextStyle(
                                   color: Colors.grey,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -615,7 +615,7 @@ class CustomBottomSheet {
                           'Màu sắc',
                           style: TextStyle(
                               fontFamily: 'Gabarito',
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -641,7 +641,7 @@ class CustomBottomSheet {
                           'Kích cỡ',
                           style: TextStyle(
                               fontFamily: 'Gabarito',
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -687,7 +687,7 @@ class CustomBottomSheet {
                             'Số lượng',
                             style: TextStyle(
                               fontFamily: 'Gabarito',
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -705,19 +705,19 @@ class CustomBottomSheet {
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryColor,
-                                  minimumSize: const Size(40, 40),
+                                  minimumSize: const Size(20, 20),
                                   shape: const CircleBorder(),
                                   shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(5),
                                 ),
                                 child: const Icon(Icons.remove,
                                     color: Colors.white, size: 16),
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.symmetric(horizontal: 22),
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 child: Text('$quantity',
-                                    style: const TextStyle(fontSize: 20)),
+                                    style: const TextStyle(fontSize: 18)),
                               ),
                               ElevatedButton(
                                 onPressed: () {
@@ -731,10 +731,10 @@ class CustomBottomSheet {
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryColor,
-                                  minimumSize: const Size(40, 40),
+                                  minimumSize: const Size(20, 20),
                                   shape: const CircleBorder(),
                                   shadowColor: Colors.transparent,
-                                  padding: const EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(5),
                                 ),
                                 child: const Icon(Icons.add,
                                     color: Colors.white, size: 16),
@@ -1012,7 +1012,7 @@ class CustomBottomSheet {
                               style: const TextStyle(
                                   fontFamily: 'Gabarito',
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold),
                             ),
                             isLoading
@@ -1024,7 +1024,7 @@ class CustomBottomSheet {
                                 : Text(
                                     buttonText,
                                     style: const TextStyle(
-                                        color: Colors.white, fontSize: 16),
+                                        color: Colors.white, fontSize: 14),
                                   ),
                           ],
                         ),

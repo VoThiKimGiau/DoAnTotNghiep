@@ -3,16 +3,9 @@ import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietGioHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/GiaoHangController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KMDHController.dart';
-import 'package:datn_cntt304_bandogiadung/controllers/KMKHController.dart';
-import 'package:datn_cntt304_bandogiadung/controllers/KhachHangController.dart';
-import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietDonHang.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
-import 'package:datn_cntt304_bandogiadung/models/KMKH.dart';
-import 'package:datn_cntt304_bandogiadung/models/KhachHang.dart';
-import 'package:datn_cntt304_bandogiadung/models/KhuyenMai.dart';
-import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/KichCoController.dart';
@@ -85,7 +78,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     super.initState();
-    _loadShippingAddresses(); // Tải địa chỉ giao hàng
+    _loadShippingAddresses();
     loadKMShip();
   }
 
@@ -169,18 +162,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     } else {
       String toaDo = selectedAddress?.toaDo ?? '';
 
-      // Tách chuỗi tọa độ thành lat và lng
       List<String> latLng = toaDo.split(',');
-      if (latLng.length < 1) return 0; // Kiểm tra xem có tọa độ không
+      if (latLng.length < 1) return 0;
 
       double lat;
       try {
-        lat = double.parse(latLng[0]); // Chuyển đổi vĩ độ
+        lat = double.parse(latLng[0]);
       } catch (e) {
-        return 0; // Nếu không thể chuyển đổi, trả về 0
+        return 0;
       }
 
-      // Kiểm tra miền dựa trên vĩ độ
       if (lat >= 23) {
         // Miền Bắc
         return 29000;
@@ -195,7 +186,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         return 25000;
       }
     }
-    return 0; // Trả về 0 nếu không khớp điều kiện nào
+    return 0;
   }
 
   @override
@@ -211,7 +202,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white,
-              title: const Text('Thanh toán'),
+              title: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: const Center(
+                      child: Text(
+                    'Thanh toán',
+                    style: TextStyle(fontSize: 18),
+                  ))),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => Navigator.pop(context),
@@ -237,7 +234,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           child: Text(
                             'Sản phẩm',
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primaryColor),
                             textAlign: TextAlign.start,
@@ -248,20 +245,43 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           title: 'Phương thức vận chuyển',
                           content: Text(
                             selectedShippingMethod,
+                            style: const TextStyle(fontSize: 12),
                           ),
                           onTap: _showShippingMethodOptions,
                         ),
                         _buildSectionCard(
                           title: 'Áp dụng khuyến mãi',
-                          content: Text(
-                              selectedMoTa1 != null && selectedMoTa2 != null
-                                  ? '$selectedMoTa1, $selectedMoTa2'
-                                  : 'Không có mã giảm giá'),
+                          content: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (selectedMoTa1 != null && selectedMoTa1!.isNotEmpty)
+                                Text(
+                                  selectedMoTa1!,
+                                  style: const TextStyle(fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              if (selectedMoTa2 != null && selectedMoTa2!.isNotEmpty)
+                                Text(
+                                  selectedMoTa2!,
+                                  style: const TextStyle(fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              if ((selectedMoTa1 == null || selectedMoTa1!.isEmpty) &&
+                                  (selectedMoTa2 == null || selectedMoTa2!.isEmpty))
+                                const Text(
+                                  'Chưa áp dụng mã giảm giá nào',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                            ],
+                          ),
                           onTap: _showPromoCodeOptions,
                         ),
                         _buildSectionCard(
                           title: 'Phương thức thanh toán',
-                          content: Text(selectedPaymentMethod),
+                          content: Text(selectedPaymentMethod,
+                            style: const TextStyle(fontSize: 12),),
                           onTap: _showPaymentMethodOptions,
                         ),
                       ],
@@ -313,8 +333,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   children: [
                     Image.network(
                       storageService.getImageUrl(product.maHinhAnh),
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                       fit: BoxFit.cover,
                     ),
                     const SizedBox(width: 16),
@@ -323,9 +343,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(productName,
-                              style: const TextStyle(fontSize: 16)),
-                          if (tenMau != null) Text(tenMau),
-                          if (tenKC != null) Text(tenKC),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                          if (tenMau != null) Text(tenMau, style: const TextStyle(fontSize: 12),),
+                          if (tenKC != null) Text(tenKC, style: const TextStyle(fontSize: 12),),
                         ],
                       ),
                     ),
@@ -334,8 +354,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       children: [
                         Text(sharedFunction.formatCurrency(product.giaBan),
                             style: const TextStyle(
-                                fontSize: 16, color: Colors.red)),
-                        Text('x${sl[index]}')
+                                fontSize: 14, color: Colors.red)),
+                        Text('x${sl[index]}', style: const TextStyle(fontSize: 13),)
                       ],
                     ),
                   ],
@@ -372,7 +392,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Gabarito',
                     ),
@@ -397,9 +417,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('${selectedAddress!.hoTen} | ${selectedAddress!.sdt}'),
+        Text('${selectedAddress!.hoTen} | ${selectedAddress!.sdt}', style: const TextStyle(fontSize: 12),),
         const SizedBox(height: 4),
-        Text(selectedAddress!.diaChi),
+        Text(selectedAddress!.diaChi, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,),
       ],
     );
   }
@@ -439,6 +459,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   void _showPromoCodeOptions() async {
+    double subtotal = 0;
+    for (int i = 0; i < widget.dsSP.length; i++) {
+      subtotal += _tinhTongTien(widget.dsSP[i].giaBan, widget.slMua[i]);
+    }
+
     final selected = await Navigator.push<List<String?>>(
       context,
       MaterialPageRoute(
@@ -450,6 +475,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           value2: giamCode2,
           selectedName1: selectedMoTa1,
           selectedName2: selectedMoTa2,
+          total: subtotal,
         ),
       ),
     );
@@ -553,7 +579,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
-              minimumSize: const Size(double.infinity, 50),
+              minimumSize: const Size(double.infinity, 40),
             ),
             child: const Text(
               'Đặt hàng',
@@ -584,25 +610,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
         children: [
           SizedBox(
               width: 125,
-              child: Text(label, style: const TextStyle(fontSize: 16))),
+              child: Text(label, style: const TextStyle(fontSize: 15))),
           if (giaGiam > 0)
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 SizedBox(
                   width: 85,
                   child: Text(
                     sharedFunction.formatCurrency(amount),
                     style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 13,
                         fontWeight:
                             isTotal ? FontWeight.bold : FontWeight.normal,
-                        fontFamily: 'Gabarito'),
+                        fontFamily: 'Gabarito',
+                    ),
+                    textAlign: TextAlign.right,
                   ),
                 ),
                 Text(
                   ' - ${sharedFunction.formatCurrency(giaGiam)}',
                   style: const TextStyle(
-                      fontSize: 16, color: Colors.red, fontFamily: 'Gabarito'),
+                      fontSize: 13, color: Colors.red, fontFamily: 'Gabarito'),
                 ),
               ],
             ),
@@ -611,7 +640,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             child: Text(
               sharedFunction.formatCurrency(finalAmount),
               style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
                   fontFamily: 'Gabarito'),
               textAlign: TextAlign.right,

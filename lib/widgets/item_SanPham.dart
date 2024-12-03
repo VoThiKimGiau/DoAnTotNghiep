@@ -31,8 +31,8 @@ class SanPhamItem extends StatelessWidget {
                     child: Image.network(
                       service.getImageUrl(item.hinhAnhMacDinh),
                       fit: BoxFit.cover,
-                      width: 160,
-                      height: 170,
+                      width: 150,
+                      height: 150,
                     ),
                   ),
                   Container(

@@ -1,5 +1,6 @@
 import 'package:datn_cntt304_bandogiadung/controllers/KMKHController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KhuyenMaiController.dart';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/CheckoutController.dart';
 import 'package:datn_cntt304_bandogiadung/models/Promotion.dart';
@@ -15,6 +16,7 @@ class PromoCodePage extends StatefulWidget {
   String? selectedName2;
   String? value1;
   String? value2;
+  double? total;
 
   PromoCodePage(
       {super.key,
@@ -24,7 +26,8 @@ class PromoCodePage extends StatefulWidget {
       required this.selectedName1,
       required this.selectedName2,
       required this.value1,
-      required this.value2});
+      required this.value2,
+      required this.total});
 
   @override
   _PromoCodePageState createState() => _PromoCodePageState();
@@ -40,6 +43,8 @@ class _PromoCodePageState extends State<PromoCodePage> {
   KMKHController kmkhController = KMKHController();
   int? SLCon1;
   int? SLCon2;
+
+  SharedFunction sharedFunction = SharedFunction();
 
   @override
   void initState() {
@@ -143,11 +148,17 @@ class _PromoCodePageState extends State<PromoCodePage> {
                     children: promotionsType1.map((promo) {
                       return GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            widget.selectedCodeType1 = promo.maKm;
-                            widget.selectedName1 = promo.moTa;
-                            widget.value1 = promo.triGiaGiam.toString();
-                          });
+                          if (widget.total! >= promo.triGiaToiThieu) {
+                            setState(() {
+                              widget.selectedCodeType1 = promo.maKm;
+                              widget.selectedName1 = promo.moTa;
+                              widget.value1 = promo.triGiaGiam.toString();
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Mua thêm ${ sharedFunction.formatCurrency(promo.triGiaToiThieu - widget.total!) } để áp dụng khuyến mãi này.')),
+                            );
+                          }
                         },
                         child: PromotionItem(
                           promotion: promo,
@@ -174,11 +185,17 @@ class _PromoCodePageState extends State<PromoCodePage> {
                     children: promotionsType2.map((promo) {
                       return GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            widget.selectedCodeType2 = promo.maKm;
-                            widget.selectedName2 = promo.moTa;
-                            widget.value2 = promo.triGiaGiam.toString();
-                          });
+                          if (widget.total! >= promo.triGiaToiThieu) {
+                            setState(() {
+                              widget.selectedCodeType2 = promo.maKm;
+                              widget.selectedName2 = promo.moTa;
+                              widget.value2 = promo.triGiaGiam.toString();
+                            });
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Mua thêm ${ sharedFunction.formatCurrency(promo.triGiaToiThieu - widget.total!) } để áp dụng khuyến mãi này.')),
+                            );
+                          }
                         },
                         child: PromotionItem(
                           promotion: promo,
@@ -206,7 +223,7 @@ class _PromoCodePageState extends State<PromoCodePage> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
-            minimumSize: const Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 40),
           ),
           child: const Text(
             'Tiếp tục',

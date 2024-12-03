@@ -25,16 +25,16 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('Chọn phương thức vận chuyển'),
+        title: const Text('Chọn phương thức vận chuyển'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context, selectedShipping),
         ),
       ),
       body: Column(
         children: [
           RadioListTile<String>(
-            title: Text('Thường'),
+            title: const Text('Thường'),
             value: 'Thường',
             groupValue: selectedShipping,
             onChanged: (value) {
@@ -44,7 +44,7 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
             },
           ),
           RadioListTile<String>(
-            title: Text('Hỏa tốc'),
+            title: const Text('Hỏa tốc'),
             value: 'Hỏa tốc',
             groupValue: selectedShipping,
             onChanged: (value) {
@@ -63,7 +63,7 @@ class _ShippingMethodPageState extends State<ShippingMethodPage> {
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryColor,
-            minimumSize: Size(double.infinity, 50),
+            minimumSize: const Size(double.infinity, 40),
           ),
           child: const Text('Tiếp tục', style: TextStyle(color: Colors.white, fontSize: 16),),
         ),

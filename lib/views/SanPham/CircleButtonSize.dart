@@ -71,8 +71,8 @@ class _CircleButtonSize extends State<CircleButtonSize> {
     setState(() {
       selectedIndex = -1;
       dsKichCo.clear();
-      fetchKichCo();
     });
+    fetchKichCo();
   }
 
   @override
@@ -93,9 +93,9 @@ class _CircleButtonSize extends State<CircleButtonSize> {
                   return GestureDetector(
                     onTap: isEnabled ? () => onSelected(index) : null,
                     child: Container(
-                      height: 50,
+                      height: 40,
                       margin: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 24),
+                          vertical: 5, horizontal: 24),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: selectedIndex == index && isEnabled
@@ -103,8 +103,8 @@ class _CircleButtonSize extends State<CircleButtonSize> {
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(30),
                         border: Border.all(
-                          color: selectedIndex == index && isEnabled
-                              ? AppColors.primaryColor
+                          color: isEnabled
+                              ? (selectedIndex == index ? Colors.white : Colors.black)
                               : Colors.grey,
                         ),
                       ),
@@ -114,12 +114,10 @@ class _CircleButtonSize extends State<CircleButtonSize> {
                           Text(
                             dsKichCo[index].tenKichCo,
                             style: TextStyle(
-                              color: (selectedIndex == -1)
-                                  ? Colors.black
-                                  : (selectedIndex == index
-                                  ? Colors.white
-                                  : (isEnabled ? Colors.black : Colors.grey)),
-                              fontSize: 16,
+                              color: isEnabled
+                                  ? (selectedIndex == index ? Colors.white : Colors.black)
+                                  : Colors.grey,
+                              fontSize: 14,
                             ),
                           ),
                           if (selectedIndex == index && isEnabled)

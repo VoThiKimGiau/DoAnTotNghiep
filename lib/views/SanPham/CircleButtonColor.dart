@@ -18,7 +18,7 @@ class CircleButtonColor extends StatefulWidget {
 }
 
 class _CircleButtonColor extends State<CircleButtonColor> {
-  int selectedIndex = -1; // Không có nút nào được chọn
+  int selectedIndex = -1;
 
   MauSPController mauSPController = MauSPController();
   List<MauSP> dsMauSP = [];
@@ -29,7 +29,7 @@ class _CircleButtonColor extends State<CircleButtonColor> {
       selectedIndex = index;
     });
     widget.onSelected(
-        dsMauSP[index].maMau); // Call onSelected with the selected color
+        dsMauSP[index].maMau);
   }
 
   @override
@@ -53,9 +53,9 @@ class _CircleButtonColor extends State<CircleButtonColor> {
       setState(() {
         dsMauSP = fetchedItems;
         if (dsMauSP.isNotEmpty) {
-          selectedIndex = 0; // Set default selection to the first item
+          selectedIndex = 0;
           widget.onSelected(
-              dsMauSP[0].maMau); // Notify the parent of the default selection
+              dsMauSP[0].maMau);
         }
 
         isLoading = false;
@@ -84,9 +84,9 @@ class _CircleButtonColor extends State<CircleButtonColor> {
                     return GestureDetector(
                       onTap: () => onSelected(index),
                       child: Container(
-                        height: 50,
+                        height: 40,
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 24),
+                            vertical: 5, horizontal: 24),
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
                           color: selectedIndex == index
@@ -110,13 +110,13 @@ class _CircleButtonColor extends State<CircleButtonColor> {
                                   color: selectedIndex == index
                                       ? Colors.white
                                       : Colors.black,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
                             Container(
-                              width: 30,
-                              height: 30,
+                              width: 25,
+                              height: 25,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Color(int.parse(dsMauSP[index]
@@ -128,7 +128,7 @@ class _CircleButtonColor extends State<CircleButtonColor> {
                                       : Color(int.parse(dsMauSP[index]
                                           .maHEX
                                           .replaceFirst('#', '0xFF'))),
-                                  width: 3.0,
+                                  width: 2.0,
                                 ),
                               ),
                             ),
