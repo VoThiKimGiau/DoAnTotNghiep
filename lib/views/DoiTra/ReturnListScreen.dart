@@ -262,7 +262,62 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
       },
     );
   }
+  Future<void> _showConfirmCancelRefundDialog(DoiTra doiTra) async {
+    if (utf8.decode(doiTra.trangThai.runes.toList()) == "Đã hoàn tiền") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Không thể hủy phiếu đã giao hàng'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
 
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Xác nhận huỷ hoàn tiền', style: TextStyle(color: Theme.of(context).colorScheme.primary)),
+          content: Text('Bạn có chắc chắn muốn xác nhận huỷ hoàn tiền đơn đổi trả này?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Hủy', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  doiTra.trangThai = 'Đã huỷ';
+                  doiTra.ngayHoanTien = DateTime.now();
+                  await _doiTraController.updateDoiTra(doiTra.maDoiTra!, doiTra);
+                  setState(() {
+                    _doiTraList = _doiTraController.getDoiTraList();
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Xác nhận huỷ thành công!'),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                    ),
+                  );
+                } catch (e) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi khi xác nhận huỷ hoàn tiền: $e'),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
+              child: Text('Xác nhận', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -330,7 +385,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
                 child: ListTile(
                   title: Text(
                     'Mã đổi trả: ${doiTra.maDoiTra}',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.primary),
+                    style: TextStyle(fontSize: 18,  color: colorScheme.primary),
                   ),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +404,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Đang xử lý")
+                      if (utf8.decode(doiTra.trangThai.runes.toList()) == "Đang xử lý"||utf8.decode(doiTra.trangThai.runes.toList()) == "Chờ xác nhận")
                         IconButton(
                           icon: Icon(Icons.check, color: colorScheme.secondary),
                           onPressed: () => _showConfirmDialog(doiTra),
@@ -369,6 +424,10 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
                         builder: (context) => ReturnDetailScreen(doiTra: doiTra),
                       ),
                     );
+                  },
+
+                  onLongPress:() {
+                    _showConfirmCancelRefundDialog(doiTra);
                   },
                 ),
               );

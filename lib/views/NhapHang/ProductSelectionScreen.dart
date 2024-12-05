@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:datn_cntt304_bandogiadung/services/shared_function.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
@@ -6,21 +7,25 @@ import 'package:datn_cntt304_bandogiadung/controllers/DanhMucSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/KichCoController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/MauSPController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/SanPhamController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/NhaCungCapController.dart';
+import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietSP.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietPhieuNhap.dart';
 import 'package:datn_cntt304_bandogiadung/models/DanhMucSP.dart';
+import 'package:datn_cntt304_bandogiadung/models/NhaCungCap.dart';
 import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
 import 'package:datn_cntt304_bandogiadung/services/storage/storage_service.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
+
+import '../../models/SanPham.dart';
 
 class ProductSelectionScreen extends StatefulWidget {
   final String maPhieuNhap;
-  final String maNCC;
   final String maNV;
 
   ProductSelectionScreen({
     required this.maPhieuNhap,
-    required this.maNCC,
     required this.maNV,
   });
 
@@ -36,21 +41,25 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   final KichCoController kichCoController = KichCoController();
   final SanPhamController sanPhamController = SanPhamController();
   final DanhMucSPController danhMucSPController = DanhMucSPController();
-
-  TextEditingController searchController = TextEditingController();
-  ScrollController _scrollController = ScrollController();
+  final NCCController nccController = NCCController();
+  final PhieuNhapController phieuNhapController = PhieuNhapController();
+  final NCCController nhaCungCapController=NCCController();
+  final TextEditingController searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   List<DanhMucSP> categories = [];
+  List<NhaCungCap> suppliers = [];
   List<ChiTietSP> filteredProducts = [];
   Map<String, int> quantities = {};
   Map<String, bool> selectedItems = {};
   Map<String, Map<String, String?>> productDetailsCache = {};
-
+  SharedFunction sharedFunction=SharedFunction();
   String? selectedCategory;
+  String? selectedSupplier;
   bool isLoading = false;
   bool allItemsLoaded = false;
   int currentPage = 0;
-  final int pageSize = 10;
+  final int pageSize = 20;
   double temporaryTotal = 0.0;
 
   Timer? _debounceTimer;
@@ -58,9 +67,16 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchCategories();
-    _fetchProducts();
+    _initializeData();
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _initializeData() async {
+    await Future.wait([
+      _fetchCategories(),
+      _fetchSuppliers(),
+    ]);
+    await _fetchProducts();
   }
 
   @override
@@ -74,24 +90,27 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   Future<void> _fetchCategories() async {
     try {
       final fetchedCategories = await danhMucSPController.fetchDanhMucSP();
-      setState(() {
-        categories = fetchedCategories;
-      });
+      if (mounted) {
+        setState(() {
+          categories = fetchedCategories;
+        });
+      }
     } catch (e) {
       print('Error fetching categories: $e');
     }
   }
 
-  Future<Map<String, String?>> fetchProductDetails(ChiTietSP ctsp) async {
-    Map<String, String?> details = {};
+  Future<void> _fetchSuppliers() async {
     try {
-      details['productName'] = await sanPhamController.getProductNameByMaSP(ctsp.maSP);
-      details['size'] = await kichCoController.layTenKichCo(ctsp.maKichCo);
-      details['color'] = await mauSPController.layTenMauByMaMau(ctsp.maMau);
+      final fetchedSuppliers = await nccController.fetchSuppliers();
+      if (mounted) {
+        setState(() {
+          suppliers = fetchedSuppliers;
+        });
+      }
     } catch (e) {
-      print('Error fetching product details: $e');
+      print('Error fetching suppliers: $e');
     }
-    return details;
   }
 
   Future<void> _fetchProducts() async {
@@ -105,7 +124,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
       final newProducts = await chiTietSPController.searchProducts(
         tenSP: searchController.text,
         maDanhMuc: selectedCategory,
-        maNCC: widget.maNCC,
+        maNCC: selectedSupplier,
         page: currentPage,
         size: pageSize,
       );
@@ -126,12 +145,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
         });
       }
 
-      // Fetch product details for new products
-      for (var product in newProducts) {
-        if (!productDetailsCache.containsKey(product.maCTSP)) {
-          productDetailsCache[product.maCTSP] = await fetchProductDetails(product);
-        }
-      }
+      _fetchProductDetailsInBackground(newProducts);
     } catch (e) {
       print('Error fetching products: $e');
       if (mounted) {
@@ -142,15 +156,53 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     }
   }
 
+  void _fetchProductDetailsInBackground(List<ChiTietSP> products) {
+    for (var product in products) {
+      if (!productDetailsCache.containsKey(product.maCTSP)) {
+        fetchProductDetails(product).then((details) {
+          if (mounted) {
+            setState(() {
+              productDetailsCache[product.maCTSP] = details;
+            });
+          }
+        });
+      }
+    }
+  }
+
+  Future<Map<String, String?>> fetchProductDetails(ChiTietSP ctsp) async {
+    Map<String, String?> details = {};
+
+    try {
+      SanPham sp=await sanPhamController.getProductByMaSP(ctsp.maSP);
+      final futures = await Future.wait([
+        sanPhamController.getProductNameByMaSP(ctsp.maSP),
+        kichCoController.layTenKichCo(ctsp.maKichCo),
+        mauSPController.layTenMauByMaMau(ctsp.maMau),
+        nhaCungCapController.fetchSupplierNameById(ctsp.maNCC),
+        danhMucSPController.fetchTenDM(sp.danhMuc)
+      ]);
+      details['productName'] = futures[0] as String?;
+      details['size'] = futures[1] as String?;
+      details['color'] = futures[2] as String?;
+      details['sup']=futures[3] as String?;
+      details['cate']=futures[4] as String?;;
+
+    } catch (e) {
+      print('Error fetching product details: $e');
+    }
+    return details;
+  }
+
   void _onScroll() {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && !isLoading) {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200 && !isLoading) {
       _fetchProducts();
     }
   }
 
   void _onSearchChanged(String query) {
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(Duration(milliseconds: 500), () {
+    _debounceTimer = Timer(Duration(milliseconds: 300), () {
       setState(() {
         currentPage = 0;
         allItemsLoaded = false;
@@ -161,12 +213,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   }
 
   void _updateTemporaryTotal() {
-    temporaryTotal = 0.0;
-    for (var product in filteredProducts) {
-      if (selectedItems[product.maCTSP] == true) {
-        temporaryTotal += (quantities[product.maCTSP] ?? 0) * product.giaBan;
-      }
-    }
+    temporaryTotal = filteredProducts.where((product) => selectedItems[product.maCTSP] == true)
+        .fold(0.0, (sum, product) => sum + (quantities[product.maCTSP] ?? 0) * product.giaBan);
     setState(() {});
   }
 
@@ -209,13 +257,52 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     );
   }
 
+  Widget _buildSupplierDropdown() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: selectedSupplier,
+          isExpanded: true,
+          hint: Text('Chọn nhà cung cấp'),
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedSupplier = newValue;
+              currentPage = 0;
+              allItemsLoaded = false;
+              filteredProducts.clear();
+            });
+            _fetchProducts();
+          },
+          items: [
+            DropdownMenuItem<String>(
+              value: null,
+              child: Text('Tất cả nhà cung cấp'),
+            ),
+            ...suppliers.map<DropdownMenuItem<String>>((NhaCungCap supplier) {
+              return DropdownMenuItem<String>(
+                value: supplier.maNCC,
+                child: Text(supplier.tenNCC),
+              );
+            }).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildProductEntry(ChiTietSP chiTietSP) {
     selectedItems.putIfAbsent(chiTietSP.maCTSP, () => false);
     quantities.putIfAbsent(chiTietSP.maCTSP, () => 0);
     final productDetails = productDetailsCache[chiTietSP.maCTSP];
 
     if (productDetails == null) {
-      return Center(child: CircularProgressIndicator());
+      return SizedBox(height: 100, child: Center(child: CircularProgressIndicator()));
     }
 
     return Container(
@@ -264,12 +351,15 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(productDetails['cate'] ?? ''),
                 Text(productDetails['productName'] ?? ''),
                 Text('${(productDetails['size'] ?? '')} - ${productDetails['color'] ?? ''}'),
                 Text(
-                  '${chiTietSP.giaBan}đ',
+                  ' ${sharedFunction.formatCurrency( chiTietSP.giaBan)}',
                   style: TextStyle(color: Colors.red),
                 ),
+                Text(productDetails['sup'] ?? ''),
+                Text('Số lượng kho:'+chiTietSP.slKho.toString()),
                 Row(
                   children: [
                     IconButton(
@@ -322,6 +412,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
+            _buildSupplierDropdown(),
             TextField(
               controller: searchController,
               decoration: InputDecoration(
@@ -356,7 +447,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               children: [
                 Text('Tạm tính:', style: TextStyle(fontSize: 18)),
                 Text(
-                  '${temporaryTotal.toStringAsFixed(0)}đ',
+                  '${sharedFunction.formatCurrency(temporaryTotal) }',
                   style: TextStyle(fontSize: 18),
                 ),
               ],
@@ -370,7 +461,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                 },
                 child: Text('Xác nhận (${quantities.entries.where((entry) => entry.value > 0).length})'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: AppColors.primaryColor,
+                  foregroundColor:Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
@@ -382,36 +474,45 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   }
 
   void _addChiTietPhieuNhap() async {
+    if (selectedSupplier == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Vui lòng chọn nhà cung cấp')),
+      );
+      return;
+    }
+
     PhieuNhap phieuNhap = PhieuNhap(
       maPhieuNhap: widget.maPhieuNhap,
-      nhaCungCap: widget.maNCC,
+      nhaCungCap: selectedSupplier!,
       maNV: widget.maNV,
       tongTien: temporaryTotal,
       ngayDat: DateTime.now(),
       trangThai: 'Đang xử lý',
     );
 
-    List<ChiTietPhieuNhap> danhSachChiTiet = [];
-    for (var entry in selectedItems.entries) {
-      if (entry.value && quantities[entry.key] != null && quantities[entry.key]! > 0) {
-        final chiTietSP = filteredProducts.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
-        ChiTietPhieuNhap chiTiet = ChiTietPhieuNhap(
-          maPN: widget.maPhieuNhap,
-          maCTSP: chiTietSP.maCTSP,
-          soLuong: quantities[entry.key]!,
-          donGia: chiTietSP.giaBan,
-        );
-        danhSachChiTiet.add(chiTiet);
-      }
-    }
-
     try {
+      await phieuNhapController.taoPhieuNhap(phieuNhap);
+
+      List<ChiTietPhieuNhap> danhSachChiTiet = [];
+      for (var entry in selectedItems.entries) {
+        if (entry.value && quantities[entry.key] != null && quantities[entry.key]! > 0) {
+          final chiTietSP = filteredProducts.firstWhere((ctsp) => ctsp.maCTSP == entry.key);
+          ChiTietPhieuNhap chiTiet = ChiTietPhieuNhap(
+            maPN: widget.maPhieuNhap,
+            maCTSP: chiTietSP.maCTSP,
+            soLuong: quantities[entry.key]!,
+            donGia: chiTietSP.giaBan,
+          );
+          danhSachChiTiet.add(chiTiet);
+        }
+      }
+
       List<ChiTietPhieuNhap> ketQua = await chiTietPhieuNhapController.themNhieuChiTietPhieuNhap(danhSachChiTiet);
       if (ketQua.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Thêm chi tiết phiếu nhập thành công!')),
         );
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PurchaseOrderList(maNV: widget.maNV)));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => PurchaseOrderList(maNV: widget.maNV)));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Không có sản phẩm nào được thêm.')),

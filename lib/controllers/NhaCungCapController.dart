@@ -16,6 +16,19 @@ class NCCController{
       throw Exception('Failed to load suppliers');
     }
   }
+  Future<String?> fetchSupplierNameById(String maNCC) async {
+    final response = await http.get(Uri.parse('${IpConfig.ipConfig}api/nhacungcap/$maNCC'));
+
+    if (response.statusCode == 200) {
+      final decodedBody = utf8.decode(response.bodyBytes);
+      final Map<String, dynamic> jsonResponse = json.decode(decodedBody);
+      return jsonResponse['tenNCC'];
+    } else {
+      print("Không thể lấy tên nhà cung cấp với mã: $maNCC");
+      return null;
+    }
+  }
+
 
   Future<NhaCungCap?> fetchSupById(String maNCC)async{
     final response =await http.get(Uri.parse('${IpConfig.ipConfig}api/nhacungcap/${maNCC}'));

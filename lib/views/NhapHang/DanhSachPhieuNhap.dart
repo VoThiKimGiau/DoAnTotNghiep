@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/models/PhieuNhap.dart';
+import 'package:datn_cntt304_bandogiadung/views/NhapHang/ProductSelectionScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -186,6 +189,7 @@ class _PurchaseOrderListState extends State<PurchaseOrderList> {
                             },
                             child: OrderItem(
                               orderNumber: phieuNhap.maPhieuNhap,
+                              status: '',
                               itemCount: 0,
                               totalAmount: 0,
                             ),
@@ -215,8 +219,9 @@ class _PurchaseOrderListState extends State<PurchaseOrderList> {
                           },
                           child: OrderItem(
                             orderNumber: phieuNhap.maPhieuNhap,
+                            status:  phieuNhap.trangThai,
                             itemCount: totalQuantity,
-                            totalAmount: phieuNhap.tongTien, // Use ThanhTien directly
+                            totalAmount: phieuNhap.tongTien,
                           ),
                         );
                       },
@@ -236,8 +241,8 @@ class _PurchaseOrderListState extends State<PurchaseOrderList> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  InventoryEntryScreen(
-                      newOrderCode: newOrderCode, maNV: widget.maNV),
+                  ProductSelectionScreen(
+                      maPhieuNhap: newOrderCode, maNV: widget.maNV),
             ),
           ).then((result) {
             if (result == true) {

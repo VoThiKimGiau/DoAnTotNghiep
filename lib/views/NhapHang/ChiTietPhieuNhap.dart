@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:datn_cntt304_bandogiadung/colors/color.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/PhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachCTSP.dart';
+import 'package:datn_cntt304_bandogiadung/views/NhapHang/DanhSachPhieuNhap.dart';
 import 'package:flutter/material.dart';
 import 'package:datn_cntt304_bandogiadung/controllers/ChiTietPhieuNhapController.dart';
 import 'package:datn_cntt304_bandogiadung/models/ChiTietPhieuNhap.dart';
@@ -102,20 +104,65 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
               if (!isReceived)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: isButtonDisabled ? null : () async {
-                      setState(() {
-                        isButtonDisabled = true;
-                      });
-                      await phieuNhapController.updatePhieuNhapDaGiao(widget.pn.maPhieuNhap);
-                    },
-                    child: Text('Đã nhập hàng'),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: isButtonDisabled
+                          ? null
+                          : () async {
+                        setState(() {
+                          isButtonDisabled = true;
+                        });
+                       _showConfirmationDialog(context);
+                      },
+                      child: Text(
+                        'Đã nhập hàng',
+                        style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
+
             ],
           ),
         ),
       ),
+    );
+  }
+  Future<bool?> _showConfirmationDialog(BuildContext context) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text('Xác nhận'),
+          content: Text('Bạn có chắc chắn muốn đánh dấu là "Đã nhập hàng"?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false); // Trả về false khi hủy
+              },
+            ),
+            ElevatedButton(
+              child: Text('Xác nhận'),
+              onPressed: () async {
+                await phieuNhapController.updatePhieuNhapDaGiao(widget.pn.maPhieuNhap);
+                Navigator.of(dialogContext).pop(true); // Trả về true khi xác nhận
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PurchaseOrderList(maNV: widget.pn.maNV),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -5,7 +5,7 @@ class PhieuNhap {
   final double tongTien;
   final DateTime ngayDat;  // Đảm bảo là kiểu DateTime
   final DateTime? ngayGiao;
-  final String trangThai;// Sử dụng kiểu String
+  String trangThai;// Sử dụng kiểu String
 
   PhieuNhap({
     required this.maPhieuNhap,

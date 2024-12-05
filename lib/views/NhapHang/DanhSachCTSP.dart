@@ -53,7 +53,7 @@ class _DanhSachCTSPState extends State<DanhSachCTSP> {
     String tenKC='';
     try {
       tenKC = await kichCoController.layTenKichCo(maKichCo);
-      String kc=utf8.decode(tenKC.runes.toList());
+      String kc=tenKC;
       return kc;
     } catch (error) {
       return 'Lỗi hiển thị kích cỡ';
@@ -176,7 +176,7 @@ class _DanhSachCTSPState extends State<DanhSachCTSP> {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                    'SL: ',
+                                                    'Số lượng: ',
                                                     style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
                                                   ),
                                                   Text(
