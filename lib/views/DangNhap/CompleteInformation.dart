@@ -52,15 +52,14 @@ class _CompleteInformationState extends State<CompleteInformation> {
     bool gTinh = _selectedGender == 'Nam' ? false : true;
 
     khachHangController.insertCustomer(new DangKyKhachHangDTO(
-      tenKH: widget.tenKH,
-      sdt: widget.sdt,
-      email: widget.email,
-      tenTK: widget.tenTK,
-      matKhau: widget.matKhau,
-      gioiTinh: gTinh,
-      ngaySinh: _selectedDate,
-      matKhauNhapLai: widget.matKhau
-    ));
+        tenKH: widget.tenKH,
+        sdt: widget.sdt,
+        email: widget.email,
+        tenTK: widget.tenTK,
+        matKhau: widget.matKhau,
+        gioiTinh: gTinh,
+        ngaySinh: _selectedDate,
+        matKhauNhapLai: widget.matKhau));
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -190,7 +189,10 @@ class _CompleteInformationState extends State<CompleteInformation> {
                           Text(
                             displayDate,
                             style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Gabarito',
+                            ),
                           ),
                           ElevatedButton(
                             onPressed: () => _selectDate(context),
