@@ -400,6 +400,7 @@ class _AdminThemCTSPState extends State<AdminThemCTSP> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Thêm chi tiết sản phẩm',
             style: TextStyle(fontSize: 18)),
