@@ -254,22 +254,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           content: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (selectedMoTa1 != null && selectedMoTa1!.isNotEmpty)
+                              if (selectedMoTa1 != null &&
+                                  selectedMoTa1!.isNotEmpty)
                                 Text(
                                   selectedMoTa1!,
                                   style: const TextStyle(fontSize: 12),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                              if (selectedMoTa2 != null && selectedMoTa2!.isNotEmpty)
+                              if (selectedMoTa2 != null &&
+                                  selectedMoTa2!.isNotEmpty)
                                 Text(
                                   selectedMoTa2!,
                                   style: const TextStyle(fontSize: 12),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                              if ((selectedMoTa1 == null || selectedMoTa1!.isEmpty) &&
-                                  (selectedMoTa2 == null || selectedMoTa2!.isEmpty))
+                              if ((selectedMoTa1 == null ||
+                                      selectedMoTa1!.isEmpty) &&
+                                  (selectedMoTa2 == null ||
+                                      selectedMoTa2!.isEmpty))
                                 const Text(
                                   'Chưa áp dụng mã giảm giá nào',
                                   style: TextStyle(fontSize: 12),
@@ -280,8 +284,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ),
                         _buildSectionCard(
                           title: 'Phương thức thanh toán',
-                          content: Text(selectedPaymentMethod,
-                            style: const TextStyle(fontSize: 12),),
+                          content: Text(
+                            selectedPaymentMethod,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                           onTap: _showPaymentMethodOptions,
                         ),
                       ],
@@ -343,9 +349,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(productName,
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                          if (tenMau != null) Text(tenMau, style: const TextStyle(fontSize: 12),),
-                          if (tenKC != null) Text(tenKC, style: const TextStyle(fontSize: 12),),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Gabarito',
+                              )),
+                          if (tenMau != null)
+                            Text(
+                              tenMau,
+                              style: const TextStyle(fontSize: 12, fontFamily: 'Gabarito',),
+
+                            ),
+                          if (tenKC != null)
+                            Text(
+                              tenKC,
+                              style: const TextStyle(fontSize: 12, fontFamily: 'Gabarito',),
+                            ),
                         ],
                       ),
                     ),
@@ -354,8 +373,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       children: [
                         Text(sharedFunction.formatCurrency(product.giaBan),
                             style: const TextStyle(
-                                fontSize: 14, color: Colors.red)),
-                        Text('x${sl[index]}', style: const TextStyle(fontSize: 13),)
+                                fontSize: 14, color: Colors.red, fontFamily: 'Gabarito',)),
+                        Text(
+                          'x${sl[index]}',
+                          style: const TextStyle(fontSize: 13, fontFamily: 'Gabarito',),
+                        )
                       ],
                     ),
                   ],
@@ -417,9 +439,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('${selectedAddress!.hoTen} | ${selectedAddress!.sdt}', style: const TextStyle(fontSize: 12),),
+        Text(
+          '${selectedAddress!.hoTen} | ${selectedAddress!.sdt}',
+          style: const TextStyle(fontSize: 12),
+        ),
         const SizedBox(height: 4),
-        Text(selectedAddress!.diaChi, style: const TextStyle(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis,),
+        Text(
+          selectedAddress!.diaChi,
+          style: const TextStyle(fontSize: 12),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }
@@ -620,10 +650,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   child: Text(
                     sharedFunction.formatCurrency(amount),
                     style: TextStyle(
-                        fontSize: 13,
-                        fontWeight:
-                            isTotal ? FontWeight.bold : FontWeight.normal,
-                        fontFamily: 'Gabarito',
+                      fontSize: 13,
+                      fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                      fontFamily: 'Gabarito',
                     ),
                     textAlign: TextAlign.right,
                   ),

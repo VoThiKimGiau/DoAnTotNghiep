@@ -33,7 +33,8 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
   Future<void> fetchCustomer() async {
     try {
-      KhachHang? fetchItem = await khachHangController.getKhachHang(widget.maKH);
+      KhachHang? fetchItem =
+          await khachHangController.getKhachHang(widget.maKH);
       setState(() {
         khachHang = fetchItem;
       });
@@ -122,7 +123,7 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
                     backgroundColor: AppColors.primaryColor,
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  onPressed: () async{
+                  onPressed: () async {
                     String matKhau = matKhauController.text.trim();
                     String nhapLaiMatKhau =
                         nhapLaiMatKhauController.text.trim();
@@ -139,21 +140,33 @@ class _CreateNewPasswordScreenState extends State<CreateNewPasswordScreen> {
 
                     if (matKhau == nhapLaiMatKhau) {
                       khachHang!.matKhau = matKhauController.text.trim();
-                      if(await khachHangController.updateCustomer(widget.maKH, khachHang!)){
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                      if (await khachHangController.updateCustomer(
+                          widget.maKH, khachHang!)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
                             content:
                                 Text('Mật khẩu đã được thay đổi thành công!'),
-                            duration: Duration(seconds: 1),),
-                      );
-
-                      Future.delayed(const Duration(seconds: 1), () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                            duration: Duration(seconds: 1),
+                          ),
                         );
-                      });
-                    } }else {
+
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
+                          );
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Mật khẩu chưa được thay đổi. Vui lòng thử lại hoặc liên hệ đội ngũ quản trị.'),
+                            duration: Duration(seconds: 1),
+                          ),
+                        );
+                      }
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text(

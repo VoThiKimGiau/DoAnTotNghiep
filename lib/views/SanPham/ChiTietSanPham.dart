@@ -322,6 +322,8 @@ class _ChiTietSanPhamScreen extends State<ChiTietSanPhamScreen> {
                                   item!.moTa,
                                   style: const TextStyle(fontSize: 16),
                                   textAlign: TextAlign.justify,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),

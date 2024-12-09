@@ -51,29 +51,39 @@ class _CompleteInformationState extends State<CompleteInformation> {
   void _createAccount() {
     bool gTinh = _selectedGender == 'Nam' ? false : true;
 
-    khachHangController.insertCustomer(new DangKyKhachHangDTO(
-        tenKH: widget.tenKH,
-        sdt: widget.sdt,
-        email: widget.email,
-        tenTK: widget.tenTK,
-        matKhau: widget.matKhau,
-        gioiTinh: gTinh,
-        ngaySinh: _selectedDate,
-        matKhauNhapLai: widget.matKhau));
+    try {
+      khachHangController.insertCustomer(new DangKyKhachHangDTO(
+          tenKH: widget.tenKH,
+          sdt: widget.sdt,
+          email: widget.email,
+          tenTK: widget.tenTK,
+          matKhau: widget.matKhau,
+          gioiTinh: gTinh,
+          ngaySinh: _selectedDate,
+          matKhauNhapLai: widget.matKhau));
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Đã tạo tài khoản thành công'),
-        duration: Duration(seconds: 1),
-      ),
-    );
-
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã tạo tài khoản thành công'),
+          duration: Duration(seconds: 1),
+        ),
       );
-    });
+
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Tạo tài khoản thất bại. Vui lòng thử lại hoặc liên hệ đội ngũ quản trị.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
   }
 
   @override

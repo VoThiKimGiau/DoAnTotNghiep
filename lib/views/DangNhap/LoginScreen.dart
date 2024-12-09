@@ -56,7 +56,7 @@ class _LoginScreen extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content:
-                    Text('Sai tải khoản hoặc mật khẩu. Vui lòng kiểm tra lại')),
+                    Text('Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại')),
           );
         } else if (!khachHang!.hoatDong) {
           ScaffoldMessenger.of(context).showSnackBar(
