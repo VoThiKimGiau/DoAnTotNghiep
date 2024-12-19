@@ -133,7 +133,7 @@ class _ShopDashboardState extends State<ShopDashboard> {
                           Icons.bar_chart, Colors.orange),
                       _buildStatCard('Đơn mới', todayOrdersCount.toString(),
                           Icons.new_releases, Colors.blue),
-                      _buildStatCard('Lợi nhuận', formatCurrency(profit),
+                      _buildStatCard('Lợi nhuận', formatCurrency(0),
                           Icons.attach_money, Colors.green),
                       _buildStatCard('Đơn đã giao', doneOrdersCount.toString(),
                           Icons.check_circle_outline, Colors.yellow),
