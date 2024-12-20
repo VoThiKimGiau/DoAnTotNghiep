@@ -501,8 +501,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           selectedCodeType1: selectedCode1,
           selectedCodeType2: selectedCode2,
           maKH: widget.customerId,
-          value1: giamCode1,
-          value2: giamCode2,
+          value1: giamCode1, // vận chuyển
+          value2: giamCode2, // giá đơn
           selectedName1: selectedMoTa1,
           selectedName2: selectedMoTa2,
           total: subtotal,
@@ -531,12 +531,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     double giaShip = tinhGiaShip(getPhiCB(), soKM ?? 0);
-    double giaGiam1 = double.parse(giamCode1 ?? '0');
-    double giaGiam2 = double.parse(giamCode2 ?? '0');
+    double giaGiam1 = double.parse(giamCode1 ?? '0'); // vận chuyển
+    double giaGiam2 = double.parse(giamCode2 ?? '0'); // giá đơn
     double tongTien = 0;
 
-    if (giaGiam2 > giaShip) {
-      tongTien = subtotal - giaGiam1;
+    if (giaGiam1 > giaShip) {
+      tongTien = subtotal - giaGiam2;
     } else {
       tongTien = subtotal + giaShip - giaGiam1 - giaGiam2;
     }
@@ -555,8 +555,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
       child: Column(
         children: [
-          _buildSummaryRow('Tạm tính', subtotal, giaGiam: giaGiam1),
-          _buildSummaryRow('Phí giao hàng', giaShip, giaGiam: giaGiam2),
+          _buildSummaryRow('Tạm tính', subtotal, giaGiam: giaGiam2),
+          _buildSummaryRow('Phí giao hàng', giaShip, giaGiam: giaGiam1),
           _buildSummaryRow('Tổng cộng', tongTien, isTotal: true),
           const SizedBox(height: 16),
           ElevatedButton(
