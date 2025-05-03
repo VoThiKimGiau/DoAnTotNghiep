@@ -71,6 +71,16 @@ class _RegisterScreen extends State<RegisterScreen> {
     return regex.hasMatch(email);
   }
 
+  // bool checkPassInHoa(String pass){
+  //   final regex = RegExp(r'[A-Z]');
+  //   return regex.hasMatch(pass);
+  // }
+
+  // bool checkPassDB(String pass){
+  //   final regex = RegExp(r'!@#$%^&*');
+  //   return regex.hasMatch(pass);
+  // }
+
   @override
   void dispose() {
     tenKHController.dispose();
@@ -259,6 +269,24 @@ class _RegisterScreen extends State<RegisterScreen> {
                       );
                       return;
                     }
+
+                    // if(!checkPassInHoa(matKhau) ){
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text('Mật khẩu phải có kí tự in hoa'),
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
+
+                    // if(!checkPassDB(matKhau) ){
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text('Mật khẩu phải có kí tự đặc biệt'),
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
 
                     for(KhachHang kh in dsKH!){
                       if(kh.tenTK == tenTK.trim())
