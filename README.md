@@ -26,19 +26,15 @@
 <p>Application: Flutter framework</p>
 <p>Ngôn ngữ: Dart</p>
 
-|                                     Nghiệp vụ                                       |         Phân công        |
-|-------------------------------------------------------------------------------------|--------------------------|
-| Tìm hiểu Flutter framework: Các bước cài đặt.                                       |                          |
-| Mô tả nghiệp vụ, activity, bpm, sequence: Bán hàng.                                 |                          |
-| Mô tả nghiệp vụ, activity, sequence: Khuyến mãi.                                    |                          |
-| Mô tả nghiệp vụ, điều kiện trả hàng: Trả hàng hoàn tiền.                            |                          |
-| Use-Case nghiệp vụ. Class diagram. Mô tả cơ cấu.                                    |                          |
-| Code:                                                                               |           Giàu           |
-| Khách hàng: đăng nhập, đăng ký, quên mật khẩu, trang chủ, yêu thích sản phẩm,       |                          |
-| thông tin nhận hàng, xem chi tiết sản phẩm, tìm kiếm, thêm sản phẩm vào giỏ hàng,   |                          |
-| đặt hàng.                                                                           |                          |
-| Admin: quản lý sản phẩm( sản phẩm, chi tiết sản phẩm, nhà cung cấp,                 |                          |
-| danh mục sản phẩm, màu sản phẩm, kích cỡ sản phẩm)                                  |                          |
+| v | Nghiệp vụ                                                                                                                                                                              | Phân công            |
+|---|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
+| 1 | Tìm hiểu Flutter framework: Các bước cài đặt.                                                                                                                                          | Giàu<br><br><br><br> |
+| 2 | Mô tả nghiệp vụ, activity, bpm, sequence: Bán hàng.                                                                                                                                    |                      |
+| 3 | Mô tả nghiệp vụ, activity, sequence: Khuyến mãi.                                                                                                                                       |                      |
+| 4 | Mô tả nghiệp vụ, điều kiện trả hàng: Trả hàng hoàn tiền.                                                                                                                               |                      |
+| 5 | Use-Case nghiệp vụ. Class diagram. Mô tả cơ cấu.                                                                                                                                       |                      |
+| 6 | Code:<br>Khách hàng: đăng nhập, đăng ký, quên mật khẩu, trang chủ, yêu thích sản phẩm, <br>thông tin nhận hàng, xem chi tiết sản phẩm, tìm kiếm, thêm sản phẩm vào giỏ hàng, đặt hàng. | Giàu                 |
+| 7 | Admin: quản lý sản phẩm( sản phẩm, chi tiết sản phẩm, nhà cung cấp, danh mục sản phẩm, màu sản phẩm, kích cỡ sản phẩm)                                                                 |                      |
 |-------------------------------------------------------------------------------------|--------------------------| 
 | Tìm hiểu Flutter framework: Ưu điểm, nhược điểm, ví dụ 1 số app được xây dựng bằng  |                          | 
 | flutter framework, kết luận.                                                        |                          |
