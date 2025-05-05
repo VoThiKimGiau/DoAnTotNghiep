@@ -61,9 +61,9 @@
 <ul>
   <li>Thêm, xóa, sửa các danh mục liên quan đến sản phẩm</li>
   <li>Thêm, xóa, sửa các danh mục liên quan đến người dùng</li>
-  <li>Thêm, xóa, sửa các danh mục liên quan đến đơn hàng</li>
   <li>Thêm, xóa, sửa các danh mục liên quan đến nhân viên</li>
   <li>Thêm, xóa, sửa các danh mục liên quan đến thông báo, khuyến mãi</li>
+  <li>Thay đổi trạng thái các đơn hàng</li>
   <li>Xem các thống kê báo cáo</li>
 </ul>
 <h5>Các chức năng của người dùng</h5>
