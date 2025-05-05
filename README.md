@@ -26,39 +26,31 @@
 <p>Application: Flutter framework</p>
 <p>Ngôn ngữ: Dart</p>
 
-| v | Nghiệp vụ                                                                                                                                                                              | Phân công            |
-|---|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|
-| 1 | Tìm hiểu Flutter framework: Các bước cài đặt.                                                                                                                                          | Giàu<br><br><br><br> |
-| 2 | Mô tả nghiệp vụ, activity, bpm, sequence: Bán hàng.                                                                                                                                    |                      |
-| 3 | Mô tả nghiệp vụ, activity, sequence: Khuyến mãi.                                                                                                                                       |                      |
-| 4 | Mô tả nghiệp vụ, điều kiện trả hàng: Trả hàng hoàn tiền.                                                                                                                               |                      |
-| 5 | Use-Case nghiệp vụ. Class diagram. Mô tả cơ cấu.                                                                                                                                       |                      |
-| 6 | Code:<br>Khách hàng: đăng nhập, đăng ký, quên mật khẩu, trang chủ, yêu thích sản phẩm, <br>thông tin nhận hàng, xem chi tiết sản phẩm, tìm kiếm, thêm sản phẩm vào giỏ hàng, đặt hàng. | Giàu                 |
-| 7 | Admin: quản lý sản phẩm( sản phẩm, chi tiết sản phẩm, nhà cung cấp, danh mục sản phẩm, màu sản phẩm, kích cỡ sản phẩm)                                                                 |                      |
-|-------------------------------------------------------------------------------------|--------------------------| 
-| Tìm hiểu Flutter framework: Ưu điểm, nhược điểm, ví dụ 1 số app được xây dựng bằng  |                          | 
-| flutter framework, kết luận.                                                        |                          |
-| Mô tả nghiệp vụ, activity, bpm: Giao hàng                                           |                          |
-| Use-Case hệ thống                                                                   |                          |
-| Class diagram                                                                       |                          |
-| Mục tiêu, phạm vi nghiên cứu, xác định yêu cầu, lý do chọn đề tài                   |                          |
-| Đặc tả, sequence:  Trả hàng hoàn tiền                                               |                          |
-| Code:                                                                               |           Minh           |
-| Khách hàng: trang chủ, đơn hàng, thông tin người dùng, đăng nhập, trả hàng,         |                          |
-| thống kê chi tiêu theo tháng, thông báo.                                            |                          |
-| Admin: phân quyền, nhập hàng, trả hàng, thống kê báo cáo, quản lý đơn hàng,         |                          |
-| thông báo, nhân viên, khách hàng, khuyến mãi.                                       |                          |
-|-------------------------------------------------------------------------------------|--------------------------| 
-| Tìm hiểu Flutter framework: Khái niệm, quá trình phát triển, các thảnh phần.        |                          |
-| Mô tả nghiệp vụ, activity, bpm: Nhập hàng.                                          |                          |
-| Bảng đặc tả, bpm: Khuyến mãi.                                                       |                          |
-| Activity, bpm: Trả hàng hoàn tiền                                                   |                          |
-| Use-Case hệ thống                                                                   |           Hải            |
-| Class diagram                                                                       |                          |
-| Lý do chọn đề tài, kết luận, tóm tắt                                                |                          |
-| Code:                                                                               |                          |
-| Khách hàng: Giỏ hàng, đặt hàng                                                      |                          |
-|-------------------------------------------------------------------------------------|--------------------------| 
+| STT | Nghiệp vụ                                                                                                                                                                              | Phân công |
+|-----|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+|  1  | Tìm hiểu Flutter framework: Các bước cài đặt.                                                                                                                                          |    Giàu   |
+|  2  | Mô tả nghiệp vụ, activity, bpm, sequence: Bán hàng.                                                                                                                                    |    Giàu   |
+|  3  | Mô tả nghiệp vụ, activity, sequence: Khuyến mãi.                                                                                                                                       |    Giàu   |
+|  4  | Mô tả nghiệp vụ, điều kiện trả hàng: Trả hàng hoàn tiền.                                                                                                                               |    Giàu   |
+|  5  | Use-Case nghiệp vụ. Class diagram. Mô tả cơ cấu.                                                                                                                                       |    Giàu   |
+|  6  | Code:<br>Khách hàng: đăng nhập, đăng ký, quên mật khẩu, trang chủ, yêu thích sản phẩm, <br>thông tin nhận hàng, xem chi tiết sản phẩm, tìm kiếm, thêm sản phẩm vào giỏ hàng, đặt hàng. |    Giàu   |
+|  7  | Admin: quản lý sản phẩm( sản phẩm, chi tiết sản phẩm, nhà cung cấp, danh mục sản phẩm, màu sản phẩm, kích cỡ sản phẩm)                                                                 |    Giàu   |
+|  8  | Tìm hiểu Flutter framework: Ưu điểm, nhược điểm, ví dụ 1 số app được xây dựng bằng flutter framework, kết luận.                                                                        |    Minh   |
+|  9  | Mô tả nghiệp vụ, activity, bpm: Giao hàng                                                                                                                                              |    Minh   |
+|  10 | Use-Case hệ thống                                                                                                                                                                      |    Minh   |
+|  11 | Class diagram                                                                                                                                                                          |    Minh   |
+|  12 | Mục tiêu, phạm vi nghiên cứu, xác định yêu cầu, lý do chọn đề tài                                                                                                                      |    Minh   |
+|  13 | Đặc tả, sequence:  Trả hàng hoàn tiền                                                                                                                                                  |    Minh   |
+|  14 | Code:<br>Khách hàng: trang chủ, đơn hàng, thông tin người dùng, đăng nhập, trả hàng, thống kê chi tiêu theo tháng, thông báo.                                                          |    Minh   |
+|  15 | Admin: phân quyền, nhập hàng, trả hàng, thống kê báo cáo, quản lý đơn hàng,thông báo, nhân viên, khách hàng, khuyến mãi.                                                               |    Minh   |
+|  16 | Tìm hiểu Flutter framework: Khái niệm, quá trình phát triển, các thành phần.                                                                                                           |    Hải    |
+|  17 | Mô tả nghiệp vụ, activity, bpm: Nhập hàng.                                                                                                                                             |    Hải    |
+|  18 | Bảng đặc tả, bpm: Khuyến mãi.                                                                                                                                                          |    Hải    |
+|  19 | Activity, bpm: Trả hàng hoàn tiền                                                                                                                                                      |    Hải    |
+|  20 | Use-Case hệ thống                                                                                                                                                                      |    Hải    |
+|  13 | Class diagram                                                                                                                                                                          |    Hải    |
+|  14 | Lý do chọn đề tài, kết luận, tóm tắt                                                                                                                                                   |    Hải    |
+|  15 | Code:<br>Khách hàng: Giỏ hàng, đặt hàng                                                                                                                                                |    Hải    |
 
 ## Chức năng
 
