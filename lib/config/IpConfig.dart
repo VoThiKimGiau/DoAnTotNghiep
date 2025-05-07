@@ -1,3 +1,3 @@
 class IpConfig {
-  static const String ipConfig = 'https://api-datn-cntt304-bandogiadung-production-9c90.up.railway.app/';
+  static const String ipConfig = 'https://api-datn-cntt304-bandogiadung-pruduction1.up.railway.app/';
 }
