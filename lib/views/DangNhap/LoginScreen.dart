@@ -18,10 +18,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreen extends State<LoginScreen> {
-  final TextEditingController tenTKController =
-      TextEditingController();
-  final TextEditingController matKhauController =
-      TextEditingController();
+  final TextEditingController tenTKController = TextEditingController();
+  final TextEditingController matKhauController = TextEditingController();
   late Future<KhachHang?> login;
   late KhachHang? khachHang;
   late KhachHangController controller;
@@ -31,6 +29,7 @@ class _LoginScreen extends State<LoginScreen> {
   late NhanVien? nhanVien;
   String? maNV = "";
   final filterSpace = FilteringTextInputFormatter.deny(RegExp(r'\s'));
+  bool showPassword = false;
 
   @override
   void initState() {
@@ -84,15 +83,14 @@ class _LoginScreen extends State<LoginScreen> {
                 Text('Sai tài khoản hoặc mật khẩu. Vui lòng kiểm tra lại'));
       } else {
         NhanVien? nv = await nhanVienController.getNVbyMaNV(maNV!);
-        if(!nv!.hoatDong){
+        if (!nv!.hoatDong) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
                   'Tài khoản đã bị vô hiệu hóa. Nếu cần hỗ trợ, vui lòng liên hệ đội ngũ quản trị.'),
             ),
           );
-        }
-        else{
+        } else {
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -164,27 +162,35 @@ class _LoginScreen extends State<LoginScreen> {
                           Container(
                             margin: const EdgeInsets.symmetric(vertical: 16.0),
                             child: TextField(
-                              controller: matKhauController,
-                              obscureText: true,
-                              // Thêm các formatters để ngăn space cho password
-                              inputFormatters: [filterSpace],
-                              // Thêm onChanged để xử lý khi text thay đổi
-                              onChanged: (value) {
-                                final noSpaceText = value.replaceAll(' ', '');
-                                if (noSpaceText != value) {
-                                  matKhauController.text = noSpaceText;
-                                  matKhauController.selection =
-                                      TextSelection.fromPosition(
-                                    TextPosition(offset: noSpaceText.length),
-                                  );
-                                }
-                              },
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Mật khẩu',
-                                helperStyle: TextStyle(fontSize: 12),
-                              ),
-                            ),
+                                controller: matKhauController,
+                                obscureText: !showPassword,
+                                // Thêm các formatters để ngăn space cho password
+                                inputFormatters: [filterSpace],
+                                // Thêm onChanged để xử lý khi text thay đổi
+                                onChanged: (value) {
+                                  final noSpaceText = value.replaceAll(' ', '');
+                                  if (noSpaceText != value) {
+                                    matKhauController.text = noSpaceText;
+                                    matKhauController.selection =
+                                        TextSelection.fromPosition(
+                                      TextPosition(offset: noSpaceText.length),
+                                    );
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                    border: const OutlineInputBorder(),
+                                    hintText: 'Mật khẩu',
+                                    helperStyle: const TextStyle(fontSize: 12),
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          showPassword = !showPassword;
+                                        });
+                                      },
+                                      icon: Icon(showPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                    ))),
                           ),
                         ],
                       ),
